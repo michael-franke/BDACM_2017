@@ -1,3 +1,17 @@
+---
+title: "Accessing the course material"
+subtitle: "Course notes for 'Bayesian Data Analysis & Cognitive Modeling 2017"
+author: "Michael Franke"
+output:
+  html_document:
+    theme: "cosmo"
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    number_sections: true
+---
+
 # Where is the course material?
 
 The [course website](https://michael-franke.github.io/BDACM_2017/) and all course material is hosted on [GitHub](https://github.com) in a publicly accessible [repository](https://github.com/michael-franke/BDACM_2017).

@@ -7,4 +7,5 @@ The course introduces main ideas and tools of Bayesian data analysis. Using Baye
 ## Course notes
 
 1. How to [obtain course material](docs/01_github.md) from GitHub
-2. What [software](docs/software.md) to install
+2. What [software](docs/02_software.md) to install
+3. is the doc folder [special](notes/test.md)?

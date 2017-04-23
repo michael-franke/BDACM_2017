@@ -1,8 +1,6 @@
-# What software will we need?
+## Basic programming language
 
-## Basics
-
-The main programming language we use is [R](https://www.r-project.org). Where homeworks require programming, we will use R.
+The main programming language we use is [R](https://www.r-project.org). The slides and notes that accompany the lecture will use it, and whenever homeworks require programming, you will use it too.
 
 It is recommended to use [RStudio](https://www.rstudio.com), because it nicely integrates with [Rmarkdown](http://rmarkdown.rstudio.com), which is what you should use for your homework assignments.
 

@@ -15,6 +15,6 @@ The course introduces main ideas and tools of Bayesian data analysis. We will co
 &nbsp; | date | topic | reading (main) | 
 :---:|:---:|---|---|---|
 1 | 4/25 | overview & formalities | Kruschke 4 & 5.1 | |
-2 | 4/28 | handling data in R |  | |
+2 | 4/28 | handling data in R | [R for Data Science](http://r4ds.had.co.nz) | |
 3 | 5/2 | primer on probability & "classical" statistics | Kruschke 4, Wagenmakers (2007) | |
-4 | 5/5 | basics of BDA | Krushke 4, 5 & 6 | Brechtbau 0.35 |
+4 | 5/5 | basics of BDA | Krushke 4, 5 & 6 | <span style = "color:firebrick">Brechtbau 0.35</span> |

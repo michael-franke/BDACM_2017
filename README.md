@@ -1,11 +1,20 @@
 # Bayesian Data Analysis & Cognitive Modeling
 
-## Overview
-
-The course introduces main ideas and tools of Bayesian data analysis. Using Bayesian inference to draw inference from obervational data makes it possible, in fact strongly encourages, using all domain-specific and task-relevant knowledge we as modellers may have. In this way, the Bayesian way of analyzing data quickly blurs the boundary between standard statistical analyses and custom-made generative models of the data-generating process. This course will focus on probabilstic cognitive models for applications.
+The course introduces main ideas and tools of Bayesian data analysis. We will compare standard and Bayesian approaches to statistical inference. We will also look at Bayesian inference and model comparison for special-purpose cognitive models (with a focus on general cognition and psycholinguistics).
 
 ## Course notes
 
 1. How to [obtain course material](notes/01_github.md) from GitHub
 2. What [software](notes/02_software.md) to install
+3. What [literature](notes/03_literature.md) to read
 
+
+
+## Schedule
+
+session | date | topic | reading (main) | 
+:---:|:---:|---|---|---|
+1 | 4/25 | overview & formalities | Kruschke 4 & 5.1 | |
+2 | 4/28 | handling data in R |  | |
+3 | 5/2 | primer on probability & "classical" statistics | Kruschke 4, Wagenmakers (2007) | |
+4 | 5/5 | basics of BDA | Krushke 4, 5 & 6 | Brechtbau 0.35 |

@@ -2,7 +2,6 @@
 title: "Bayesian data analysis & cognitive modeling"
 subtitle: "Session 1: course overview"
 author: "Michael Franke"
-runtime: shiny
 output:
   ioslides_presentation:
     css: mistyle.css

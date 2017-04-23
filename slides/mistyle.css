@@ -247,6 +247,7 @@ slides > slide {
   height: 700px;
   margin-left: -450px;
   margin-top: -350px;
+  margin-top: -350px;
   padding: 40px 60px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -432,9 +433,9 @@ b {
 
 /* line 266, ../scss/default.scss */
 a {
-  color: #2a7cdf;
+  color: black;
   text-decoration: none;
-  border-bottom: 1px solid rgba(42, 124, 223, 0.5);
+  /* border-bottom: 1px solid rgba(178, 34, 34, 0.5); */
 }
 /* line 271, ../scss/default.scss */
 a:hover {
@@ -447,20 +448,23 @@ h1, h2, h3 {
 }
 
 /* line 280, ../scss/default.scss */
+/* slide title */
 h2 {
-  font-size: 45px;
-  line-height: 65px;
+  font-size: 35px;
+  line-height: 25px;
   letter-spacing: -2px;
-  color: #515151;
+  /*color: #515151; */
+  color: firebrick;
 }
 
 /* line 287, ../scss/default.scss */
 h3 {
-  font-size: 30px;
+  font-size: 24px;
   letter-spacing: -1px;
   line-height: 2;
   font-weight: inherit;
-  color: #797979;
+  /* color: #797979; */
+  color: firebrick; 
 }
 
 /* line 295, ../scss/default.scss */
@@ -628,12 +632,12 @@ button:not(:disabled):active {
 
 /* line 412, ../scss/default.scss */
 .blue {
-  color: #4387fd;
+  color: firebrick;
 }
 
 /* line 415, ../scss/default.scss */
 .blue2 {
-  color: skyblue;
+  color: firebrick;
 }
 
 /* line 418, ../scss/default.scss */
@@ -643,7 +647,7 @@ button:not(:disabled):active {
 
 /* line 421, ../scss/default.scss */
 .yellow {
-  color: #ffd14d;
+  color: firebrick;
 }
 
 /* line 424, ../scss/default.scss */
@@ -751,11 +755,11 @@ table.rmdtable tr:nth-child(odd) {
 table.rmdtable th {
   color: white;
   font-size: 18px;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(40%, skyblue), color-stop(80%, skyblue)) no-repeat;
-  background: -webkit-linear-gradient(top, skyblue 40%, skyblue 80%) no-repeat;
-  background: -moz-linear-gradient(top, skyblue 40%, skyblue 80%) no-repeat;
-  background: -o-linear-gradient(top, skyblue 40%, skyblue 80%) no-repeat;
-  background: linear-gradient(top, skyblue 40%, skyblue 80%) no-repeat;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(40%, firebrick), color-stop(80%, firebrick)) no-repeat;
+  background: -webkit-linear-gradient(top, firebrick 40%, firebrick 80%) no-repeat;
+  background: -moz-linear-gradient(top, firebrick 40%, firebrick 80%) no-repeat;
+  background: -o-linear-gradient(top, firebrick 40%, firebrick 80%) no-repeat;
+  background: linear-gradient(top, firebrick 40%, firebrick 80%) no-repeat;
 }
 /* line 494, ../scss/default.scss */
 table.rmdtable td, table th {
@@ -1514,6 +1518,6 @@ input {
 }
 
 .michashit {
-    color: cornflowerblue;
+    color: firebrick;
     font-weight: bolder;
 }

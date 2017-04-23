@@ -9,12 +9,13 @@ The course introduces main ideas and tools of Bayesian data analysis. We will co
 3. What [literature](notes/03_literature.md) to read
 
 
+## Schedule & slides
 
-## Schedule
+NB: slides are HTML files; use arrow keys to navigate.
 
 n | date | topic | reading (main) | 
 :---:|:---:|-----|---|---|
-1 | 4/25 | overview & formalities |  | |
+1 | 4/25 | [overview & formalities](slides/01_overview.html) |  | |
 2 | 4/28 | handling & plotting data in R | [R for Data Science](http://r4ds.had.co.nz) focus ch. 3, 5, 12, 18, 21 | |
 3 | 5/2 | primer on probability & "classical" statistics | Kruschke ch. 4 | |
 4 | 5/5 | Rmarkdown, distributions & statistical tests in R | [R for Data Science](http://r4ds.had.co.nz) part IV | <span style = "color:firebrick">Brechtbau 0.35</span> |

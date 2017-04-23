@@ -10,10 +10,6 @@ output:
     transition: faster
     widescreen: yes
 ---
-```{r setup, include=FALSE}
-ddir0="~/Desktop/bayes_computation/"
-```
-
 
 
 ## At a glance

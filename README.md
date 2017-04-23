@@ -12,7 +12,7 @@ The course introduces main ideas and tools of Bayesian data analysis. We will co
 
 ## Schedule
 
-session | date | topic | reading (main) | 
+&nbsp; | date | topic | reading (main) | 
 :---:|:---:|---|---|---|
 1 | 4/25 | overview & formalities | Kruschke 4 & 5.1 | |
 2 | 4/28 | handling data in R |  | |

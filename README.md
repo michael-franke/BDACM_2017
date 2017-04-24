@@ -41,3 +41,6 @@ n | date | topic | reading (main) |
 23 | 18/7 | practice: regression in Stan 2 | |
 24 | 21/7 | rounding off, project topics | |
 
+n | date | topic | reading (main) | 
+:---:|:---:|-----|---|---|
+1 | 25/4 | [overview & formalities](slides/01_overview.html) | 1 | 1 |

@@ -13,7 +13,7 @@ The course introduces main ideas and tools of Bayesian data analysis. We will co
 
 NB: slides are HTML files; use arrow keys to navigate.
 
-n | date | topic | reading (main) | 
+n | date | topic | reading (main) | extra info
 :---:|:---:|-----|---|---|
 1 | 25/4 | [overview & formalities](slides/01_overview.html) |  |  |
 2 | 28/4 | handling & plotting data in R | [R for Data Science](http://r4ds.had.co.nz) 3, 5, 12, 18, 21 |  |

@@ -82,6 +82,10 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 <span style = "color:white"> &nbsp; </span>    
     
 - looks at point estimates only
+
+<span style = "color:white"> &nbsp; </span>
+
+- bag of magic tricks
   
 </div>
 <div style = "float:right; width:35%;">
@@ -94,6 +98,21 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
   
 </div>  
 
+## Any thoughts?
+
+<span style = "color:white"> &nbsp; </span>
+<span style = "color:white"> &nbsp; </span>
+
+
+<div align = 'center'>
+  <img src="pics/Abelson_1995_quote.jpeg" alt="abelson quote" style="width: 650px;"/>
+</div>
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  from Abelson (1995) "Statistics as a Principled Argument"; quote tweeted by Richard D. Morey, April 24 2017
+</div>
+
+
 ## Pros & Cons of BDA {.columns-2} 
 
 ### Pro
@@ -101,6 +120,7 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 - well-founded & totally general
 - easily extensible / customizable
 - more informative / insightful
+- stimulates view: "models as tools"
 
 <img src="https://metrouk2.files.wordpress.com/2014/02/10667_front_11.jpg" alt="Drawing" style="width: 350px;"/>
 
@@ -108,7 +128,8 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 
 - less ready-made, more hands-on
 - not yet fully digested by community
-- lacks "standard solutions"
+- possibly computationally complex
+- requires thinking (wait, that's a pro!)
 
 <img src="pics/minorthreat.jpg" alt="Drawing2" align="center" style="width: 210px;"/>
 
@@ -170,4 +191,27 @@ for 6 credits you must ...
 
 grade will be a (non-arbitrary) function of homework grades and final project
 
+## Etiquette
+
+- slides are not self-explanatory -> you must attend class
+- one-minded attention during class -> no social media, news or whatever
+- come prepared, read around, think along, ask questions
+-  recap lesson later the same day:
+    - rethink
+    - reread
+    - take notes
+    - prepare questions
+- nobody is master; all are fallible; knowledge gain is community work
+
+## Preparation for next class
+
+<span style = "color:white"> &nbsp; </span>
+
+- check the [website](https://michael-franke.github.io/BDACM_2017/) 
+
+- read the notes on [materials](https://michael-franke.github.io/BDACM_2017/notes/01_github.html), [software](https://michael-franke.github.io/BDACM_2017/notes/02_software.html), and [literature](https://michael-franke.github.io/BDACM_2017/notes/03_literature.html)
+
+- install R & RStudio -> play around!
+
+- browse, read or devour [R for Data analysis Science](http://r4ds.had.co.nz)
 

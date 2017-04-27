@@ -1,0 +1,29 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "01: course overview"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    smaller: yes
+    transition: faster
+    widescreen: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+## Data science
+
+<div align = 'center'>
+  <img src="pics/data_scientist_def.jpg" alt="data scientist" style="width: 700px;"/>
+</div>
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  read [more](https://priceonomics.com/whats-the-difference-between-data-science-and/)
+</div>
+
+

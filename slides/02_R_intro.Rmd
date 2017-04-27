@@ -1,6 +1,6 @@
 ---
 title: "Bayesian data analysis & cognitive modeling"
-subtitle: "01: course overview"
+subtitle: "02: data wrangling & visualization"
 author: "Michael Franke"
 output:
   ioslides_presentation:
@@ -27,3 +27,87 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 </div>
 
 
+# data wrangling
+
+## read data
+
+```{r, message = T}
+d = readr::read_csv('../data/00_typicality_some.csv') # from package 'readr'
+```
+
+## inspect data
+
+```{r}
+d
+```
+
+## any comments?
+
+```{r}
+levels(factor(d$comments))[1:20]
+```
+
+
+## self-reported native languages
+
+```{r}
+table(d$language)
+```
+
+## filter non-native speakers of Enblush
+
+```{r}
+d = dplyr::filter(d, ! language %in% c("FRENCH", "Japanese", "Russian", "Spanish", "Tamil", "white"))
+table(d$language)
+```
+
+
+## select relevant columns & rows
+
+```{r}
+d = d %>% dplyr::filter(type == "some") %>% 
+          dplyr::select(-language, -comments, -type)
+d
+```
+
+## more intelligible column names
+
+```{r}
+d = d %>% dplyr::rename(condition = nr_black)
+d
+```
+
+## adding columns
+
+```{r}
+d = d %>% dplyr::mutate(dependent.measure = ifelse(variant %in% c("A", "B"), "ordinal", "binary"),
+                        alternatives.present = ifelse(variant %in% c("A", "C"), 1, 0)) %>% 
+          dplyr::select(- variant)
+d
+```
+
+## rescale responses
+
+```{r}
+d = d %>% mutate(response = purrr::map2_dbl(dependent.measure, response, 
+                                            function(x,y) { ifelse(x == "ordinal", (y-1)/6, y) } ))
+d
+```
+
+
+## get mean RTs for dependent measures
+
+```{r}
+d %>% dplyr::group_by(dependent.measure) %>% 
+      dplyr::summarize(mean.response = mean(response)) %>% show()
+```
+
+
+## get mean responses
+
+```{r}
+d %>% dplyr::group_by(dependent.measure, alternatives.present, condition) %>% 
+      dplyr::summarize(mean.response = mean(response)) %>% show()
+```
+
+# data visualization

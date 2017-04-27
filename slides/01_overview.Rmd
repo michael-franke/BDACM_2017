@@ -213,5 +213,5 @@ grade will be a (non-arbitrary) function of homework grades and final project
 
 - install R & RStudio -> play around!
 
-- browse, read or devour [R for Data analysis Science](http://r4ds.had.co.nz)
+- browse, read or devour [R for Data Science](http://r4ds.had.co.nz)
 

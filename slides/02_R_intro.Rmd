@@ -21,14 +21,18 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 <span style = "color:white"> &nbsp; </span>
 
 - get in touch with R for <span style = "color:firebrick">data wrangling & plotting</span>
+    - think about data & its format
+    - manipulate data into appropriate format: <span style = "color:firebrick">data wrangling</span>
+    - extract <span style = "color:firebrick">data summaries</span> 
+    - choose aspects to <span style = "color:firebrick">visualize data</span>
     
 <span style = "color:white"> &nbsp; </span>
 
-- look at data set from a <span style = "color:firebrick">case study</span> on quantifier <span style = "font-style: italic">some</span>
+- look at data set from <span style = "color:firebrick">case study</span> on quantifier <span style = "font-style: italic">some</span>
 
 # R for data science
 
-## data science
+## data science?
 
 <div align = 'center'>
   <img src="pics/data_scientist_def.jpg" alt="data scientist" style="width: 700px;"/>
@@ -38,14 +42,120 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
   read [more](https://priceonomics.com/whats-the-difference-between-data-science-and/)
 </div>
 
-# R
+
+## data science?
 
 <span style = "color:white"> &nbsp; </span>
 
-- special purpose programming language
-    - statistics
-    - data mining
-    - data visualization
+<div align = 'center'>
+  <img src="http://r4ds.had.co.nz/diagrams/data-science-explore.png" alt="diagram from 'R for Data Science'" style="width: 650px;"/>
+</div>
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  from [R for Data Science](http://r4ds.had.co.nz/explore-intro.html)
+</div>
+
+
+# R
+
+## R
+
+<span style = "color:white"> &nbsp; </span>
+
+special purpose programming language ~~data science~~ <span style = "color:firebrick">statistical computing</span>
+
+- statistics
+- data mining
+- data visualization
+
+<span style = "color:white"> &nbsp; </span>
+
+[authority](https://rviews.rstudio.com/2017/02/22/how-to-teach-r-common-mistakes/) says to tell you: 
+<span style = "color:firebrick">do not think of R as a programming language!</span>
+
+## R
+
+<span style = "color:white"> &nbsp; </span>
+
+is a trusted old friend
+
+<span style = "color:white"> &nbsp; </span>
+
+a lot of innovation and development takes place in <span style = "color:firebrick">packages</span>
+
+<span style = "color:white"> &nbsp; </span>
+
+- install packages (only once)
+
+```{r, eval = F}
+install.packages('tidyverse')
+```
+
+
+<span style = "color:white"> &nbsp; </span>
+
+- load packages (for every session)
+
+```{r, eval = F}
+library(tidyverse)
+```
+
+
+## base R & package functions
+
+<span style = "color:white"> &nbsp; </span>
+
+base R functionality is always available
+
+```{r}
+rnorm(n = 5, mean = 10) # 5 samples from a normal with mean 10 & std. dev. 1 (default)
+```
+
+<span style = "color:white"> &nbsp; </span>
+
+packages bring extra functions
+
+```{r}
+library(mvtnorm)
+mvtnorm::rmvnorm(n = 5, mean = rep(10,5)) # 5 samples from a multivariate normal
+```
+
+## help
+
+<span style = "color:white"> &nbsp; </span>
+
+```{r}
+help('rmvnorm')
+```
+
+
+    Mvnorm {mvtnorm}	R Documentation
+    Multivariate Normal Density and Random Deviates
+
+    Description
+
+    These functions provide the density function and a random number generator
+    for the multivariate normal distribution with mean equal to mean and 
+    covariance matrix sigma.
+
+    Usage
+
+    dmvnorm(x, mean = rep(0, p), sigma = diag(p), log = FALSE)
+    rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
+        method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
+
+
+
+## RStudio
+
+integrated develop environment for R
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div align = 'center'>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Rstudio.png" alt="RStudio screenshot" style="width: 725px;"/>
+</div>
 
 # case study
 
@@ -247,12 +357,21 @@ ggplot(data = resp.summary, aes(x = condition, y = mean.response, color = altern
 
 # fini
 
-## preparation for next class
+## to prevent boredom
+
+<span style = "color:firebrick">obligatory</span>
+
+- prepare Kruschke Chapter 4
+
+- fill in CSV file and send it to [Christian Adam](mailto:christian.adam@uni-tuebingen.de)
 
 <span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">optional</span>
 
 - read more on [R for Data Science](http://r4ds.had.co.nz)
 
+- explore reading times in today's data set
+
 <span style = "color:white"> &nbsp; </span>
 
-- read Kruschke Chapter 4

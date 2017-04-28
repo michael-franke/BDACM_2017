@@ -1,0 +1,9 @@
+user.name, qtype, question, response
+bubu, field, what program are you enrolled in?, general linguistics
+bubu, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+bubu, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 1
+bubu, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 1
+bubu, lit.most, what's your most favorite literary genre?, post apocalyptic
+bubu, lit.least, what's your least favorite literary genre?, romance
+bubu, pdf.reader, how to you read your science papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+bubu, prog.skill, how good a programmer are you? (integer from 0 -- 100), 40

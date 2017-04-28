@@ -124,7 +124,7 @@ mvtnorm::rmvnorm(n = 5, mean = rep(10,5)) # 5 samples from a multivariate normal
 
 <span style = "color:white"> &nbsp; </span>
 
-```{r}
+```{r, eval = F}
 help('rmvnorm')
 ```
 
@@ -155,6 +155,35 @@ integrated develop environment for R
 
 <div align = 'center'>
   <img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Rstudio.png" alt="RStudio screenshot" style="width: 725px;"/>
+</div>
+
+# data
+
+## types of data
+
+<span style = "color:white"> &nbsp; </span>
+
+this course will focus (entirely?) on <span style = "color:firebrick">rectangular data</span>
+
+<span style = "color:white"> &nbsp; </span>
+
+not covered:
+
+- image data
+- sound data
+- video data
+- corpora
+- ...
+
+## rectangular data
+
+```{r}
+library(nycflights13)
+nycflights13::flights
+```
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  study Chapters 5 and 12 from [R for Data Science](http://r4ds.had.co.nz)
 </div>
 
 # case study
@@ -281,7 +310,7 @@ d
 
 ```{r}
 d %>% dplyr::group_by(dependent.measure) %>% 
-      dplyr::summarize(mean.response = mean(response)) %>% show()
+      dplyr::summarize(mean.response = mean(response))
 ```
 
 
@@ -363,13 +392,14 @@ ggplot(data = resp.summary, aes(x = condition, y = mean.response, color = altern
 
 - prepare Kruschke Chapter 4
 
-- fill in CSV file and send it to [Christian Adam](mailto:christian.adam@uni-tuebingen.de)
+- fill in [CSV file](https://github.com/michael-franke/BDACM_2017/blob/master/data/01_class_enquette.csv) and send it to [Christian Adam](mailto:christian.adam@uni-tuebingen.de)
 
 <span style = "color:white"> &nbsp; </span>
 
 <span style = "color:firebrick">optional</span>
 
 - read more on [R for Data Science](http://r4ds.had.co.nz)
+    - Chapters 5 and 12 on data representation and wrangling
 
 - explore reading times in today's data set
 

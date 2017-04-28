@@ -16,7 +16,7 @@ NB: slides are HTML files; use arrow keys to navigate.
 n | date | topic | reading (main) | extra info
 :---:|:---:|-----|---|---|
 1 | 25/4 | [overview & formalities](slides/01_overview.html) |  |  |
-2 | 28/4 | [handling & plotting data in R](slides/02_R_intro.Rmd) | [R for Data Science](http://r4ds.had.co.nz) 3, 5, 12, 18, 21 |  |
+2 | 28/4 | [handling & plotting data in R](slides/02_R_intro.html) | [R for Data Science](http://r4ds.had.co.nz) 3, 5, 12, 18, 21 |  |
 3 | 2/5 | primer on probability & "classical" statistics | Kruschke ch. 4 |  |
 4 | 5/5 | Rmarkdown & statistics in R | [R for Data Science](http://r4ds.had.co.nz) IV | <span style = "color:firebrick">Brechtbau 0.35</span> |
 5 | 9/5 | *p*-problems & intro to BDA | Wagenmakers (2007), Krushke ch. 2, 5 & 6 |   |

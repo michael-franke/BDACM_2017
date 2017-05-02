@@ -35,7 +35,7 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 - probability
     - discrete, continuous, cumulative
     - subjective vs. objective chance
-    - means, modes, medians
+    - example distributions
     
 <span style = "color:white"> &nbsp; </span>
 
@@ -179,33 +179,6 @@ poisson.plot = ggplot(poisson.plot.data, aes(x = k, y = probability, color = lam
 poisson.plot
 ```
 
-## probability logic
-
-<span style = "color:white"> &nbsp; </span>
-
-let $X,Y \subseteq T$
-
-<div style = "float:left; width:35%;">
-
-<span style = "color:firebrick">definition</span>
-
-- $P(X) = \sum_{\state \in X} P(\state)$
-  
-</div>
-<div style = "float:right; width:55%;">
-
-<span style = "color:firebrick">corollaries</span>
-
-- $P(X \cup Y) = P(X) + P(Y) - P(X \cap Y)$
-- $P(\States \setminus X) = 1 - P(X)$
-  
-</div>  
-
-
-<div style = "position:absolute; top: 620px; right:60px;">
-  [more](https://plato.stanford.edu/entries/logic-probability/) on probability & logic
-</div>
-
 # probability: continuous
 
 ## definition
@@ -224,42 +197,323 @@ for infinite $\States$, $P(\state)$ is $\state$'s <span style = "color:firebrick
 
 ## Normal distribution
 
-fill me
+for mean $\mu$ and standard deviation $\sigma$, the <span style = "color:firebrick">normal distribution</span> is:
+
+$$ \mathcal{N}(x ; \mu, \sigma) = \frac{1}{\sqrt{2 \sigma^2 \pi}} \exp \left ( - \frac{(x-\mu)^2}{2 \sigma^2} \right) $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r, echo = F, fig.height = 3}
+normal.plot = ggplot(data.frame(x = c(-8, 8)), aes(x = x)) +
+  stat_function(fun = function(x) dnorm(x, sd = 4), aes(color = "4")) +
+  stat_function(fun = function(x) dnorm(x, sd = 1), aes(color = "1")) +
+  scale_colour_manual("standard deviation", breaks = c("4", "1"), values = c("firebrick", "darkgrey")) +
+  ylab("Norm(x ; mu = 0, sd")
+normal.plot
+```
 
 ## beta distribution
 
-fill me
 
-## Dirichlet distribution
 
-fill me
+the <span style = "color:firebrick">beta distribution</span> has a support on the unit interval $[0;1]$ and models a wide variety of shapes for shape parameters $alpha$ and $\beta$
 
-## Gamma distribution
+it is the <span style = "color:firebrick">conjugate prior</span> for a binomial model in Bayesian analysis (more soon!)
 
-fill me
+$$ \text{Beta}(x ; \alpha, \beta) \propto x^{\alpha-1} \, (1-x)^{\beta-1} $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r, echo = F, fig.height = 3}
+beta.plot = ggplot(data.frame(x = c(0, 1)), aes(x = x)) +
+  stat_function(fun = function(x) dbeta(x, shape1 = 1, shape2 = 1),  aes(color = "a=1, b=1")) +
+  stat_function(fun = function(x) dbeta(x, shape1 = 4, shape2 = 1),  aes(color = "a=4, b=1")) +
+  stat_function(fun = function(x) dbeta(x, shape1 = 5, shape2 = 10), aes(color = "a=5, b=10")) +
+  scale_colour_manual("shape parameters", breaks = c("a=1, b=1", "a=4, b=1", "a=5, b=10"), 
+                      values = c("firebrick", "darkgrey", "skyblue")) +
+  ylab("Beta(x ; a, b)")
+beta.plot
+```
+
+
+# interpretations of probability
+
+## objective vs. subjective probability
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style="text-align: center">
+  what's your subjective belief about the chance of drawing a red ball?
+</div>
+
+
+<div align = 'center'>
+  <img src="pics/urn_painting_obj_subj_beliefs.png" alt="urn picture" style="width: 500px;"/>
+</div>
+
+## interpretations of probability
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">objective</span>
+
+- probabilities correspond to limit frequencies
+- probability is an inherent property of the outside world
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">subjective</span>
+
+- probabilities are levels of credence of an agent
+- they inform (rational) decision making
+- beliefs can themselves be rational
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  more on this topic in [SEP](https://plato.stanford.edu/entries/probability-interpret/) & an [underground classic](https://www.princeton.edu/~bayesway/Book*.pdf)
+</div>
+
 
 # conditional probability & Bayes rule
 
-## cond prob
+## probability logic
+
+<span style = "color:white"> &nbsp; </span>
+
+let $X,Y \subseteq T$ for finite $\States$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+
+<span style = "color:firebrick">axioms</span>
+
+- $P(\emptyset) = 0$
+- $P(X) = \sum_{\state \in X} P(\state)$
+  
+</div>
+<div style = "float:right; width:55%;">
+
+<span style = "color:firebrick">corollaries</span>
+
+- $P(X \cup Y) = P(X) + P(Y) - P(X \cap Y)$
+- $P(\States \setminus X) = 1 - P(X)$
+  
+</div>  
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  [more](https://plato.stanford.edu/entries/logic-probability/) on probability & logic
+</div>
+
+## conditional probability
+
+<span style = "color:white"> &nbsp; </span>
+
+
+the <span style = "color:firebrick">conditional probability </span> of $X \subseteq \States$ given $Y \subseteq \States$ is:
+
+$$ P(X \mid Y) = \frac{P(X \cap Y)}{P(Y)} $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+the <span style = "color:firebrick">conditional probability </span> of $\state$ given $Y \subseteq \States$ is:
+
+$$ P(X \mid Y) = \begin{cases}\frac{P(\state)}{P(Y)} & \mathrm{if } \ \ \state \in Y \\
+0 & \mathrm{otherwise}
+\end{cases} $$
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  requires $P(Y) \neq 0$
+</div>
+
+
+## example
+
+original belief:
+
+```{r}
+house.probs
+```
+
+updated after learning that it's not a northern house:
+
+```{r}
+house.probs.upated = c(house.probs[1:3], 0, 0) %>% (function(x) x / sum(x))
+house.probs.upated
+```
+
+NB: probability ratios stay intact 
+
+## Bayes rule
+
+<span style = "color:white"> &nbsp; </span>
+
+given probability $P(Y \mid X)$, we derive probability $P(X \mid Y)$:
+
+$$ \begin{align*}
+        \red{P(X \mid Y)}\  & \red{\propto P(Y\mid X) \cdot P(X)} \\
+        & = \frac{P(Y\mid X) \cdot P(X)}{\sum_{X'} P(Y \mid X') \cdot P(X')} =
+        \frac{P(Y\mid X) \cdot P(X)}{P(Y)} = \frac{P(X \cap Y)}{P(Y)}
+  \end{align*} $$
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">why useful?</span>
+
+- reasoning from cause to effect ("abduction")
+- inferring latent, unobservable stuff (model parameters) from concrete data
+
+# $p$-values and confidence intervals
+
+## wide-spread confusion
+
+many statistical concepts are misunderstood by the majority of researchers
+
+- Oakes (1986): $p$-values are misinterpreted all the time
+- Haller & Kraus ([2002](https://www.metheval.uni-jena.de/lehre/0405-ws/evaluationuebung/haller.pdf)): also true for senior researchers and statistics teachers
+- Hoekstra et al. (2014): the same holds true for confidence intervals
+
+<div align = 'center'>
+  <img src="pics/haller_misinterpretation.png" alt="plot from Haller" style="width: 500px;"/>
+</div>
+    
+
+## quiz
+
+<span style = "color:white"> &nbsp; </span>
+
+1. $p$-values quantify subjective confidence that the null hypothesis is true/false
+2. $p$-values quantify objective evidence for/against the null hypothesis
+3. $p$-values quantify how surprising the data is under the null hypothsis
+4. $p$-values quantify probability that the null hypothesis is true/false
+5. non-significant $p$-values mean that the null hypothesis is true
+6. significant $p$-values mean that the null hypothesis is false
+6. significant $p$-values mean that the null hypothesis is unlikely
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  which of these are true?
+</div>
+
+## $p$-values
+
+
+sloppy version: the $p$-value (of a two-sided exact test) gives the probability, under the null hypothesis, of an outcome at least as unlikely as the actual outcome 
+
+better version: the $p$-value is the probability of observing, under <span style = "color:firebrick">infinite hypothetical repetitions of the same experiment</span>, a less extreme value of a <span style = "color:firebrick">test statistic</span> than that of the oberved data, given that the null hypothesis is true
+
+
+<div align = 'center'>
+  <img src="pics/wagenmakers_p.png" alt="wagenmakers diagram" style="width: 420px;"/>
+</div>
+
+## example: fair coin?
+
+- we flip $n=24$ times and observe $k = 7$ successes
+- null hypothesis: $p = 0.5$
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
+  
+plotData = data.frame(x = 0:24, y = dbinom(0:24, 24, 0.5))
+plotData2 = data.frame(x = c(0:7, 17:24), y = dbinom(c(0:7, 17:24), 24, 0.5))
+sig.plot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
+  geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
+  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, p = 0.5)") +
+  # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
+  geom_text(x = 3, y = 0.03, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = ""))
+sig.plot
+```
+
+## example: fair coin?
+
+```{r}
+binom.test(7,24)
+```
+
+## significance
+
+fix a significance level, e.g.: $0.05$
+
+<span style = "color:white"> &nbsp; </span>
+
+we say that a test result is significant a $p$-value is below the pre-determined significance level
+
+<span style = "color:white"> &nbsp; </span>
+
+we reject the null hypothesis in case of significant test result
+
+<span style = "color:white"> &nbsp; </span>
+
+the significance level thereby determines the $alpha$-error of falsely rejecting the null hypothesis
+
+- aka: type-I error / incorrect rejection / false positive
+
+
+
+## confidence interval
+
+the null hypothesis fixes a concrete value of some parameter (e.g., coin bias $p = 0.5$)
+
+we have an experiment $E$ and we have a set of all possible outcomes $O(E)$ of that experiment
+
+the observed outcome is $o^*$
+
+consider a function $I \colon o \mapsto I_o$ mapping each possible outcome $o \in O(E)$ to an interval of relevant parameter values
+
+this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence interval</span> iff, under the assumption that the null hypothesis is correct, when we repeat the experiment infinitely often, the proportion of intervals $I_{o}$, associated with each outcome $o$ of a hypothetical repetition, that contain the the true parameter value is $1-p$
+
+## great visualization
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style="text-align: center">
+  [here](http://rpsychologist.com/d3/CI/)
+</div>
+
+## what do we learn from a CI?
+
+<span style = "color:white"> &nbsp; </span>
+
+1. range of values we would not reject (at the given significance level)
+2. range of values that would not make the data surprising (at the given level)
+3. range of values that are most likely given the data
+4. range of values that it is rational to belief in / bet on
+5. that the true value lies in this interval
+6. that the true value is likely in this interval
+7. that, if we repeat the experiment, the outcome will likely lie in this interval
+
 
 # fini
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- some oddities of $p$-values & Rmarkdown
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- introduction to a Bayesian approach to statistical inference
 
 ## to prevent boredom
 
 <span style = "color:firebrick">obligatory</span>
 
-- prepare Kruschke Chapter 4
-
-- fill in [CSV file](https://github.com/michael-franke/BDACM_2017/blob/master/data/01_class_enquette.csv) and send it to [Christian Adam](mailto:c.adam@student.uni-tuebingen.de)
+- prepare Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf))
+    - only up to page 792 (you may stop at section "A Bayesian test of the $p$ postulate"; you may also go on)
 
 <span style = "color:white"> &nbsp; </span>
 
 <span style = "color:firebrick">optional</span>
 
-- read more on [R for Data Science](http://r4ds.had.co.nz)
-    - Chapters 5 and 12 on data representation and wrangling
-
-- explore reading times in today's data set
+- read [R for Data Science](http://r4ds.had.co.nz) part IV on Rmarkdown
 
 <span style = "color:white"> &nbsp; </span>
 

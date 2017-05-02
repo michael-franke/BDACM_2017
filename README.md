@@ -17,8 +17,8 @@ n | date | topic | reading (main) | extra info
 :---:|:---:|-----|---|---|
 1 | 25/4 | [overview & formalities](slides/01_overview.html) |  |  |
 2 | 28/4 | [handling & plotting data in R](slides/02_R_intro.html) | [R for Data Science](http://r4ds.had.co.nz) 3, 5, 12, 18, 21 |  |
-3 | 2/5 | primer on probability & "classical" statistics | Kruschke ch. 4 |  |
-4 | 5/5 | *p*-problems & Rmarkdown  | Wagenmakers (2007), [R for Data Science](http://r4ds.had.co.nz) IV | <span style = "color:firebrick">Brechtbau 0.35</span> |
+3 | 2/5 | [primer on probability & "classical" statistics](slides/03_prob_stat_intro.html) | Kruschke ch. 4 |  |
+4 | 5/5 | *p*-problems & Rmarkdown  | Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf)), [R for Data Science](http://r4ds.had.co.nz) IV | <span style = "color:firebrick">Brechtbau 0.35</span> |
 5 | 9/5 | intro to BDA | Krushke ch. 2, 5 & 6 |   |
 6 | 12/5 | MCMC sampling | Kruschke ch. 7 | |
 7 | 16/5 | JAGS | Kruschke ch. 8 |  |

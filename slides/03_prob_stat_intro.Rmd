@@ -49,11 +49,14 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 
 ## definition
 
-a <span style = "color:firebrick">discrete probability distribution</span> over a finite set of mutually exclusive world states $\States$ is a function $P \colon \pow{\States} \rightarrow [0;1]$ such that:
-    
-- $P(\States') = \sum_{\state \in \States'} P(\state)$, for all $\States' \subseteq \States$
-    - here $P(\state)$ is shorthand for $P(\set{\state})$
-- $P(\States)=1$
+<span style = "color:white"> &nbsp; </span>
+
+
+a <span style = "color:firebrick">discrete probability distribution</span> over a finite set of mutually exclusive world states $\States$ is a function $P \colon \States \rightarrow [0;1]$ such that $P(\States)=1$.
+
+<span style = "color:white"> &nbsp; </span>
+
+for finite $\States$, $P(\state)$ is $\state$'s <span style = "color:firebrick">probability mass</span>
 
 ## example
 
@@ -105,6 +108,48 @@ $$ P(\state) = \frac{f(\state)}{ \sum_{\state' \in \States} f(\state')} $$
 house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
 ```
 
+
+## probability logic
+
+<span style = "color:white"> &nbsp; </span>
+
+let $X,Y \subseteq T$
+
+<div style = "float:left; width:35%;">
+
+<span style = "color:firebrick">definition</span>
+
+- $P(X) = \sum_{\state \in X} P(\state)$
+  
+</div>
+<div style = "float:right; width:55%;">
+
+<span style = "color:firebrick">corrolaries</span>
+
+- $P(X \cup Y) = P(X) + P(Y) - P(X \cap Y)$
+- $P(\States \setminus X) = 1 - P(X)$
+  
+</div>  
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  [more](https://plato.stanford.edu/entries/logic-probability/) on probability & logic
+</div>
+
+
+## definition
+
+<span style = "color:white"> &nbsp; </span>
+
+a <span style = "color:firebrick">probability distribution</span> over an infinite set (a convex, continuous interval) $\States \subseteq \mathbb{R}$ is a function $P \colon \pow{\States} \rightarrow \mathbb{R}^{\ge 0}$ such that $\int P(\state) \mathrm{d}\state = 1$
+
+<span style = "color:white"> &nbsp; </span>
+
+for all intervals $I = [a;b] \subseteq \States$: $\Pr(I) = \int_{a}^{b} f(\state) \ \text{d}\state$
+    
+<span style = "color:white"> &nbsp; </span>
+
+for infinite $\States$, $P(\state)$ is $\state$'s <span style = "color:firebrick">probability density</span>
 
 # fini
 

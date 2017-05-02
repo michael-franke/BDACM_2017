@@ -120,9 +120,12 @@ binom.plot.data = expand.grid(n = 24, p = c(0.25, 0.5), k = 0:24) %>%
   mutate(probability = dbinom(k,n,p), p = as.factor(p))
 binom.plot = ggplot(binom.plot.data, aes(x = k, y = probability, fill = p)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("darkgrey", "firebrick"))
+  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("B(k; n=24, p)")
 binom.plot
 ```
+
+
+
 
 ## negative binomial
 
@@ -135,7 +138,7 @@ neg.binom.plot.data = expand.grid(n = 0:75, p = c(0.25, 0.5), k = 7) %>%
   mutate(probability = k/n * dbinom(k,n,p), p = as.factor(p))
 neg.binom.plot = ggplot(neg.binom.plot.data, aes(x = n, y = probability, fill = p)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("darkgrey", "firebrick"))
+  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("NB(n; k=7, p)")
 neg.binom.plot
 ```
 
@@ -322,7 +325,7 @@ $$ P(X \mid Y) = \frac{P(X \cap Y)}{P(Y)} $$
 
 the <span style = "color:firebrick">conditional probability </span> of $\state$ given $Y \subseteq \States$ is:
 
-$$ P(X \mid Y) = \begin{cases}\frac{P(\state)}{P(Y)} & \mathrm{if } \ \ \state \in Y \\
+$$ P(\state \mid Y) = \begin{cases}\frac{P(\state)}{P(Y)} & \mathrm{if } \ \ \state \in Y \\
 0 & \mathrm{otherwise}
 \end{cases} $$
 
@@ -507,7 +510,7 @@ this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence 
 <span style = "color:firebrick">obligatory</span>
 
 - prepare Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf))
-    - only up to page 792 (you may stop at section "A Bayesian test of the $p$ postulate"; you may also go on)
+    - only up to page 788 (you may stop at section "Bayesian inference"; you may also go on)
 
 <span style = "color:white"> &nbsp; </span>
 

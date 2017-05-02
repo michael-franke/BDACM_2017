@@ -1,0 +1,76 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "03: probability & statistics primer"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    smaller: no
+    transition: faster
+    widescreen: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+$$ \definecolor{firebrick}{RGB}{178,34,34} \newcommand{\red}[1]{{\color{firebrick}{#1}}} $$
+$$ \newcommand{\set}[1]{\{#1\}} $$
+$$ \newcommand{\tuple}[1]{\langle#1\rangle} $$
+$$\newcommand{\States}{{T}}$$
+$$\newcommand{\state}{{t}}$$
+
+
+## road map for today
+
+<span style = "color:white"> &nbsp; </span>
+
+- probability
+    - discrete, continuous, cumulative
+    - subjective vs. objective chance
+    - means, modes, medians
+    
+<span style = "color:white"> &nbsp; </span>
+
+- conditional probability & Bayes rule
+
+<span style = "color:white"> &nbsp; </span>
+
+- $p$-values & confidence intervals
+
+# probability
+
+## definition
+
+Given a finite set of mutually exclusive world states $\States$, a \markdef{probability distribution} over $\States$ is a function $\Pr: \pow{\States} \df [0;1]$ such that:
+    
+    $\Pr(T') = \sum_{t \in T'} P(\set{t})$, for all $\States' \subseteq \States$; and
+    $\Pr(\States)=1$
+
+# fini
+
+## to prevent boredom
+
+<span style = "color:firebrick">obligatory</span>
+
+- prepare Kruschke Chapter 4
+
+- fill in [CSV file](https://github.com/michael-franke/BDACM_2017/blob/master/data/01_class_enquette.csv) and send it to [Christian Adam](mailto:c.adam@student.uni-tuebingen.de)
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">optional</span>
+
+- read more on [R for Data Science](http://r4ds.had.co.nz)
+    - Chapters 5 and 12 on data representation and wrangling
+
+- explore reading times in today's data set
+
+<span style = "color:white"> &nbsp; </span>
+

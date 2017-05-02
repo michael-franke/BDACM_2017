@@ -45,7 +45,7 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 
 - $p$-values & confidence intervals
 
-# probability
+# probability: discrete
 
 ## definition
 
@@ -109,6 +109,76 @@ house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
 ```
 
 
+## binomial
+
+the <span style = "color:firebrick">binomial distribution</span> gives the probability of observing $k$ successes in $n$ coin flips with a bias of $p$:
+
+$$ B(k ; n,p) = {{n}\choose{k}} p^{k} \, (1-p)^{n-k} $$ 
+
+```{r, echo = F, fig.height = 3.5}
+binom.plot.data = expand.grid(n = 24, p = c(0.25, 0.5), k = 0:24) %>% 
+  mutate(probability = dbinom(k,n,p), p = as.factor(p))
+binom.plot = ggplot(binom.plot.data, aes(x = k, y = probability, fill = p)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("darkgrey", "firebrick"))
+binom.plot
+```
+
+## negative binomial
+
+the <span style = "color:firebrick">negative binomial distribution</span> gives the probability of needing $n$ coin flips to observe $k$ successes with a bias of $p$:
+
+$$ NB(n ; k,p) = \frac{k}{n} {{n}\choose{k}} p^{k} \, (1-p)^{n - k}$$
+
+```{r, echo = F, fig.height = 3.5}
+neg.binom.plot.data = expand.grid(n = 0:75, p = c(0.25, 0.5), k = 7) %>% 
+  mutate(probability = k/n * dbinom(k,n,p), p = as.factor(p))
+neg.binom.plot = ggplot(neg.binom.plot.data, aes(x = n, y = probability, fill = p)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("darkgrey", "firebrick"))
+neg.binom.plot
+```
+
+## multinomial
+
+probability of seeing $\tuple{x_1, \dots, x_k}$ in $n$ draws from a discrete probability distribution with $\tuple{p_1, \dots, p_n}$ where $x_i$ is the number of times that category $i$ was drawn ($\sum_{i = 1}^k x_i = n$)
+
+$$ \mathrm{MultiNom}(\tuple{x_1, \dots, x_k} ; \tuple{p_1, \dots, p_n} ) = \frac{n!}{x_1! \dots x_n!} p_1^{x_1} \dots p_n^{x_n} $$
+
+## Poisson
+
+<span style = "color:firebrick">Poisson distribution</span> gives the probability of an event occurring $k$ times in a fixed interval, when the expected value and variance of $k$ is $\lambda$
+
+$$ \mathrm{Poisson}(k ; \lambda) =  \frac{\lambda^k \exp(-\lambda)}{k!}$$ 
+
+```{r, echo = F, fig.height = 3.5}
+poisson.plot.data = expand.grid(k = 0:25, lambda = c(4, 10)) %>% 
+  mutate(probability = dpois(k,lambda), lambda = as.factor(lambda))
+poisson.plot = ggplot(poisson.plot.data, aes(x = k, y = probability, fill = lambda)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("darkgrey", "firebrick"))
+poisson.plot
+```
+
+## cumulative distribution
+
+$\States$ is <span style = "color:firebrick">ordinal</span> if there is a total strict ordering such that for all $\state, \state' \in \States$:
+
+$$ \state > \state' \ \ \mathrm{or} \ \ \state < \state'$$
+
+the <span style = "color:firebrick">cumulative distribution</span> of $P$ is $P_{\le}(\state) = \sum_{\state' \le \state}P(\state')$
+
+<span style = "color:firebrick">example: cumulative Poisson</span>
+
+```{r, echo = F, fig.height = 3.5}
+poisson.plot.data = expand.grid(k = 0:25, lambda = c(4, 10)) %>% 
+  mutate(probability = ppois(k,lambda), lambda = as.factor(lambda))
+poisson.plot = ggplot(poisson.plot.data, aes(x = k, y = probability, color = lambda)) + 
+  geom_point() + geom_line() +
+  scale_color_manual(values = c("darkgrey", "firebrick")) + ylab("cumulative probability mass")
+poisson.plot
+```
+
 ## probability logic
 
 <span style = "color:white"> &nbsp; </span>
@@ -124,7 +194,7 @@ let $X,Y \subseteq T$
 </div>
 <div style = "float:right; width:55%;">
 
-<span style = "color:firebrick">corrolaries</span>
+<span style = "color:firebrick">corollaries</span>
 
 - $P(X \cup Y) = P(X) + P(Y) - P(X \cap Y)$
 - $P(\States \setminus X) = 1 - P(X)$
@@ -136,6 +206,7 @@ let $X,Y \subseteq T$
   [more](https://plato.stanford.edu/entries/logic-probability/) on probability & logic
 </div>
 
+# probability: continuous
 
 ## definition
 
@@ -150,6 +221,26 @@ for all intervals $I = [a;b] \subseteq \States$: $\Pr(I) = \int_{a}^{b} f(\state
 <span style = "color:white"> &nbsp; </span>
 
 for infinite $\States$, $P(\state)$ is $\state$'s <span style = "color:firebrick">probability density</span>
+
+## Normal distribution
+
+fill me
+
+## beta distribution
+
+fill me
+
+## Dirichlet distribution
+
+fill me
+
+## Gamma distribution
+
+fill me
+
+# conditional probability & Bayes rule
+
+## cond prob
 
 # fini
 

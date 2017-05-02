@@ -13,6 +13,7 @@ output:
 ```{r setup, include=FALSE, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
 require('tidyverse')
+require('forcats')
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
 ```
 
@@ -20,11 +21,11 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
   MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
 </script>
 
-$$ \definecolor{firebrick}{RGB}{178,34,34} \newcommand{\red}[1]{{\color{firebrick}{#1}}} $$
-$$ \newcommand{\set}[1]{\{#1\}} $$
-$$ \newcommand{\tuple}[1]{\langle#1\rangle} $$
-$$\newcommand{\States}{{T}}$$
-$$\newcommand{\state}{{t}}$$
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
 
 
 ## road map for today
@@ -48,10 +49,62 @@ $$\newcommand{\state}{{t}}$$
 
 ## definition
 
-Given a finite set of mutually exclusive world states $\States$, a \markdef{probability distribution} over $\States$ is a function $\Pr: \pow{\States} \df [0;1]$ such that:
+a <span style = "color:firebrick">discrete probability distribution</span> over a finite set of mutually exclusive world states $\States$ is a function $P \colon \pow{\States} \rightarrow [0;1]$ such that:
     
-    $\Pr(T') = \sum_{t \in T'} P(\set{t})$, for all $\States' \subseteq \States$; and
-    $\Pr(\States)=1$
+- $P(\States') = \sum_{\state \in \States'} P(\state)$, for all $\States' \subseteq \States$
+    - here $P(\state)$ is shorthand for $P(\set{\state})$
+- $P(\States)=1$
+
+## example
+
+okay, winter is coming; but who will sit the Iron Throne next spring?
+
+<span style = "color:white"> &nbsp; </span>
+
+```{r}
+house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
+names(house.probs)= c("Targaryen", "Lannister", "Baratheon", "Greyjoy", "Stark")
+round(house.probs,3)
+```
+
+<span style = "color:white"> &nbsp; </span>
+
+```{r}
+sum(house.probs)
+```
+
+
+## example
+
+```{r, fig.height = 3.5}
+house.probs.df = as_tibble(house.probs) %>% 
+  mutate(house = names(house.probs) %>% factor() %>% fct_inorder()) %>% 
+  rename(probability = value)
+house.plot = ggplot(house.probs.df, aes(x = house, y = probability)) + 
+  geom_bar(stat = "identity", fill = "firebrick")
+house.plot
+```
+
+## notation
+
+<span style = "color:white"> &nbsp; </span>
+
+if $f \colon \States \rightarrow \mathbb{R}^{\ge0}$, then
+
+$$ P(\state) \propto f(\state) $$
+
+is shorthand notation for
+
+$$ P(\state) = \frac{f(\state)}{ \sum_{\state' \in \States} f(\state')} $$
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">example</span>
+
+```{r, eval = F}
+house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
+```
+
 
 # fini
 

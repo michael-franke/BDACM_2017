@@ -113,7 +113,7 @@ house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
 
 the <span style = "color:firebrick">binomial distribution</span> gives the probability of observing $k$ successes in $n$ coin flips with a bias of $p$:
 
-$$ B(k ; n,p) = {{n}\choose{k}} p^{k} \, (1-p)^{n-k} $$ 
+$$ B(k ; n,p) = \binom{n}{k} p^{k} \, (1-p)^{n-k} $$ 
 
 ```{r, echo = F, fig.height = 3.5}
 binom.plot.data = expand.grid(n = 24, p = c(0.25, 0.5), k = 0:24) %>% 
@@ -128,7 +128,7 @@ binom.plot
 
 the <span style = "color:firebrick">negative binomial distribution</span> gives the probability of needing $n$ coin flips to observe $k$ successes with a bias of $p$:
 
-$$ NB(n ; k,p) = \frac{k}{n} {{n}\choose{k}} p^{k} \, (1-p)^{n - k}$$
+$$ NB(n ; k,p) = \frac{k}{n} \binom{n}{k} p^{k} \, (1-p)^{n - k}$$
 
 ```{r, echo = F, fig.height = 3.5}
 neg.binom.plot.data = expand.grid(n = 0:75, p = c(0.25, 0.5), k = 7) %>% 

@@ -1,11 +1,11 @@
 ---
 title: "Bayesian data analysis & cognitive modeling"
-subtitle: "04: $p$-problems & Rmarkdown"
+subtitle: "04: <span style = 'font-style: italic'>p</span>-problems & Rmarkdown"
 author: "Michael Franke"
 output:
   ioslides_presentation:
     css: mistyle.css
-    smaller: no
+    smaller: yes
     transition: faster
     widescreen: yes
 ---
@@ -26,11 +26,12 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 ```
 
 
+
 ## road map for today
 
 <span style = "color:white"> &nbsp; </span>
 
-- review: $p$-values & confidence intervals
+- review $p$-values & confidence intervals
 
 <span style = "color:white"> &nbsp; </span>
 
@@ -43,46 +44,36 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 
 # $p$-values and confidence intervals
 
-## wide-spread confusion
-
-many statistical concepts are misunderstood by the majority of researchers
-
-- Oakes (1986): $p$-values are misinterpreted all the time
-- Haller & Kraus ([2002](https://www.metheval.uni-jena.de/lehre/0405-ws/evaluationuebung/haller.pdf)): also true for senior researchers and statistics teachers
-- Hoekstra et al. (2014): the same holds true for confidence intervals
-
-<div align = 'center'>
-  <img src="pics/haller_misinterpretation.png" alt="plot from Haller" style="width: 500px;"/>
-</div>
-    
-
-## quiz
-
-<span style = "color:white"> &nbsp; </span>
-
-1. $p$-values quantify subjective confidence that the null hypothesis is true/false
-2. $p$-values quantify objective evidence for/against the null hypothesis
-3. $p$-values quantify how surprising the data is under the null hypothsis
-4. $p$-values quantify probability that the null hypothesis is true/false
-5. non-significant $p$-values mean that the null hypothesis is true
-6. significant $p$-values mean that the null hypothesis is false
-6. significant $p$-values mean that the null hypothesis is unlikely
-
-<div style = "position:absolute; top: 620px; right:60px;">
-  which of these are true?
-</div>
-
 ## $p$-values
 
-
-sloppy version: the $p$-value (of a two-sided exact test) gives the probability, under the null hypothesis, of an outcome at least as unlikely as the actual outcome 
-
-better version: the $p$-value is the probability of observing, under <span style = "color:firebrick">infinite hypothetical repetitions of the same experiment</span>, a less extreme value of a <span style = "color:firebrick">test statistic</span> than that of the oberved data, given that the null hypothesis is true
+the $p$-value is the probability of observing, under <span style = "color:firebrick">infinite hypothetical repetitions of the same experiment</span>, a less extreme value of a <span style = "color:firebrick">test statistic</span> than that of the oberved data, given that the null hypothesis is true
 
 
 <div align = 'center'>
   <img src="pics/wagenmakers_p.png" alt="wagenmakers diagram" style="width: 420px;"/>
 </div>
+
+## requirements
+
+<span style = "color:white"> &nbsp; </span>
+
+- <span style = "color:firebrick">null hypothesis $H_0$</span>
+    - e.g., the coin is fair
+    - e.g., the mean and variance of measure $X$ is the same in two groups
+
+<span style = "color:white"> &nbsp; </span>
+
+- <span style = "color:firebrick">sampling distribution $P(x \mid H_0)$</span>
+    - how likely is observation $x$ under $H_0$?
+    - NB: this requires fixing the space $X$ of possible $x$ (in order to normalize)
+
+<span style = "color:white"> &nbsp; </span>
+
+- <span style = "color:firebrick">test statistic $t(x)$</span>
+    - any single-valued function $t(x)$ that characterizes $x$ in a relevant or helpful way
+        - convention: $t(x_1) > t(x_2)$ iff $x_1$ is more extreme that $x_2$
+    - for an <span style = "color:firebrick">exact test</span> we take the likelihood of $x$ under $H_0$: $t(x) = P(x \mid H_0)$
+    
 
 ## example: fair coin?
 

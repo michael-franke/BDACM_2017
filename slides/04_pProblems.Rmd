@@ -1,0 +1,209 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "04: $p$-problems & Rmarkdown"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    smaller: no
+    transition: faster
+    widescreen: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+require('forcats')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+## road map for today
+
+<span style = "color:white"> &nbsp; </span>
+
+- review: $p$-values & confidence intervals
+
+<span style = "color:white"> &nbsp; </span>
+
+- digest $p$-problems identified by Wagenmakers (2007)
+
+<span style = "color:white"> &nbsp; </span>
+
+- brief introduction to Rmarkdown & reproducible research
+
+
+# $p$-values and confidence intervals
+
+## wide-spread confusion
+
+many statistical concepts are misunderstood by the majority of researchers
+
+- Oakes (1986): $p$-values are misinterpreted all the time
+- Haller & Kraus ([2002](https://www.metheval.uni-jena.de/lehre/0405-ws/evaluationuebung/haller.pdf)): also true for senior researchers and statistics teachers
+- Hoekstra et al. (2014): the same holds true for confidence intervals
+
+<div align = 'center'>
+  <img src="pics/haller_misinterpretation.png" alt="plot from Haller" style="width: 500px;"/>
+</div>
+    
+
+## quiz
+
+<span style = "color:white"> &nbsp; </span>
+
+1. $p$-values quantify subjective confidence that the null hypothesis is true/false
+2. $p$-values quantify objective evidence for/against the null hypothesis
+3. $p$-values quantify how surprising the data is under the null hypothsis
+4. $p$-values quantify probability that the null hypothesis is true/false
+5. non-significant $p$-values mean that the null hypothesis is true
+6. significant $p$-values mean that the null hypothesis is false
+6. significant $p$-values mean that the null hypothesis is unlikely
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  which of these are true?
+</div>
+
+## $p$-values
+
+
+sloppy version: the $p$-value (of a two-sided exact test) gives the probability, under the null hypothesis, of an outcome at least as unlikely as the actual outcome 
+
+better version: the $p$-value is the probability of observing, under <span style = "color:firebrick">infinite hypothetical repetitions of the same experiment</span>, a less extreme value of a <span style = "color:firebrick">test statistic</span> than that of the oberved data, given that the null hypothesis is true
+
+
+<div align = 'center'>
+  <img src="pics/wagenmakers_p.png" alt="wagenmakers diagram" style="width: 420px;"/>
+</div>
+
+## example: fair coin?
+
+- we flip $n=24$ times and observe $k = 7$ successes
+- null hypothesis: $p = 0.5$
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
+  
+plotData = data.frame(x = 0:24, y = dbinom(0:24, 24, 0.5))
+plotData2 = data.frame(x = c(0:7, 17:24), y = dbinom(c(0:7, 17:24), 24, 0.5))
+sig.plot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
+  geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
+  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, p = 0.5)") +
+  # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
+  geom_text(x = 3, y = 0.03, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = ""))
+sig.plot
+```
+
+## example: fair coin?
+
+```{r}
+binom.test(7,24)
+```
+
+## significance
+
+fix a significance level, e.g.: $0.05$
+
+<span style = "color:white"> &nbsp; </span>
+
+we say that a test result is significant a $p$-value is below the pre-determined significance level
+
+<span style = "color:white"> &nbsp; </span>
+
+we reject the null hypothesis in case of significant test result
+
+<span style = "color:white"> &nbsp; </span>
+
+the significance level thereby determines the $alpha$-error of falsely rejecting the null hypothesis
+
+- aka: type-I error / incorrect rejection / false positive
+
+
+
+## confidence interval
+
+the null hypothesis fixes a concrete value of some parameter (e.g., coin bias $p = 0.5$)
+
+we have an experiment $E$ and we have a set of all possible outcomes $O(E)$ of that experiment
+
+the observed outcome is $o^*$
+
+consider a function $I \colon o \mapsto I_o$ mapping each possible outcome $o \in O(E)$ to an interval of relevant parameter values
+
+this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence interval</span> iff, under the assumption that the null hypothesis is correct, when we repeat the experiment infinitely often, the proportion of intervals $I_{o}$, associated with each outcome $o$ of a hypothetical repetition, that contain the the true parameter value is $1-p$
+
+## great visualization
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style="text-align: center">
+  [here](http://rpsychologist.com/d3/CI/)
+</div>
+
+## what do we learn from a CI?
+
+<span style = "color:white"> &nbsp; </span>
+
+1. range of values we would not reject (at the given significance level)
+2. range of values that would not make the data surprising (at the given level)
+3. range of values that are most likely given the data
+4. range of values that it is rational to belief in / bet on
+5. that the true value lies in this interval
+6. that the true value is likely in this interval
+7. that, if we repeat the experiment, the outcome will likely lie in this interval
+
+# $p$-problems
+
+## 3 problems
+
+<span style = "color:white"> &nbsp; </span>
+
+1. $p$ depends on unobserved data
+2. $p$ depends on subjective intentions 
+3. $p$ does not quantify evidence
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  Wagenmakers (2007)
+</div>
+
+
+
+# fini
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- some oddities of $p$-values & Rmarkdown
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- introduction to a Bayesian approach to statistical inference
+
+## to prevent boredom
+
+<span style = "color:firebrick">obligatory</span>
+
+- prepare Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf))
+    - only up to page 788 (you may stop at section "Bayesian inference"; you may also go on)
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">optional</span>
+
+- read [R for Data Science](http://r4ds.had.co.nz) part IV on Rmarkdown
+
+<span style = "color:white"> &nbsp; </span>
+

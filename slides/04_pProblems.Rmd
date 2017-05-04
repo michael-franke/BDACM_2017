@@ -42,7 +42,7 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 - brief introduction to Rmarkdown & reproducible research
 
 
-# $p$-values and confidence intervals
+# $p$-values
 
 ## $p$-values
 
@@ -75,10 +75,40 @@ the $p$-value is the probability of observing, under <span style = "color:firebr
     - for an <span style = "color:firebrick">exact test</span> we take the likelihood of $x$ under $H_0$: $t(x) = P(x \mid H_0)$
     
 
-## example: fair coin?
+## definition
 
-- we flip $n=24$ times and observe $k = 7$ successes
-- null hypothesis: $p = 0.5$
+<span style = "color:white"> &nbsp; </span>
+
+in the <span style = "color:firebrick">general case</span>, the <span style = "color:firebrick">$p$-value of observation $x$</span> under null hypothesis $H_0$, with sample space $X$, sampling distribution $P(\cdot \mid H_0) \in \Delta(X)$ and test statistic $t \colon X \rightarrow \mathbb{R}$ is:
+
+$$ p(x ; H_0, X, P(\cdot \mid H_0), t) = \int_{\left\{ \tilde{x} \in X \ \mid \ t(\tilde{x}) \ge t(x) \right\}} P(\tilde{x} \mid H_0) \ \text{d}\tilde{x}$$ 
+
+intuitive slogan: <span style = "color:firebrick">probability of at least as extreme outcomes</span>
+
+<span style = "color:white"> &nbsp; </span>
+
+for an <span style = "color:firebrick">exact test</span> we get:
+
+$$ p(x ; H_0, X, P(\cdot \mid H_0)) = \int_{\left\{ \tilde{x} \in X \ \mid \ P(\tilde{x} \mid H_0) \le P(x \mid H_0) \right\}} P(\tilde{x} \mid H_0) \ \text{d}\tilde{x}$$ 
+
+intuitive slogan: <span style = "color:firebrick">probability of at least as unlikely outcomes</span>
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  notation: $\Delta(X)$ -- set of all probability measures over $X$
+</div>
+
+
+## example
+
+<span style = "color:firebrick">fair coin?</span>
+
+- data: we flip $n=24$ times and observe $k = 7$ successes
+- null hypothesis: $\theta = 0.5$
+- sampling distribution: binomial distribution
+
+$$ B(k ; n = 24, \theta = 0.5) = \binom{n}{k} \theta^{k} \, (1-\theta)^{n-k} $$
+
 
 ```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
   
@@ -86,49 +116,87 @@ plotData = data.frame(x = 0:24, y = dbinom(0:24, 24, 0.5))
 plotData2 = data.frame(x = c(0:7, 17:24), y = dbinom(c(0:7, 17:24), 24, 0.5))
 sig.plot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
   geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
-  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, p = 0.5)") +
+  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, theta = 0.5)") +
   # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
   geom_text(x = 3, y = 0.03, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = ""))
 sig.plot
 ```
 
-## example: fair coin?
+## hypothesis test in R
 
 ```{r}
 binom.test(7,24)
 ```
 
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r}
+binom.test(7,24)$p.value
+```
+
+## Monte Carlo simulation
+
+use a large number of random samples to approximate the solution to a difficult problem
+
+```{r, fig.height = 3.5}
+# repeat 24 flips of a fair coin 20,000 times
+n.samples = 20000
+x.reps = map_int(1:n.samples, function(i) sum(sample(x = 0:1, size = 24, replace = T, prob = c(0.5, 0.5))))   
+ggplot(data.frame(k = x.reps), aes(x = k)) + geom_histogram(binwidth = 1)
+```
+
+## MC simulated $p$-value
+
+
+```{r}
+x.reps.prob = dbinom(x.reps, 24, 0.5) ## Bernoulli likelihood under H_0
+sum(x.reps.prob <= dbinom(7, 24, 0.5)) /  n.samples
+```
+
+```{r, fig.height = 3}
+p.value.sequence = cumsum(x.reps.prob <= dbinom(7, 24, 0.5)) / 1:n.samples
+tibble(iteration = 1:n.samples, p.value = cumsum(x.reps.prob <= dbinom(7, 24, 0.5)) / 1:n.samples) %>% 
+  ggplot(aes(x = iteration, y = p.value)) + geom_line()
+```
+
 ## significance
 
-fix a significance level, e.g.: $0.05$
+<span style = "color:white"> &nbsp; </span>
+
+fix a <span style = "color:firebrick">significance level</span>, e.g.: $0.05$
 
 <span style = "color:white"> &nbsp; </span>
 
-we say that a test result is significant a $p$-value is below the pre-determined significance level
+we say that a test result is <span style = "color:firebrick">significant</span> iff the $p$-value is below the pre-determined significance level
 
 <span style = "color:white"> &nbsp; </span>
 
-we reject the null hypothesis in case of significant test result
+we <span style = "color:firebrick">reject the null hypothesis</span> in case of significant test results
 
 <span style = "color:white"> &nbsp; </span>
 
-the significance level thereby determines the $alpha$-error of falsely rejecting the null hypothesis
+the significance level thereby determines the <span style = "color:firebrick">$\alpha$-error</span> of falsely rejecting the null hypothesis
 
 - aka: type-I error / incorrect rejection / false positive
 
 
+# confidence intervals
 
 ## confidence interval
 
-the null hypothesis fixes a concrete value of some parameter (e.g., coin bias $p = 0.5$)
+<span style = "color:white"> &nbsp; </span>
 
-we have an experiment $E$ and we have a set of all possible outcomes $O(E)$ of that experiment
+let $H_0^{ \theta = z}$ be the null hypothesis that assumes that parameter $\theta = z$
 
-the observed outcome is $o^*$
+fix sampling distribution $P(\cdot \mid H_0^{ \theta = z})$ and test statistic $t$ as before
 
-consider a function $I \colon o \mapsto I_o$ mapping each possible outcome $o \in O(E)$ to an interval of relevant parameter values
+the level $(1 - \alpha)$ confidence interval for outcome $x$ is the biggest interval $[a, b]$ such that:
 
-this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence interval</span> iff, under the assumption that the null hypothesis is correct, when we repeat the experiment infinitely often, the proportion of intervals $I_{o}$, associated with each outcome $o$ of a hypothetical repetition, that contain the the true parameter value is $1-p$
+$$ p(x ; H_0^{\theta = z}) > \alpha  \ \ \ \text{, for all } z \in [a;b]$$ 
+
+intuitive slogan: <span style = "color:firebrick">range of values that we would not reject</span>
+
 
 ## great visualization
 
@@ -142,13 +210,16 @@ this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence 
 
 <span style = "color:white"> &nbsp; </span>
 
-1. range of values we would not reject (at the given significance level)
-2. range of values that would not make the data surprising (at the given level)
-3. range of values that are most likely given the data
-4. range of values that it is rational to belief in / bet on
-5. that the true value lies in this interval
-6. that the true value is likely in this interval
-7. that, if we repeat the experiment, the outcome will likely lie in this interval
+
+1. range of values we would not reject (at the given significance level) <div style="float: right; margin: 0px;">yes</div>
+2. range of values that would not make the data surprising (at the given level) <div style="float: right; margin: 0px;">yes</div>
+3. range of values that are most likely given the data <div style="float: right; margin: 0px;">no</div>
+4. range of values that it is rational to believe in / bet on <div style="float: right; margin: 0px;">no</div>
+5. that the true value lies in this interval for sure <div style="float: right; margin: 0px;">no</div>
+6. that the true value is likely in this interval <div style="float: right; margin: 0px;">well</div>
+7. that, if we repeat the experiment, the outcome will likely lie in this interval <div style="float: right; margin: 0px;">no</div>
+
+
 
 # $p$-problems
 
@@ -156,16 +227,178 @@ this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence 
 
 <span style = "color:white"> &nbsp; </span>
 
-1. $p$ depends on unobserved data
-2. $p$ depends on subjective intentions 
-3. $p$ does not quantify evidence
+- $p$ depends on unobserved data
+
+<span style = "color:white"> &nbsp; </span>
+    
+- $p$ depends on subjective intentions 
+
+<span style = "color:white"> &nbsp; </span>
+
+- $p$ does not quantify evidence
 
 
 <div style = "position:absolute; top: 620px; right:60px;">
   Wagenmakers (2007)
 </div>
 
+## stop at $n = 24$
 
+<span style = "color:firebrick">fair coin?</span>
+
+- data: we decide to flip $n=24$ times and observe $k = 7$ successes
+- null hypothesis: $\theta = 0.5$
+- sampling distribution: binomial distribution
+
+$$ B(k ; n = 24, \theta = 0.5) = \binom{n}{k} \theta^{k} \, (1-\theta)^{n-k} $$
+
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
+sig.plot
+```
+
+## stop at $k = 7$
+
+<span style = "color:firebrick">fair coin?</span>
+
+- data: we decide to flip until $k=7$ and have to flip $n=24$ times 
+- null hypothesis: $\theta = 0.5$
+- sampling distribution: negative binomial distribution
+
+$$ NB(n ; k = 7, \theta = 0.5) = \frac{k}{n} \binom{n}{k} \theta^{k} \, (1-\theta)^{n - k}$$
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=3}
+
+negBinom <- function(k, N, theta) {
+  sapply(1:length(k), function(x) k[x]/N * dbinom(k[x], N, theta))
+}
+  
+plotData = data.frame(x = 7:35, 
+                      y = negBinom(7, 7:35, 0.5))
+plotData2 = data.frame(x = 24:35,
+                       y = negBinom(7, 24:35, 0.5))
+myplot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
+  geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
+  geom_hline(yintercept=7/24*dbinom(7,24,0.5)) + xlab("n") + ylab("NB(n | k = 7, theta = 0.5)") +
+  # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
+  geom_text(x = 30, y = 0.015, label = paste0("p = " , round(1-sum(negBinom(7, 7:23, 0.5)),3), collapse = ""))
+myplot
+
+```
+
+
+## what is the "same experiment" in a different possible world?
+
+<span style = "color:white"> &nbsp; </span>
+
+what does it mean to repeat an experiment?
+
+<span style = "color:white"> &nbsp; </span>
+
+tons of gruesome scenarios:
+
+- exclusion criteria for participants settled after seeing the data
+- inability to use data when the way of obtaining it is unknown
+    - who can you trust?
+    - what's the sampling distribution for large-scale surveys, linguistic corpora...?
+- sampling protocol dependent on external circumstance (funding, motivation, ...)
+- <span style = "font-style: italic">ex post</span> unverfifiable researcher reports: was this really what they intended to do?
+
+
+## the method is not to blame for the abuse?
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:white"> &nbsp; </span>
+
+<div align = 'center'>
+  <img src="pics/guns_dont_kill.png" alt="guns don't kill" style="width: 450px;"/>
+</div>
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  read more on [preregistration](http://www.apa.org/science/about/psa/2015/08/pre-registration.aspx) and [reproducibility](http://www.nature.com/news/1-500-scientists-lift-the-lid-on-reproducibility-1.19970)
+</div>
+
+
+# Rmarkdown
+
+## promoting reproducible research
+
+<span style = "color:white"> &nbsp; </span>
+
+- prepare, analyze & plot data right inside your document
+
+- hand over all of your work in one single, easily executable chunk
+
+## markdown
+
+headers & sections
+
+```{markdown}
+# header 1
+## header 2
+### header 3
+```
+
+emphasis, highlighting etc.
+
+```{markdown}
+*italics* or _italics_
+**bold** or __italics__
+~~strikeout~~
+```
+
+links
+
+```{markdown}
+[link](https://www.google.com)
+```
+
+inline code & code blocks
+
+```{markdown}
+`function(x) return(x - 1)`
+```
+
+ 
+<div style = "position:absolute; top: 620px; right:60px;">
+  [cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+</div>
+
+## Rmarkdown
+
+extension of markdown to dynamically integrate R output
+
+multiple output formats:
+
+- HTML pages, HTML slides (here), ...
+- PDF, LaTeX, Word, ...
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  [cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+</div>
+
+## Rmarkdown in your homework
+
+<span style = "color:white"> &nbsp; </span>
+
+do it all in one file `BDA+CM_HW1_YOURLASTNAME.Rmd`
+
+use a header that generate HTML files like this:
+
+    ---
+    title: "My flawless first homework set"
+    date: 2017-05-8
+    output: html_document
+    ---
+
+have all code and plots show at the appropriate place in between your text answers which explain the code and the text
+
+send the `*.Rmd` and the `*.HTML`
+
+avoid using extra material not included in the `*.Rmd`
 
 # fini
 
@@ -173,28 +406,29 @@ this construction is a level-$(1-p)$ <span style = "color:firebrick">confidence 
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Friday</span>
-
-- some oddities of $p$-values & Rmarkdown
-
-<span style = "color:white"> &nbsp; </span>
-
 <span style = "color:firebrick">Tuesday</span>
 
 - introduction to a Bayesian approach to statistical inference
 
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- introduction to MCMC methods
+
+
 ## to prevent boredom
+
+<span style = "color:white"> &nbsp; </span>
 
 <span style = "color:firebrick">obligatory</span>
 
-- prepare Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf))
-    - only up to page 788 (you may stop at section "Bayesian inference"; you may also go on)
+- prepare Kruschke chapters 5 & 6 
 
-<span style = "color:white"> &nbsp; </span>
+- start on your first homework set
+    - ask questions on Tuesday in class!
 
-<span style = "color:firebrick">optional</span>
 
-- read [R for Data Science](http://r4ds.had.co.nz) part IV on Rmarkdown
 
-<span style = "color:white"> &nbsp; </span>
+
 

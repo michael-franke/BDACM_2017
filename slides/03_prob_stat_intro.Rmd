@@ -111,16 +111,16 @@ house.probs = c(6,3,1,2,4) %>% (function(x) x/sum(x))
 
 ## binomial
 
-the <span style = "color:firebrick">binomial distribution</span> gives the probability of observing $k$ successes in $n$ coin flips with a bias of $p$:
+the <span style = "color:firebrick">binomial distribution</span> gives the probability of observing $k$ successes in $n$ coin flips with a bias of $\theta$:
 
-$$ B(k ; n,p) = \binom{n}{k} p^{k} \, (1-p)^{n-k} $$ 
+$$ B(k ; n,\theta) = \binom{n}{k} \theta^{k} \, (1-\theta)^{n-k} $$ 
 
 ```{r, echo = F, fig.height = 3.5}
-binom.plot.data = expand.grid(n = 24, p = c(0.25, 0.5), k = 0:24) %>% 
-  mutate(probability = dbinom(k,n,p), p = as.factor(p))
-binom.plot = ggplot(binom.plot.data, aes(x = k, y = probability, fill = p)) + 
+binom.plot.data = expand.grid(n = 24, theta = c(0.25, 0.5), k = 0:24) %>% 
+  mutate(probability = dbinom(k,n,theta), theta = as.factor(theta))
+binom.plot = ggplot(binom.plot.data, aes(x = k, y = probability, fill = theta)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("B(k; n=24, p)")
+  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("B(k; n=24, theta)")
 binom.plot
 ```
 
@@ -129,16 +129,16 @@ binom.plot
 
 ## negative binomial
 
-the <span style = "color:firebrick">negative binomial distribution</span> gives the probability of needing $n$ coin flips to observe $k$ successes with a bias of $p$:
+the <span style = "color:firebrick">negative binomial distribution</span> gives the probability of needing $n$ coin flips to observe $k$ successes with a bias of $\theta$:
 
-$$ NB(n ; k,p) = \frac{k}{n} \binom{n}{k} p^{k} \, (1-p)^{n - k}$$
+$$ NB(n ; k, \theta) = \frac{k}{n} \binom{n}{k} \theta^{k} \, (1-\theta)^{n - k}$$
 
 ```{r, echo = F, fig.height = 3.5}
-neg.binom.plot.data = expand.grid(n = 0:75, p = c(0.25, 0.5), k = 7) %>% 
-  mutate(probability = k/n * dbinom(k,n,p), p = as.factor(p))
-neg.binom.plot = ggplot(neg.binom.plot.data, aes(x = n, y = probability, fill = p)) + 
+neg.binom.plot.data = expand.grid(n = 0:75, theta = c(0.25, 0.5), k = 7) %>% 
+  mutate(probability = k/n * dbinom(k,n,theta), theta = as.factor(theta))
+neg.binom.plot = ggplot(neg.binom.plot.data, aes(x = n, y = probability, fill = theta)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("NB(n; k=7, p)")
+  scale_fill_manual(values = c("darkgrey", "firebrick")) + ylab("NB(n; k=7, theta)")
 neg.binom.plot
 ```
 
@@ -416,7 +416,7 @@ better version: the $p$-value is the probability of observing, under <span style
 ## example: fair coin?
 
 - we flip $n=24$ times and observe $k = 7$ successes
-- null hypothesis: $p = 0.5$
+- null hypothesis: $\theta = 0.5$
 
 ```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
   
@@ -424,7 +424,7 @@ plotData = data.frame(x = 0:24, y = dbinom(0:24, 24, 0.5))
 plotData2 = data.frame(x = c(0:7, 17:24), y = dbinom(c(0:7, 17:24), 24, 0.5))
 sig.plot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
   geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
-  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, p = 0.5)") +
+  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, theta = 0.5)") +
   # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
   geom_text(x = 3, y = 0.03, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = ""))
 sig.plot

@@ -409,6 +409,7 @@ multiple output formats:
 - HTML pages, HTML slides (here), ...
 - PDF, LaTeX, Word, ...
 
+
 <div style = "position:absolute; top: 620px; right:60px;">
   [cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) and a [quick tour](http://rmarkdown.rstudio.com/authoring_quick_tour.html)
 </div>

@@ -20,7 +20,7 @@ n | date | topic | reading (main) | extra info
 3 | 2/5 | [primer on probability & "classical" statistics](slides/03_prob_stat_intro.html) | Kruschke ch. 4 |  |
 4 | 5/5 | [*p*-problems & Rmarkdown](slides/04_pProblems.html)  | Wagenmakers ([2007](http://www.ejwagenmakers.com/2007/pValueProblems.pdf)), [R for Data Science](http://r4ds.had.co.nz) IV | <span style = "color:firebrick">Brechtbau 0.35</span> |
 5 | 9/5 | intro to BDA | Krushke ch. 5 & 6 |   |
-6 | 12/5 | MCMC sampling | Kruschke ch. 7 | [HW1](homework/01_warmingup.html) due |
+6 | 12/5 | MCMC sampling | Kruschke ch. 7 | [HW1](homework/01_warmingup.Rmd) due |
 7 | 16/5 | JAGS | Kruschke ch. 8 |  |
 8 | 19/5 | practice: parameter inference 1 | Lee & Wagenmakers ch. 3, 4 | |
 9 | 23/5 | hierarchical modeling | Kruschke ch. 9 | |

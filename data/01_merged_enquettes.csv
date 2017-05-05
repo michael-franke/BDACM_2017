@@ -1,0 +1,219 @@
+ID,user.name, qtype, question, response
+0,bubu, field, what program are you enrolled in?, cognitive science
+0,bubu, r.experience.bin, do you have experience with R?, 1
+0,bubu, bda.experience.bin, do you have experience with BDA?, 0
+0,bubu, cm.experience.bin, do you have experience with CM?, 0
+0,bubu, lit.most, what is your most favorite literary genre?, fantasy
+0,bubu, lit.least, what is your least favorite literary genre?, horror
+0,bubu, mus.most, what is your most favorite musical genre?, indie rock
+0,bubu, mus.least, what is your least favorite musical genre?, heavy metal
+0,bubu, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""; ""screen""; ""tablet""; ""phone""; ""paper""), screen
+0,bubu, prog.skill, how good a programmer are you? (integer from 0 -- 100), 40
+0,bubu, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+0,bubu, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""; ""friends""; ""work""; ""party""; ""nature""; ""culture""; ""consumption""), nature
+0,bubu, philosopher, who is your favorite philosopher?, platon
+0,bubu, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 40
+1,Deppi, field, what program are you enrolled in?,cognitive science
+1,Deppi, r.experience.bin,do you have experience with R? (yes: 1; no: 0),1
+1,Deppi, bda.experience.bin,do you have experience with BDA? (yes: 1; no: 0),0
+1,Deppi, cm.experience.bin,do you have experience with CM? (yes: 1; no: 0),0
+1,Deppi, lit.most, what is your most favorite literary genre?,speculative fiction
+1,Deppi, lit.least, what is your least favorite literary genre?,comic
+1,Deppi, mus.most, what is your most favorite musical genre?,pop
+1,Deppi, mus.least, what is your least favorite musical genre?,metalcore
+1,Deppi, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""; ""screen""; ""tablet""; ""phone""; ""paper"")",paper
+1,Deppi, prog.skill,how good a programmer are you? (integer from 0 -- 100),35
+1,Deppi, exercise,how many days per week do you exercise (do sports)? (integer from 0 -- 7),3
+1,Deppi, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""; ""friends""; ""work""; ""party""; ""nature""; ""culture""; ""consumption"")", friends
+1,Deppi, philosopher, who is your favorite philosopher?,Paul Watzlawick
+1,Deppi, cooking, "how many minutes per day do you spend on cooking (average; approximately)?",50
+2,bubu, field, what program are you enrolled in?, cognitive science
+2,bubu, r.experience.bin, do you have experience with R?, 1
+2,bubu, bda.experience.bin, do you have experience with BDA?, 0
+2,bubu, cm.experience.bin, do you have experience with CM?, 0
+2,bubu, lit.most, what is your most favorite literary genre?, crime thriller
+2,bubu, lit.least, what is your least favorite literary genre?, horror
+2,bubu, mus.most, what is your most favorite musical genre?, rock
+2,bubu, mus.least, what is your least favorite musical genre?, german folk music
+2,bubu, pdf.reader, how do you read your academic papers?, screen
+2,bubu, prog.skill, how good a programmer are you?, 30
+2,bubu, exercise, how many days per week do you exercise (do sports)?, 2
+2,bubu, weekend, choose the weekend activity you most enjoy, friends
+2,bubu, philosopher, who is your favorite philosopher?, Voltaire
+2,bubu, cooking, how many minutes per day do you spend on cooking, 40
+3,momo, field, what program are you enrolled in?, cognitive science
+3,momo, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+3,momo, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+3,momo, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+3,momo, lit.most, what is your most favorite literary genre?, novel
+3,momo, lit.least, what is your least favorite literary genre?, science fiction
+3,momo, mus.most, what is your most favorite musical genre?, indie rock
+3,momo, mus.least, what is your least favorite musical genre?, metal
+3,momo, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""";" ""screen""";" ""tablet""";" ""phone""";" ""paper""), paper
+3,momo, prog.skill, how good a programmer are you? (integer from 0 -- 100), 75
+3,momo, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+3,momo, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""";" ""friends""";" ""work""";" ""party""";" ""nature""";" ""culture""";" ""consumption""), nature
+3,momo, philosopher, who is your favorite philosopher?, Platon
+3,momo, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+4,shadow, field, what program are you enrolled in?, cognitive science
+4,shadow, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+4,shadow, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+4,shadow, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+4,shadow, lit.most, what is your most favorite literary genre?, fantasy
+4,shadow, lit.least, what is your least favorite literary genre?, romance
+4,shadow, mus.most, what is your most favorite musical genre?, pop/rock
+4,shadow, mus.least, what is your least favorite musical genre?, german volksmusik
+4,shadow, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+4,shadow, prog.skill, how good a programmer are you? (integer from 0 -- 100), 65
+4,shadow, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 7
+4,shadow, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), friends
+4,shadow, philosopher, who is your favorite philosopher?, none
+4,shadow, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+5,benny, field, what program are you enrolled in?, cognitive science
+5,benny, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+5,benny, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+5,benny, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+5,benny, lit.most, what is your most favorite literary genre?, thriller
+5,benny, lit.least, what is your least favorite literary genre?, romance
+5,benny, mus.most, what is your most favorite musical genre?, Rock and Techno
+5,benny, mus.least, what is your least favorite musical genre?, chart-pop
+5,benny, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""";" ""screen""";" ""tablet""";" ""phone""";" ""paper""), screen
+5,benny, prog.skill, how good a programmer are you? (integer from 0 -- 100), 77
+5,benny, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+5,benny, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""";" ""friends""";" ""work""";" ""party""";" ""nature""";" ""culture""";" ""consumption""), friends
+5,benny, philosopher, who is your favorite philosopher?, Robert Gwisdek
+5,benny, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60
+6,stewie, field, what program are you enrolled in?, computational linguistics
+6,stewie, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+6,stewie, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 1
+6,stewie, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+6,stewie, lit.most, what's your most favorite literary genre?, fiction
+6,stewie, lit.least, what's your least favorite literary genre?, non-fiction
+6,stewie, pdf.reader, how to you read your science papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+6,stewie, prog.skill, how good a programmer are you? (integer from 0 -- 100), 66
+7,friedel, field, what program are you enrolled in?, cognitive science
+7,friedel, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+7,friedel, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+7,friedel, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+7,friedel, lit.most, what is your most favorite literary genre?, fantasy
+7,friedel, lit.least, what is your least favorite literary genre?, romance
+7,friedel, mus.most, what is your most favorite musical genre?, rock
+7,friedel, mus.least, what is your least favorite musical genre?, extreme metal
+7,friedel, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+7,friedel, prog.skill, how good a programmer are you? (integer from 0 -- 100), 30
+7,friedel, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+7,friedel, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), friends
+7,friedel, philosopher, who is your favorite philosopher?, immanuel kant
+7,friedel, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+8,FDR, field, what program are you enrolled in?, psychology
+8,FDR, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+8,FDR, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+8,FDR, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+8,FDR, lit.most, what is your most favorite literary genre?, historical
+8,FDR, lit.least, what is your least favorite literary genre?, science fiction
+8,FDR, mus.most, what is your most favorite musical genre?, electronic
+8,FDR, mus.least, what is your least favorite musical genre?, Schlager
+8,FDR, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+8,FDR, prog.skill, how good a programmer are you? (integer from 0 -- 100), 10
+8,FDR, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 2
+8,FDR, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), friends
+8,FDR, philosopher, who is your favorite philosopher?, Pierre Bourdieu
+8,FDR, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 40
+9,d75a12529250b1060dcbcf567ae68426, field, what program are you enrolled in?, Cognitive Science
+9,d75a12529250b1060dcbcf567ae68426, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+9,d75a12529250b1060dcbcf567ae68426, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+9,d75a12529250b1060dcbcf567ae68426, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+9,d75a12529250b1060dcbcf567ae68426, lit.most, what is your most favorite literary genre?, rational fiction
+9,d75a12529250b1060dcbcf567ae68426, lit.least, what is your least favorite literary genre?, romance
+9,d75a12529250b1060dcbcf567ae68426, mus.most, what is your most favorite musical genre?, epic
+9,d75a12529250b1060dcbcf567ae68426, mus.least, what is your least favorite musical genre?, metal
+9,d75a12529250b1060dcbcf567ae68426, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+9,d75a12529250b1060dcbcf567ae68426, prog.skill, how good a programmer are you? (integer from 0 -- 100), 75
+9,d75a12529250b1060dcbcf567ae68426, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 2
+9,d75a12529250b1060dcbcf567ae68426, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), work
+9,d75a12529250b1060dcbcf567ae68426, philosopher, who is your favorite philosopher?, Peter Singer
+9,d75a12529250b1060dcbcf567ae68426, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+10,xyz, field, what program are you enrolled in?, cognitive science
+10,xyz, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+10,xyz, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+10,xyz, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+10,xyz, lit.most, what is your most favorite literary genre?, crime
+10,xyz, lit.least, what is your least favorite literary genre?, action
+10,xyz, mus.most, what is your most favorite musical genre?, dance
+10,xyz, mus.least, what is your least favorite musical genre?, jazz
+10,xyz, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+10,xyz, prog.skill, how good a programmer are you? (integer from 0 -- 100), 15
+10,xyz, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 2
+10,xyz, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), nature
+10,xyz, philosopher, who is your favorite philosopher?, Peter Singer
+10,xyz, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 15
+11,1d2c1b14e30d5311361b1be4d588e3b0, field, what program are you enrolled in?, computational linguistics
+11,1d2c1b14e30d5311361b1be4d588e3b0, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 0
+11,1d2c1b14e30d5311361b1be4d588e3b0, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+11,1d2c1b14e30d5311361b1be4d588e3b0, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+11,1d2c1b14e30d5311361b1be4d588e3b0, lit.most, what is your most favorite literary genre?,
+11,1d2c1b14e30d5311361b1be4d588e3b0, lit.least, what is your least favorite literary genre?, romance
+11,1d2c1b14e30d5311361b1be4d588e3b0, mus.most, what is your most favorite musical genre?,
+11,1d2c1b14e30d5311361b1be4d588e3b0, mus.least, what is your least favorite musical genre?, pop
+11,1d2c1b14e30d5311361b1be4d588e3b0, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), e-reader
+11,1d2c1b14e30d5311361b1be4d588e3b0, prog.skill, how good a programmer are you? (integer from 0 -- 100), 75
+11,1d2c1b14e30d5311361b1be4d588e3b0, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+11,1d2c1b14e30d5311361b1be4d588e3b0, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), culture
+11,1d2c1b14e30d5311361b1be4d588e3b0, philosopher, who is your favorite philosopher?,
+11,1d2c1b14e30d5311361b1be4d588e3b0, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+12,bibi, field, what program are you enrolled in?, Cognitive Science
+12,bibi, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+12,bibi, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+12,bibi, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+12,bibi, lit.most, what is your most favorite literary genre?, Crime
+12,bibi, lit.least, what is your least favorite literary genre?, Fantasy
+12,bibi, mus.most, what is your most favorite musical genre?, good music
+12,bibi, mus.least, what is your least favorite musical genre?, Schlager
+12,bibi, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+12,bibi, prog.skill, how good a programmer are you? (integer from 0 -- 100), 69
+12,bibi, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+12,bibi, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), nature
+12,bibi, philosopher, who is your favorite philosopher?, Andy Clark
+12,bibi, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
+13,John Smith, field, what program are you enrolled in?, cognitive science
+13,John Smith, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+13,John Smith, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+13,John Smith, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+13,John Smith, lit.most, what is your most favorite literary genre?, thriller
+13,John Smith, lit.least, what is your least favorite literary genre?, romance
+13,John Smith, mus.most, what is your most favorite musical genre?, 80s rock
+13,John Smith, mus.least, what is your least favorite musical genre?, deutsche Schlager
+13,John Smith, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+13,John Smith, prog.skill, how good a programmer are you? (integer from 0 -- 100), 50
+13,John Smith, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 2
+13,John Smith, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), friends
+13,John Smith, philosopher, who is your favorite philosopher?, none
+13,John Smith, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 45
+14,aloha, field, what program are you enrolled in?, cognitive science
+14,aloha, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+14,aloha, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+14,aloha, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+14,aloha, lit.most, what is your most favorite literary genre?, fiction
+14,aloha, lit.least, what is your least favorite literary genre?, romance
+14,aloha, mus.most, what is your most favorite musical genre?, electro swing
+14,aloha, mus.least, what is your least favorite musical genre?, heavy metal
+14,aloha, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), paper
+14,aloha, prog.skill, how good a programmer are you? (integer from 0 -- 100), 67
+14,aloha, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 4
+14,aloha, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), nature
+14,aloha, philosopher, who is your favorite philosopher?, Confucius
+14,aloha, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60
+15,bibui, field, what program are you enrolled in?, cognitive science
+15,bibi, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+15,bibi, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+15,bibi, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+15,bibi, lit.most, what is your most favorite literary genre?, fantasy
+15,bibi, lit.least, what is your least favorite literary genre?, romance
+15,bibi, mus.most, what is your most favorite musical genre?, deep house
+15,bibi, mus.least, what is your least favorite musical genre?, hardstyle
+15,bibi, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+15,bibi, prog.skill, how good a programmer are you? (integer from 0 -- 100), 60
+15,bibi, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 6
+15,bibi, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), sofa
+15,bibi, philosopher, who is your favorite philosopher?, Aristotle
+15,bibi, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 90

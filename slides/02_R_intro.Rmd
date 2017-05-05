@@ -392,7 +392,7 @@ ggplot(data = resp.summary, aes(x = condition, y = mean.response, color = altern
 
 - prepare Kruschke Chapter 4
 
-- fill in [CSV file](https://github.com/michael-franke/BDACM_2017/blob/master/data/01_class_enquette.csv) and send it to [Christian Adam](mailto:c.adam@student.uni-tuebingen.de)
+- fill in [CSV file](https://github.com/michael-franke/BDACM_2017/blob/master/data/01_class_enquete.csv) and send it to [Christian Adam](mailto:c.adam@student.uni-tuebingen.de)
 
 <span style = "color:white"> &nbsp; </span>
 

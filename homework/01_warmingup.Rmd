@@ -10,19 +10,35 @@ require('forcats')
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
 ```
 
-This homework assignment is due May 12th 2017 before class. Please email a `*.Rmd` file and a compiled output, preferably HTML to [Christian Adam](c.adam@student.uni-tuebingen.de). Make sure that the text explains your code and plots; the explanation you give is equally important, if not more so. Use R for the tasks below. Plot using ggplot2. Make use of the tidyverse wherever you can, in particular use piping (`%>%`) and the `dplyr` functions `filter()`, `mutate()`, `arrange()`, `select()` and `summarise()`. Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. Plots will be scored based on how sensible, clear and aesthetically pleasing they are. Each exercise gives 25 points.
+This homework assignment is due May 12th 2017 before class. Please email a `*.Rmd` file and a compiled output, preferably HTML to [Christian Adam](c.adam@student.uni-tuebingen.de). Make sure that the text explains your code and plots; the explanation you give is equally important, if not more so. Use R for the tasks below. Plot using ggplot2. Make use of the tidyverse wherever you can, in particular use piping (`%>%`) and the `dplyr` functions `filter()`, `mutate()`, `arrange()`, `select()` and `summarise()`. Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. Plots will be scored based on how sensible, clear and aesthetically pleasing they are.
 
-# Exercise 1: the in-class enquette 
+# Exercise 1: tidying up the in-class enquette (20 points)
 
 For this exercise, you will need the files `01_merged_enquettes.csv` and `01_participant_info.rds`, which find on in our GitHub repository in folder `data`. `01_merged_enquettes.csv` is a concatenation of the csv files everyone filled out with an extra column `ID` which uniquely identifies the file each row came from. To retain anonymity, usernames that matched a participant's actual name were replaced by their MD5 hash.
 `participant_info.rds` contains the gender and the message body (sans name) of each csv file sent in along with the file identifier.
 
-1. Read `01_merged_enquettes.csv` into a data frame, using `readerr::read_csv()`. Make sure you understand what happens with strings and factors when you do this and whether this is what you want later on.
+1. Read `01_merged_enquettes.csv` into a data frame, using `reader::read_csv()`. Make sure you understand what happens with strings and factors when you do this and whether this is what you want later on.
 2. When dealing with data, we need to be as sure as possible that it has the structure we assume and for large data sets, this cannot be done by manually inspecting each row of the data. So we will have to be a bit more clever about how we check for data integrity. This particular data set deviates from what we would expect in three or more ways - find at least two of them. (Hint: Functions that may be useful here are `summary()`, `str()`, `length()`, `levels()`, `nrow()` and `unique()`; when using RStudio, you might also find the function `View()` helpful.)
+3. Load `01_participant_info.rds`. It would be nice to have the data from the two dataframes combined. Find a way to do that, s.t. each row is one filled out question with the columns (in the given order): ID, user.name, Gender, qtype, question, response, Message
+4. `nchar()` returns the number of characters in a string. Add a column `message_length` to the data frame that contains the length of `Message` in characters.
+5. Use this new column and one additional column from the data frame to make a first plot that shows their relationship. Describe what the plot suggests to you and how confident you are in that suggestion holding up.
+6. Save the data frame in the RDS format.
 
-# Exercise 2: IMDB movie ratings
+# Exercise 2: plotting data from IMDB movie ratings (20 points)
 
-# Exercise 3: beta binomial distribution
+For this exercise, you will need the file `movie_metadata.csv`, which you can obtain [here](https://github.com/sundeepblue/movie_rating_prediction/blob/master/movie_metadata.csv). The data should self-explanatory enough that you can start playing around with it, but you can find more information about the data and things you could do with it on the creator's [blog post](https://blog.nycdatascience.com/student-works/machine-learning/movie-rating-prediction/).
+
+Load the data using `readr::read_csv()`. Our main variable of interest will be the movie ratings `imdb_score`. If your tibble containing the data has variable `d`, you can access this column by `d$imbd_score`. Explore the ratings by making three different plots:
+
+1. Plot the distribution of movie ratings. In the same plot, overlay a normal distribution with the same mean and standard deviation as the movie ratings. Describe whether this plot tells you anything.
+2. Make a plot of your choice that describes the movie ratings in terms of two categorical variables (i.e. variables with a fixed number of possible discrete values (levels) like `genres` or `color`). An obvious choice for this would be a facet plot, where one of the categorical variables determines the facets and the other is mapped to, say, `color`, but feel free to use any kind of plot that you like.
+3. There are a number of numerical variables included in the data set as well (like the number of likes). Choose two and plot the relationship between each of them to the movie scores and answer the following questions:
+    - What do they tell you?
+    - Can you combine the information from both plots?
+    - What if you were interested in more than two numerical variables?
+
+
+# Exercise 3: MC simulation of the beta binomial distribution (30 points)
 
 We learned about the beta distribution and the binomial distribution in class. Here we are going to look at the beta-binomial distribution which is a simple sequential combination of both. Although there is a precise mathematical characterization of the beta-binomial distribution, and although there is an R package `rmutil` which implements (a version of) it, we will here explore it by Monte Carlo sampling in order to better understand it.
 
@@ -43,7 +59,7 @@ tibble(k = 0:24,  # NB: `tibble` allows `k`to be used in next line; `data.frame`
 ```
 
 
-# Exercise 4: 
+# Exercise 4: MC validation of one interpretation of confidence intervals (30 points)
 
 Use a Monte Carlo method to assess whether it is true that the confidence interval calculated by R's function `binom.test()` contains the true value in 95% of the cases. To do this, repeat the following sampling process many times. First sample a random value for a coin bias $\theta \sim \text{Beta}(1,1)$ from a uniform distribution over the unit interval (realized here with a beta distribution with shape parameters both set to 1). Remember that you can get 1 sample from this distribution in R by writing:
 

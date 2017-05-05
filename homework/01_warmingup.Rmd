@@ -1,0 +1,64 @@
+---
+title: "BDA+CM_2017: Homework 1"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+require('forcats')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+# Exercise 1: beta binomial distribution
+
+We learned about the beta distribution and the binomial distribution in class. Here we are going to look at the beta-binomial distribution which is a simple sequential combination of both. Although there is a precise mathematical characterization of the beta-binomial distribution, and although there is an R package `rmutil` which implements (a version of) it, we will here explore it by Monte Carlo sampling in order to better understand it.
+
+The beta-binomial model is this. There is a latent bias parameter $\theta$ of a coin, but we do not know it. Our belief about possible values for $\theta$ is described by a beta distribution $\text{Beta}(\theta; \alpha, \beta)$ with shape parameters $\alpha$ and $\beta$. If $\theta$ has a fixed value, the probability of $k$ successful trials in $n$ flips is given by the binomial distribution $\text{B}(k ; n, \theta)$. The beta-binomial model combines our uncertainty about $\theta$ with the binomial model. Think of it as first sampling a random $\theta$ from the distribution $\text{Beta}(\alpha, \beta)$ (we will write $\theta \sim \text{Beta}(\alpha, \beta)$), then throwing a coin with bias $\theta$ $n$ times and observing the number of successes; do this many times; the average frequency with which we observe any possible $k$ in this feed-forward sampling process will approximate the beta-binomial distribution $\text{BetaBinom}(k ; \alpha, \beta, n)$.
+
+Implement a Monte Carlo simulation to approximate $\text{BetaBinom}(k ; \alpha, \beta, n)$ with $\alpha = 8$, $\beta = 18$ and $n = 24$ in this way. To do so, sample many values of $\theta \sim \text{Beta}(\alpha, \beta)$, using the function `rbeta()` in R. Then sample the outcome of one or several coin tosses for this $\theta$, using function `rbinom`. Store the results and make a barplot of the proportion (not frequency counts!) with which each number occurred. To see whether you got it right and/or have enough samples, visually compare your simulation results to the analytic solution, which is:
+
+$$ \text{BetaBinom}(k ; n, \alpha, \beta) = \binom{n}{k} \frac{\text{Beta}(k+\alpha, n-k+\beta)}{\text{Beta}(\alpha, \beta)}$$ 
+and looks like this for our concrete values:
+
+```{r, fig.height = 3.5}
+alpha = 8
+beta = 18
+n = 24
+tibble(k = 0:24,        # notice: tibble allows variabke `k` to be used immediately in the next line; `data.frame` would not
+       probability = choose(n,k) * beta(k + alpha, n - k + beta) / beta(alpha, beta)) %>% 
+  ggplot(aes(x = k, y = probability)) + geom_bar(stat = "identity")
+```
+
+
+# Exercise 2: 
+
+Use a Monte Carlo method to assess whether it is true that the confidence interval calculated by R's function `binom.test()` contains the true value in 95% of the cases. To do this, repeat the following sampling process many times. First sample a random value for a coin bias $\theta \sim \text{Beta}(1,1)$ from a uniform distribution over the unit interval (realized here with a beta distribution with shape parameters both set to 1). Remember that you can get 1 sample from this distribution in R by writing:
+
+```{r}
+theta = rbeta(1, shape1 = 1, shape2 = 1)
+```
+
+For each sampled value $\theta$, sample a value of $n \sim \text{Poisson}(\lambda = 10)$ from a Poisson distribution with mean and variance 10. In R, you get a sample from a Poisson distribution with parameter $\lambda = 10$ by writing:
+
+```{r}
+n = rpois(1,10)
+```
+
+We use a Poisson distribution just for convenience, since it is a salient distribution to give us random integers from some suitable range, not because of any special theoretical reason.
+
+Next, for each value pair of $\theta$ and $n$ draw many samples from a binomial distribution, i.e., sample a number of successes $k \sim \text{B}(n, \theta)$, using: 
+
+```{r}
+k = rbinom(1, n, theta)
+```
+
+Now calculate the confidence interval for your triple of $\theta$, $n$ and $k$, using:
+
+```{r}
+binom.test(k,n,theta)$conf.int
+```
+
+You get the lower bound of this by `binom.test(k,n,theta)$conf.int[1]` and the upper bound by `binom.test(k,n,theta)$conf.int[2]` Check whether $\theta$ lies inside this confidence interval.
+
+Since you do all this many, many times, record the number of times $\theta$ fell inside the confidence interval. If all is well, the proportion of cases where $\theta$ is inside the interval should converge to 95%. To check this, give a plot of the developement of the proprotion of cases where $\theta$ is inside the confidence interval over your iterations, like we did for the MC simulated $p$-value in class.

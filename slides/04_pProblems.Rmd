@@ -324,13 +324,45 @@ tons of gruesome scenarios:
 
 # Rmarkdown
 
-## promoting reproducible research
+## why Rmarkdown
 
 <span style = "color:white"> &nbsp; </span>
 
+<div style = "float:left; width:55%;">
+  
 - prepare, analyze & plot data right inside your document
 
 - hand over all of your work in one single, easily executable chunk
+    - support reproducible and open research
+
+- export to a variety of different formats
+
+</div>
+<div style = "float:right; width:35%;">
+
+<div align = 'center'>
+  <img src="http://rmarkdown.rstudio.com/images/RMarkdownOutputFormats.png" alt="Rmarkdown formats" style="width: 350px;"/>
+</div>
+
+</div>  
+
+
+## flow of information
+
+<span style = "color:white"> &nbsp; </span>
+
+
+
+<div align = 'center'>
+  <img src="http://rmarkdown.rstudio.com/images/RMarkdownFlow.png" alt="Rmarkdown info flow" style="width: 550px;"/>
+</div>
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div align = 'center'>
+  <img src="http://rmarkdown.rstudio.com/images/RMarkdownOutputFormats.png" alt="Rmarkdown formats" style="width: 250px;"/>
+</div>
 
 ## markdown
 
@@ -367,6 +399,7 @@ inline code & code blocks
   [cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 </div>
 
+
 ## Rmarkdown
 
 extension of markdown to dynamically integrate R output
@@ -377,8 +410,29 @@ multiple output formats:
 - PDF, LaTeX, Word, ...
 
 <div style = "position:absolute; top: 620px; right:60px;">
-  [cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+  [cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) and a [quick tour](http://rmarkdown.rstudio.com/authoring_quick_tour.html)
 </div>
+
+## supports LaTeX
+
+inline equations with `$\theta$`
+
+equation blocks with
+
+    $$ \begin{align*} E &= mc^2 \\
+    & = \text{a really smart forumla}
+    \end{align*} $$
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">caveat</span>
+
+LaTeX-style formulas will be rendered differently depending on the output method:
+
+- PDF-LaTeX gives you genuine LaTeX with (almost) all abilities 
+- HTML output uses [MathJax](https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference) to emulate LaTeX-like behavior
+    - only LaTeX-packages & functionality emulated in JS will be available
 
 ## Rmarkdown in your homework
 

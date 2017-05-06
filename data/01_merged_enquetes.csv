@@ -217,3 +217,31 @@ ID,user.name, qtype, question, response
 15,bibi, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), sofa
 15,bibi, philosopher, who is your favorite philosopher?, Aristotle
 15,bibi, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 90
+16,bubu, field, what program are you enrolled in?, cognitive science
+16,bubu, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+16,bubu, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+16,bubu, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 1
+16,bubu, lit.most, what is your most favorite literary genre?, hard sci fi
+16,bubu, lit.least, what is your least favorite literary genre?, romance
+16,bubu, mus.most, what is your most favorite musical genre?, stoner rock
+16,bubu, mus.least, what is your least favorite musical genre?, r&b
+16,bubu, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+16,bubu, prog.skill, how good a programmer are you? (integer from 0 -- 100), 25
+16,bubu, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 2
+16,bubu, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), nature
+16,bubu, philosopher, who is your favorite philosopher?, 
+16,bubu, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 2
+17,Ron Swanson, field, what program are you enrolled in?, computational linguistics
+17,Ron Swanson, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+17,Ron Swanson, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 1
+17,Ron Swanson, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 1
+17,Ron Swanson, lit.most, what is your most favorite literary genre?, short stories
+17,Ron Swanson, lit.least, what is your least favorite literary genre?, horror
+17,Ron Swanson, mus.most, what is your most favorite musical genre?, indie pop
+17,Ron Swanson, mus.least, what is your least favorite musical genre?, techno
+17,Ron Swanson, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), screen
+17,Ron Swanson, prog.skill, how good a programmer are you? (integer from 0 -- 100), 60
+17,Ron Swanson, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 0
+17,Ron Swanson, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), consumption
+17,Ron Swanson, philosopher, who is your favorite philosopher?, Wittgenstein
+17,Ron Swanson, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60

@@ -69,20 +69,20 @@ ID,user.name, qtype, question, response
 4,shadow, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), friends
 4,shadow, philosopher, who is your favorite philosopher?, none
 4,shadow, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 30
-5,benny, field, what program are you enrolled in?, cognitive science
-5,benny, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
-5,benny, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
-5,benny, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
-5,benny, lit.most, what is your most favorite literary genre?, thriller
-5,benny, lit.least, what is your least favorite literary genre?, romance
-5,benny, mus.most, what is your most favorite musical genre?, Rock and Techno
-5,benny, mus.least, what is your least favorite musical genre?, chart-pop
-5,benny, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""";" ""screen""";" ""tablet""";" ""phone""";" ""paper""), screen
-5,benny, prog.skill, how good a programmer are you? (integer from 0 -- 100), 77
-5,benny, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
-5,benny, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""";" ""friends""";" ""work""";" ""party""";" ""nature""";" ""culture""";" ""consumption""), friends
-5,benny, philosopher, who is your favorite philosopher?, Robert Gwisdek
-5,benny, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60
+5,42f4b247702c99bda0fc7bcc41c70d19, field, what program are you enrolled in?, cognitive science
+5,42f4b247702c99bda0fc7bcc41c70d19, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+5,42f4b247702c99bda0fc7bcc41c70d19, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+5,42f4b247702c99bda0fc7bcc41c70d19, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+5,42f4b247702c99bda0fc7bcc41c70d19, lit.most, what is your most favorite literary genre?, thriller
+5,42f4b247702c99bda0fc7bcc41c70d19, lit.least, what is your least favorite literary genre?, romance
+5,42f4b247702c99bda0fc7bcc41c70d19, mus.most, what is your most favorite musical genre?, Rock and Techno
+5,42f4b247702c99bda0fc7bcc41c70d19, mus.least, what is your least favorite musical genre?, chart-pop
+5,42f4b247702c99bda0fc7bcc41c70d19, pdf.reader, how do you read your academic papers? (choose from: ""e-reader""";" ""screen""";" ""tablet""";" ""phone""";" ""paper""), screen
+5,42f4b247702c99bda0fc7bcc41c70d19, prog.skill, how good a programmer are you? (integer from 0 -- 100), 77
+5,42f4b247702c99bda0fc7bcc41c70d19, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 3
+5,42f4b247702c99bda0fc7bcc41c70d19, weekend, choose the weekend activity you most enjoy (choose from: ""sofa""";" ""friends""";" ""work""";" ""party""";" ""nature""";" ""culture""";" ""consumption""), friends
+5,42f4b247702c99bda0fc7bcc41c70d19, philosopher, who is your favorite philosopher?, Robert Gwisdek
+5,42f4b247702c99bda0fc7bcc41c70d19, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60
 6,stewie, field, what program are you enrolled in?, computational linguistics
 6,stewie, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
 6,stewie, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 1
@@ -245,3 +245,17 @@ ID,user.name, qtype, question, response
 17,Ron Swanson, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), consumption
 17,Ron Swanson, philosopher, who is your favorite philosopher?, Wittgenstein
 17,Ron Swanson, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 60
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, field, what program are you enrolled in?, ISCL
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, r.experience.bin, do you have experience with R? (yes: 1; no: 0), 1
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, bda.experience.bin, do you have experience with BDA? (yes: 1; no: 0), 0
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, cm.experience.bin, do you have experience with CM? (yes: 1; no: 0), 0
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, lit.most, what is your most favorite literary genre?, good books
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, lit.least, what is your least favorite literary genre?, boring books
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, mus.most, what is your most favorite musical genre?, good misic
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, mus.least, what is your least favorite musical genre?, bad music
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, pdf.reader, how do you read your academic papers? (choose from: "e-reader"; "screen"; "tablet"; "phone"; "paper"), e-reader
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, prog.skill, how good a programmer are you? (integer from 0 -- 100), 40
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, exercise, how many days per week do you exercise (do sports)? (integer from 0 -- 7), 1
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, weekend, choose the weekend activity you most enjoy (choose from: "sofa"; "friends"; "work"; "party"; "nature"; "culture"; "consumption"), nature
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, philosopher, who is your favorite philosopher?, Karl Marx
+18,1dd5a32c902d030bd38a6c6bb65d9fe2, cooking, how many minutes per day do you spend on cooking (average; approximately)?, 40

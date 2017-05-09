@@ -28,14 +28,16 @@ theme_set(theme_bw() + theme(plot.background=element_blank()) )
 
 ## key notions
 
-- joint distributions & marginalization
-- conditional probability & Bayes rule
+- basics
+    - joint distributions & marginalization
+    - conditional probability & Bayes rule
 - 3 pillars of Bayesian data analysis:
     - estimation 
     - comparison
     - prediction
-- highest density interval
-- conjugate priors
+- parameter estimation for coin flips
+    - conjugate priors
+    - highest density interval
 
 
 ## recap
@@ -99,7 +101,7 @@ prob2ds
 conditional probability given blue eyes:
 
 ```{r}
-  round(prob2ds[1,] / sum(prob2ds[1,]), 4)
+  prob2ds["blue",] %>% (function(x) x/sum(x))
 ```
 
 ## model & data
@@ -116,7 +118,7 @@ model likelihood $P(D \, | \, \theta)$:
 
 ```{r echo = FALSE}
   likelihood = round(matrix(c(0, 1, 1/3, 2/3, 1/2, 1/2, 2/3, 1/3, 1, 0), nrow = 2),2)
-  rownames(likelihood) = c("heads", 'tails')
+  rownames(likelihood) = c("succ", 'fail')
   colnames(likelihood) = c("t=0", "t=1/3", "t=1/2", "t=2/3", "t=1")
 ```
 
@@ -153,18 +155,19 @@ Bayes rule: $P(\theta \, | \, D) \propto P(\theta) \times P(D \, | \, \theta)$
   prob2d
 ```
 
-<div style = "float:left; width:45%;">
+<div style = "float:left; width:55%;">
 
 posterior $P(\theta \, | \, \text{heads})$ after one success:
 
 ```{r}
-  prob2d[1,]/sum(prob2d[1,])
+  prob2d["succ",] %>% 
+    (function(x) x / sum(x))
 ```
 
 </div>
-<div style = "float:right; width:45%;">
+<div style = "float:right; width:35%;">
 
-```{r, echo = FALSE, fig.width = 4.5, fig.height = 2.75, dev.args = list(bg = 'transparent'), fig.align='center'}
+```{r, echo = FALSE, fig.width = 3.75, fig.height = 2.75, dev.args = list(bg = 'transparent'), fig.align='center'}
   plotData = data.frame(prior = rep(0.2,5), posterior = prob2d[1,]/sum(prob2d[1,]), theta = c(0, 1/3, 0.5, 2/3, 1))
   plotData = gather(plotData, key = distribution, value = probability, prior, posterior )
   ggplot(plotData, aes(x = theta, y = probability, color = distribution )) + geom_point() + geom_line() + theme(plot.background=element_blank()) + 
@@ -174,67 +177,197 @@ posterior $P(\theta \, | \, \text{heads})$ after one success:
 </div>  
 
 
+# 3 pillars of BDA
+
+## caveat
+
+<span style = "color:white"> &nbsp; </span>
 
 
+this section is for overview and outlook only
 
-# fun with coins
+<span style = "color:white"> &nbsp; </span>
+
+we will deal with this in detail later
+
+## estimation
+
+<span style = "color:white"> &nbsp; </span>
+
+given model and data, which parameter values should we believe in?
+
+$$\underbrace{P(\theta \, | \, D)}_{posterior} \propto \underbrace{P(\theta)}_{prior} \ \underbrace{P(D \, | \, \theta)}_{likelihood}$$
+
+## model comparison
+
+which of two models is more likely, given the data?
+
+$$\underbrace{\frac{P(M_1 \mid D)}{P(M_2 \mid D)}}_{\text{posterior odds}} = \underbrace{\frac{P(D \mid M_1)}{P(D \mid M_2)}}_{\text{Bayes factor}} \ \underbrace{\frac{P(M_1)}{P(M_2)}}_{\text{prior odds}}$$
+
+## prediction
+
+<span style = "color:white"> &nbsp; </span>
+
+which future observations do we expect (after seeing some data)?
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">prior predictive</span>
+
+$$ P(D) = \int P(\theta) \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">posterior predictive</span>
+
+$$ P(D \mid D') = \int P(\theta \mid D') \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+</div>  
+
+
+<span style = "color:white"> &nbsp; </span>
+<span style = "color:white"> &nbsp; </span>
+
+
+requires sampling distribution (more on this later)
+
+special case: prior/posterior predictive $p$-value (model criticism)
+
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+- focus on <span style = "color:firebrick">parameter estimation</span> first
+
+- look at computational tools for efficiently calculating posterior $P(\theta \mid D)$
+
+- use clever theory to reduce <span style = "color:firebrick">model comparison</span> to parameter estimation
+
+# coin bias estimation
 
 ## likelihood function for several tosses
 
-conventions: 
+- success is 1; failure is 0
+- pair $\tuple{k,n}$ is an outcome with $k$ success in $n$ flips
 
-- heads is 1; tails is 0
-- pair $\langle n_h, n_t \rangle$ is an outcome with $n_h$ heads, $n_t$ tails
-- $n = n_h + n_t$ is the total number of flips
+recap: <span style="color:firebrick">binomial distribution</span>:
 
-
-probability of outcome $\langle n_h, n_t \rangle$ is given by the <span style="color:black">binomial distribution</span>:
-
-$$P(\langle n_h, n_t \rangle \, | \, \theta) = {{n}\choose{n_h}} \theta^{n_h} \, (1-\theta)^{n_t}$$ 
-
-```{r}
-  binomialMatrix = matrix(0, nrow = 3, ncol = 5)
-  colnames(binomialMatrix) = colnames(prob2d)
-  rownames(binomialMatrix) = c("(0,2)", "(1,1)", "(2,0)")
-  thetas = c(0, 1/3, 0.5, 2/3, 1)
-  ks = 0:2
-  for (theta in 1:length(thetas)){
-    for (k in 1:length(ks)){
-      binomialMatrix[k,theta] = dbinom(ks[k],2,thetas[theta])
-    }
-  }
-  show(round(binomialMatrix,2))
-```
+$$ B(k ; n, \theta) = \binom{n}{k} \theta^{k} \, (1-\theta)^{n-k} $$
 
 
-## excursion: Kruschke's approach
+<span style = "color:firebrick">parameter estimation problem</span>
 
-conventions:
+$$ P(\theta \mid k, n) = \frac{P(\theta) \ B(k ; n, \theta)}{\int P(\theta') \ B(k ; n, \theta') \ \text{d}\theta} $$ 
 
-- heads is 1; tails is 0
-- outcomes are arbitrary sequences of flip results, e.g.: $1001$
-- each flip result is assumed to be independent
 
-probability of flip sequence with $n_h$ heads and $n_t$ tails is given by the <span style="color:black">"Kruschke-Bernoulli distribution"</span>:
+<div style = "position:absolute; top: 620px; right:60px;">
+  hey!?! what about the $p$-problems, sampling distributions etc.?
+</div>
 
-$$P(\langle n_h, n_t \rangle \, | \, \theta) = \theta^{n_h} \, (1-\theta)^{n_t}$$ 
+## parameter estimation & normalized likelihoods
 
-e.g., likelihood function for all flip sequences of at most length 2:
+<span style = "color:firebrick">claim:</span> estimation of $P(\theta \mid D)$ is independent of assumptions about sample space and sample procedure
 
-```{r}
-  KruschkeMatrix = matrix(0, nrow = 6, ncol = 5)
-  colnames(KruschkeMatrix) = colnames(prob2d)
-  rownames(KruschkeMatrix) = c("0", "1", "00", "01", "10", "11")
-  KruschkeMatrix[1:2,] = likelihood[2:1,]
-  thetas = c(0, 1/3, 0.5, 2/3, 1)
-  outcomes = c(0,1,1,2)
-  for (theta in 1:length(thetas)){
-    for (outcome in 1:length(outcomes)){
-      KruschkeMatrix[outcome+2,theta] = thetas[theta]^outcomes[outcome] * (1-thetas[theta])^(2- outcomes[outcome])
-    }
-  }
-  show(round(KruschkeMatrix,2))
-```
+<span style = "color:firebrick">proof</span>
+
+any normalizing constant $X$ cancels out:
+
+$$
+\begin{align*}
+P(\theta \mid D) & = \frac{P(\theta) \ P(D \mid \theta)}{\int_{\theta'} P(\theta') \ P(D \mid \theta')} \\
+& = \frac{ \frac{1}{X} \ P(\theta) \ P(D \mid \theta)}{ \ \frac{1}{X}\ \int_{\theta'} P(\theta') \ P(D \mid \theta')} \\
+& = \frac{P(\theta) \ \frac{1}{X}\ P(D \mid \theta)}{  \int_{\theta'} P(\theta') \ \frac{1}{X}\ P(D \mid \theta')}
+\end{align*}
+$$
+
+<div style="float: right; margin: 0px;"> <span style = "color:firebrick">$\Box$</span> </div>
+
+## welcome infinity
+
+what if $\theta$ is allowed to have any value $\theta \in [0;1]$?
+
+<span style = "color:firebrick">two problems</span>
+
+1. how to specify $P(\theta)$ in a concise way?
+2. how to compute normalizing constant $\int_0^1  P(\theta) \ P(D \, | \, \theta) \, \text{d}\theta$?
+
+
+<div class = "columns-2">
+
+<span style = "color:firebrick">one solution</span>
+  
+  - use <span style = "color:firebrick">beta distribution</span> to specify prior $P(\theta)$ with some handy parameters
+  - since this is the <span style = "color:firebrick">conjugate prior</span> to our likelihood function, computing posteriors is as easy as sleep
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:white"> &nbsp; </span>
+  
+<img src="http://shrifeedesign.de/wp-content/uploads/2013/12/2fliegen.jpg" alt="KruschkeFig5.3" style="width: 250px;"/>
+</div>
+
+## beta distribution
+
+2 shape parameters $a, b > 0$, defined over domain $[0;1]$
+
+$$\text{Beta}(\theta \, | \, a, b) \propto \theta^{a-1} \, (1-\theta)^{b-1}$$
+
+<div class = "centered">
+<img src="pics/Kruschke_Fig6_1_BetaDistr.png" alt="KruschkeFig6.1" style="width: 380px;"/>
+</div>
+
+## conjugate distributions
+
+<span style = "color:white"> &nbsp; </span>
+
+if prior $P(\theta)$ and posterior $P(\theta \, | \, D)$ are of the same family, they <span style = "color:firebrick">conjugate</span>, and the prior $P(\theta)$ is called <span style = "color:firebrick">conjugate prior</span> for the likelihood function $P(D \, | \, \theta)$ from which the posterior $P(\theta \, | \, D)$ is derived
+
+<span style = "color:firebrick">claim:</span> the beta distribution is the conjugate prior of a binomial likelihood function
+
+<span style = "color:firebrick">proof</span>
+
+$$ \begin{align*} 
+P(\theta \mid \tuple{k, n}) & \propto B(k ; n, \theta) \ \text{Beta}(\theta \, | \, a, b) \\
+P(\theta \mid \tuple{k, n}) & \propto \theta^{k} \, (1-\theta)^{n-k} \, \theta^{a-1} \, (1-\theta)^{b-1}  \ \  = \ \  \theta^{k + a - 1} \, (1-\theta)^{n-k +b -1} \\
+P(\theta \mid \tuple{k, n}) & = \text{Beta}(\theta \, | \, k + a, n-k + b)
+\end{align*}  $$
+
+<div style="float: right; margin: 0px;"> <span style = "color:firebrick">$\Box$</span> </div>
+
+
+## example applications
+
+<div class = "centered">
+<img src="pics/Kruschke_Fig6_4_BetaUpdates.png" alt="KruschkeFig6.4" style="width: 725px;"/>
+</div>
+
+# priors, likelihood & posterior
+
+## Bayes' puppies
+
+<span style = "color:white"> &nbsp; </span>
+
+posterior is a "compromise" between prior and likelihood
+
+$$\underbrace{P(\theta \, | \, D)}_{posterior} \propto \underbrace{P(\theta)}_{prior} \ \underbrace{P(D \, | \, \theta)}_{likelihood}$$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+
+<div align = 'center'>
+  <img src="http://4.bp.blogspot.com/-S47YpZTPIqk/T0ji_PrZ44I/AAAAAAAAAOA/buHdlQc2Si4/s1600/PuppiesBayesRule.jpg" alt="Bayes puppies" style="width: 650px;"/>
+</div>
+
 
 ## influence of sample size on posterior
 
@@ -242,7 +375,7 @@ e.g., likelihood function for all flip sequences of at most length 2:
 <img src="pics/Kruschke_Fig5_2_influenceSampleSize.png" alt="KruschkeFig5.2" style="width: 610px;"/>
 </div>
 
-## influence of prior on posterior
+## influence of sample size on posterior
 
 <div class = "centered">
 <img src="pics/Kruschke_Fig5_3_influencePrior.png" alt="KruschkeFig5.3" style="width: 610px;"/>
@@ -252,7 +385,9 @@ e.g., likelihood function for all flip sequences of at most length 2:
 
 ## highest density interval
 
-Given a distribution $P(x)$ over $X$, the <span style = "color:black">95% highest density interval</span> is a subset $Y \subseteq X$ such that:
+<span style = "color:white"> &nbsp; </span>
+
+given distribution $P(\cdot) \in \Delta(X)$, the <span style = "color:black">95% highest density interval</span> is a subset $Y \subseteq X$ such that:
 
 1. $P(Y) = .95$, and
 2. no point outside of $Y$ is more likely than any point within.
@@ -261,78 +396,64 @@ Given a distribution $P(x)$ over $X$, the <span style = "color:black">95% highes
 
 Intuition: range of values we are justified to belief in (categorically).
 
+<div style = "position:absolute; top: 620px; right:60px;">
+  caveat: NOT the same as the 2.5%-97.5% quantile range!!
+</div>
+
+
 ## examples
 
 <div class = "centered">
 <img src="pics/Kruschke_Fig4_5_HDIExamples.png" alt="KruschkeFig5.3" style="width: 370px;"/>
 </div>
 
+## example
 
+observed: $k = 7$ successes in $n = 24$ flips; 
 
-# welcome infinity
+prior: $\theta \sim \text{Beta}(1,1)$
 
-## continuous biases
+```{r, echo = FALSE, results='hide', warning=FALSE, message=FALSE}
 
-what if $\theta$ is allowed to have any value $\theta \in [0;1]$?
+HDIofICDF = function( ICDFname , credMass=0.95 , tol=1e-8 , ... ) {
+  # Arguments:
+  #   ICDFname is R's name for the inverse cumulative density function
+  #     of the distribution.
+  #   credMass is the desired mass of the HDI region.
+  #   tol is passed to R's optimize function.
+  # Return value:
+  #   Highest density iterval (HDI) limits in a vector.
+  # Example of use: For determining HDI of a beta(30,12) distribution, type
+  #   HDIofICDF( qbeta , shape1 = 30 , shape2 = 12 )
+  #   Notice that the parameters of the ICDFname must be explicitly named;
+  #   e.g., HDIofICDF( qbeta , 30 , 12 ) does not work.
+  # Adapted and corrected from Greg Snow's TeachingDemos package.
+  incredMass =  1.0 - credMass
+  intervalWidth = function( lowTailPr , ICDFname , credMass , ... ) {
+    ICDFname( credMass + lowTailPr , ... ) - ICDFname( lowTailPr , ... )
+  }
+  optInfo = optimize( intervalWidth , c( 0 , incredMass ) , ICDFname=ICDFname ,
+                      credMass=credMass , tol=tol , ... )
+  HDIlowTailPr = optInfo$minimum
+  return( c( ICDFname( HDIlowTailPr , ... ) ,
+             ICDFname( credMass + HDIlowTailPr , ... ) ) )
+}
 
-(at least) two problems:
+plotData = data.frame(theta = seq(0.01,1, by = 0.01),
+                      post = dbeta(seq(0.01,1, by = 0.01), 8, 18 ))
+hdi = HDIofICDF( qbeta , shape1 = 8 , shape2 = 18 )
+hdiData = data.frame(theta = rep(hdi, each = 2),
+                     post = c(0,dbeta(hdi, 8, 18), 0))
+ggplot(plotData, aes(x = theta, y = post)) + xlim(0,1) + geom_line(color = "black") + ylab("posterior") +
+  geom_line(data = hdiData, aes(x = theta, y = post), color = "skyblue", size = 1) +
+  geom_text(x = mean(hdi), y = 1, label = "HDI: 0.14 - 0.48")
 
-1. how to specify $P(\theta)$ in a concise way?
-2. how to compute normalizing constant $\int_0^1 P(D \, | \, \theta) \times P(\theta) \, \text{d}\theta$ in Bayes rule?
+```
 
-<span style = "color:white">dummy</span>
-
-<div class = "columns-2">
-
-one solution:
-  
-  - use <span style = "color:black">beta distribution</span> to specify prior $P(\theta)$ with some handy parameters
-  - since this is the <span style = "color:black">conjugate prior</span> to our likelihood function, computing posteriors is as easy as sleep
-
-<span style = "color:white"> dummy </span>
-
-<span style = "color:white"> dummy </span>
-  
-<img src="http://shrifeedesign.de/wp-content/uploads/2013/12/2fliegen.jpg" alt="KruschkeFig5.3" style="width: 250px;"/>
-</div>
-
-## beta distribution
-
-2 shape parameters $a, b > 0$, defined over domain $[0;1]$
-
-$$\text{Beta}(x \, | \, a, b) \propto x^{a-1} \, (1-x)^{b-1}$$
-
-<div class = "centered">
-<img src="pics/Kruschke_Fig6_1_BetaDistr.png" alt="KruschkeFig6.1" style="width: 380px;"/>
-</div>
-
-## conjugate distributions
-
-If the prior $P(\theta)$ and the posterior $P(\theta \, | \, D)$ are probability distributions of the same family, they are called conjugate; in particular, the posterior is then the <span style = "color:black">conjugate prior</span> for the likelihood function $P(D \, | \, \theta)$ from which the posterior $P(\theta \, | \, D)$ is derived.
-
-<span style = "color:black">NTS:</span> The beta distribution is the conjugate prior of Kruschke's likelihood function.
-
-Unravel definitions & rewrite:
-
-$$ \begin{align*} 
-P(\theta \, | \, \langle n_h, n_t \rangle) & \propto P(\langle n_h, n_t \rangle \, | \, \theta) \, \text{Beta}(\theta \, | \, a, b) \\
-& \propto \theta^{n_h} \, (1-\theta)^{n_t} \, \theta^{a-1} \, (1-\theta)^{b-1} \\
-& = \theta^{n_h + a -1} \, (1-\theta)^{n_t +b -1} 
-\end{align*}  $$
-
-Hence, by definition:
-
-$$ P(\theta \, | \, \langle n_h, n_t \rangle) =  \text{Beta}(\theta \, | \, n_h + a, n_t + b)$$
-
-## example applications
-
-<div class = "centered">
-<img src="pics/Kruschke_Fig6_4_BetaUpdates.png" alt="KruschkeFig6.4" style="width: 725px;"/>
-</div>
 
 # the road ahead
 
-## bda more generally
+## BDA more generally
 
 problems:
 

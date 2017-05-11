@@ -1,6 +1,6 @@
 ---
 title: "Bayesian data analysis & cognitive modeling"
-subtitle: "04: BDA basics"
+subtitle: "05: BDA basics"
 author: "Michael Franke"
 output:
   ioslides_presentation:

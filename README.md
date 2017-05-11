@@ -23,21 +23,21 @@ n | date | topic | reading (main) | extra info
 6 | 12/5 | MCMC sampling | Kruschke ch. 7 | [HW1](homework/01_warmingup.html) due |
 7 | 16/5 | JAGS | Kruschke ch. 8 |  |
 8 | 19/5 | practice: parameter inference 1 | Lee & Wagenmakers ch. 3, 4 | |
-9 | 23/5 | hierarchical modeling | Kruschke ch. 9 | |
+9 | 23/5 | hierarchical modeling | Kruschke ch. 9 | HW2 due |
 10 | 23/5 | practice: parameter inference 2 | Lee & Wagenmakers ch. 5, 6 | |
 11 | 26/5 | theory: model comparison | Kruschke ch 10, Lee & Wagenmakers ch. 7  | |
 12 | 30/5 | practice: model comparison | Lee & Wagenmakers ch. 7, 8  | |
 -- | -- | <span style = "color:firebrick">pentecoast</span> | --  | |
 13 | 13/6 | more on Bayes factors | tba |
-14 | 16/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV |
-15 | 20/6 | estimation, comparison & criticism | Kruschke 11, 12 |
-16 | 23/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV |
-17 | 27/6 | WebPPL | |
-18 | 30/6 | probabilistic cognitive models | |
-19 | 4/7 | intro: generalized linear model | Kruschke ch. 15 & 16 |
-20 | 7/7 | using Stan | [Stan manual](http://mc-stan.org/documentation/), Kruschke ch 14 |
-21 | 11/7 | GLM: further topics | Kruschke ch 17-22 |
-22 | 14/7 | practice: regression in Stan 1 | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |
-23 | 18/7 | practice: regression in Stan 2 | |
-24 | 21/7 | rounding off, project topics | |
+14 | 16/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | HW3 due |
+   | 20/6 | <span style = "color:firebrick">no class</span> |
+15 | 23/6 | estimation, comparison & criticism | Kruschke 11, 12 |
+16 | 27/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV |
+17 | 30/6 | WebPPL & probabilistic cognitive models | | HW4 due |
+18 | 4/7 | intro: generalized linear model | Kruschke ch. 15 & 16 |
+19 | 7/7 | using Stan | [Stan manual](http://mc-stan.org/documentation/), Kruschke ch 14 |
+20 | 11/7 | GLM: further topics | Kruschke ch 17-22 |
+21 | 14/7 | practice: regression in Stan 1 | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |
+22 | 18/7 | practice: regression in Stan 2 | | HW5 due |
+23 | 21/7 | rounding off, project topics | |
 

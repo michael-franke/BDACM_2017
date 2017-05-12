@@ -2,10 +2,10 @@
 title: "Bayesian data analysis & cognitive modeling"
 subtitle: "06: MCMC methods"
 author: "Michael Franke"
+runtime: shiny
 output:
   ioslides_presentation:
     css: mistyle.css
-    smaller: no
     transition: faster
     widescreen: yes
 ---
@@ -13,7 +13,7 @@ output:
 ```{r setup, include=FALSE, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
                       dev.args = list(bg = 'transparent'), fig.align='center',
-                      cache=TRUE)
+                      cache=FALSE)
 require('tidyverse')
 require('forcats')
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
@@ -92,7 +92,7 @@ myPlot
 ## notation
 
 
-if $P(\cdot \mid \vec{\alpha}) \in \Delta(X)$ is a distribution over $X$ (possibly high-dimensional) with fixed parameters $\vec{\alpha}$, then write $x \in P(\vec{\alpha})$
+if $P(\cdot \mid \vec{\alpha}) \in \Delta(X)$ is a distribution over $X$ (possibly high-dimensional) with fixed parameters $\vec{\alpha}$, then write $x \sim P(\vec{\alpha})$
     
 - think $x$ is a sample from $P(\vec{\alpha})$
 
@@ -110,121 +110,122 @@ if $P(\cdot \mid \vec{\alpha}) \in \Delta(X)$ is a distribution over $X$ (possib
 <span style = "color:firebrick">problem</span>
 
 - assume that $x \sim P$ and that $P$ is "unwieldy"
-- we'd like to know: some property $P$ (e.g., function $f(P)$)
-    - e.g., mean/median/sd, 95% HDI, $\dots$
-    - or, marginalized distribution over $X_i$ \dots
+- we'd like to know some property of $P$ (e.g., function $f(P)$)
+    - e.g., mean/median/sd, 95% HDI, cumulative probability $\int_{0.8}^\infty P(x) \ \text{d}x$, $\dots$
+    
 
 <span style = "color:white"> dummy </span>
 
 <span style = "color:firebrick">solution: Monte Carlo simulation</span> 
 
-- draw samples $S = x_1, \dots x_n ~ P$
-- calculate $f(S)$
-- for many $f$, $f(S)$ will approximate $f(X)$ if $S$ is "representative" of $P$
-
-
-<!--## simulating a beta distribution
-```{r,echo=FALSE}
-# shinyApp(
-#   ui=shinyUI(fluidPage(  
-#     fluidRow(
-#       column(4, sliderInput("a", label = "a:",
-#                             min = .1, max = 20, value = 2, step = .1)),
-#       column(4, sliderInput("M", label = "number of simulations:",
-#                             min = 10, max = 10000, value = 1000, step = 10))
-#       
-#       ),
-#     fluidRow(
-#       column(4,sliderInput("b", label = "b:",
-#                            min = .1, max = 20, value = 2, step = .1)),
-#       column(4, sliderInput("breaks", label = "number of breaks:",
-#                             min = 5, max = 100, value = 15, step = 1))
-#       ),
-#      fluidRow(
-#        column(6, h4("distribution")),
-#        column(3, h4("quantity"))
-#        ),
-#     fluidRow(
-#       column(6, plotOutput("postsim",height = "250px") ),
-#       column(4, tableOutput("table2") )
-#       )
-#     )),
-#   
-#   server=function(input, output) {
-#     
-#     xdraw<-function(input){
-#       a=input$a
-#       b=input$b
-#       M=input$M
-#       breaks=input$breaks
-#       xdraw = rbeta(n=M,shape1=a,shape2=b)
-#       return(xdraw)
-#       }
-#     
-#     x<-reactive(xdraw(input))
-#     
-#     plothist<-function(xdraw,input){
-#       a=input$a
-#       b=input$b
-#       M=input$M
-#       breaks=input$breaks
-#       par(mar=c(4,4,2,4))
-#       xx=seq(0.001,.999,.001)
-#       px= dbeta(xx,shape1=a,shape2=b)
-#       fvalues = px
-#       no.inf = fvalues[is.finite(fvalues)]
-#       maxlimy=max(no.inf)+.5
-#       hist(xdraw,xlim=c(0,1),ylim=c(0,maxlimy+.1),breaks=breaks,
-#            xlab=expression(x),ylab=expression(p*(italic(x))),main="",freq=FALSE)
-#       lines(xx,px,lwd=2,col="red")
-#       lines(HPDinterval(as.mcmc(xdraw)), c(0.05,0.05), lwd = 2.5, col = "blue")
-#       expr.post=expression(italic(p) * (italic(x)))
-#       legend("topright",inset=c(0,0),lwd=2,lty="solid",col="red",
-#              legend=expr.post)
-#       rug(xdraw)
-#     }
-#     
-#     plottable<-function(xdraw,input){
-#       dd=data.frame(1:input$M,xdraw)
-#       colnames(dd)<-c("draw","x")
-#       dd[1:10,]
-#     }
-#     
-#     plottable2<-function(xdraw,input){
-#       a=input$a
-#       b=input$b
-#       M=input$M
-#       outquant = matrix(NA,5,2)
-#       outquant[1,1] = a/(a+b)
-#       outquant[1,2] = mean(xdraw)
-#       outquant[2,1] = sqrt(a*b/((a+b)^2*(a+b+1)))
-#       outquant[2,2] = sd(xdraw)
-#       outquant[3,1] = NA
-#       outquant[3,2] = median(xdraw)
-#       outquant[4,2] = HPDinterval(as.mcmc(xdraw))[1]
-#       outquant[5,2] = HPDinterval(as.mcmc(xdraw))[2]
-#       rownames(outquant)=c("mean","sd","median","HDI low","HDI up")
-#       colnames(outquant)=c("true","estimated")
-#       outquant
-#     }
-#     
-#     output$postsim <- renderPlot({
-#       plothist(x(),input)
-#       })
-#     
-#     output$table2 <- renderTable({
-#       plottable2(x(),input)
-#     })
-#     
-#     }
-#   )
-```
--->
-
+- draw samples $S = x_1, \dots x_n \sim P$
+- calculate $f(S)$ (analog of $f(P)$ but for samples)
+- for many $f$, $f(S)$ will approximate $f(P)$ if $S$ is "representative" of $P$
 
 ## exmple
 
-approximate HDI of a beta distribution?
+
+```{r,echo=FALSE}
+shinyApp(
+  ui=shinyUI(fluidPage(
+    fluidRow(
+      column(4, sliderInput("a", label = "a:",
+                            min = .1, max = 20, value = 2, step = .1)),
+      column(4, sliderInput("M", label = "number of simulations:",
+                            min = 10, max = 10000, value = 1000, step = 10))
+
+      ),
+    fluidRow(
+      column(4,sliderInput("b", label = "b:",
+                           min = .1, max = 20, value = 2, step = .1)),
+      column(4, sliderInput("breaks", label = "number of breaks:",
+                            min = 5, max = 100, value = 15, step = 1))
+      ),
+     fluidRow(
+       column(6, h4("distribution")),
+       column(3, h4("quantity"))
+       ),
+    fluidRow(
+      column(6, plotOutput("postsim",height = "250px") ),
+      column(4, tableOutput("table2") )
+      )
+    )),
+
+  server=function(input, output) {
+
+    xdraw<-function(input){
+      a=input$a
+      b=input$b
+      M=input$M
+      breaks=input$breaks
+      xdraw = rbeta(n=M,shape1=a,shape2=b)
+      return(xdraw)
+      }
+
+    x<-reactive(xdraw(input))
+
+    plothist<-function(xdraw,input){
+      a=input$a
+      b=input$b
+      M=input$M
+      breaks=input$breaks
+      par(mar=c(4,4,2,4))
+      xx=seq(0.001,.999,.001)
+      px= dbeta(xx,shape1=a,shape2=b)
+      fvalues = px
+      no.inf = fvalues[is.finite(fvalues)]
+      maxlimy=max(no.inf)+.5
+      hist(xdraw,xlim=c(0,1),ylim=c(0,maxlimy+.1),breaks=breaks,
+           xlab=expression(x),ylab=expression(p*(italic(x))),main="",freq=FALSE)
+      lines(xx,px,lwd=2,col="red")
+      lines(HPDinterval(as.mcmc(xdraw)), c(0.05,0.05), lwd = 2.5, col = "blue")
+      expr.post=expression(italic(p) * (italic(x)))
+      legend("topright",inset=c(0,0),lwd=2,lty="solid",col="red",
+             legend=expr.post)
+      rug(xdraw)
+    }
+
+    plottable<-function(xdraw,input){
+      dd=data.frame(1:input$M,xdraw)
+      colnames(dd)<-c("draw","x")
+      dd[1:10,]
+    }
+
+    plottable2<-function(xdraw,input){
+      a=input$a
+      b=input$b
+      M=input$M
+      outquant = matrix(NA,5,2)
+      outquant[1,1] = a/(a+b)
+      outquant[1,2] = mean(xdraw)
+      outquant[2,1] = sqrt(a*b/((a+b)^2*(a+b+1)))
+      outquant[2,2] = sd(xdraw)
+      outquant[3,1] = NA
+      outquant[3,2] = median(xdraw)
+      outquant[4,2] = HPDinterval(as.mcmc(xdraw))[1]
+      outquant[5,2] = HPDinterval(as.mcmc(xdraw))[2]
+      rownames(outquant)=c("mean","sd","median","HDI low","HDI up")
+      colnames(outquant)=c("true","estimated")
+      outquant
+    }
+
+    output$postsim <- renderPlot({
+      plothist(x(),input)
+      })
+
+    output$table2 <- renderTable({
+      plottable2(x(),input)
+    })
+
+    }
+  )
+```
+
+
+
+
+
+
 
 # Markov chains
 
@@ -237,7 +238,7 @@ approximate HDI of a beta distribution?
 
 <span style = "color:firebrick">intuition</span>
 
-a sequence of elements from $X$, $x_1, \dots, x_n$ such that every $x_{i+1}$ depends only on its predecessor $x_i$
+a sequence of elements, $x_1, \dots, x_n$ such that every $x_{i+1}$ depends only on its predecessor $x_i$
 (think: <span style = "color:firebrick">probabilistic FSA</span>)
 
   
@@ -280,7 +281,7 @@ get sequence of samples $x_1, \dots, x_n$ s.t.
 
 - non-independence -> autocorrelation <div style="float: right; margin: 0px;">`r emo::ji(":(")`</div>
 - easy proof that stationary distribution is $P$ <div style="float: right; margin: 0px;">`r emo::ji(":)")`</div>
-- we can work with non-normalized probabilities (to be seen next) <div style="float: right; margin: 0px;">`r emo::ji(":)")`</div>
+- we can work with non-normalized probabilities <div style="float: right; margin: 0px;">`r emo::ji(":)")`</div>
     
 # Metropolis Hastings
 
@@ -290,8 +291,8 @@ get sequence of samples $x_1, \dots, x_n$ s.t.
 <img src="http://static.giantbomb.com/uploads/original/1/17015/1455061-monkey2_2010_07_31_21_20_48_28.png" alt="islands" style="width: 500px;"/>
 </div>
 
-- set of islands $X = \{x_1, x_2, \dots x_n\}$
-- goal: hop around & visit every island $x_i$ proportional to its population $P(x_i)$
+- set of islands $X = \{x^s, x^b, x^p\}$
+- goal: hop around & visit every island $x \in X$ proportional to its population $P(x)$
     - think: "samples" $x \sim P$ 
 - problem: island hopper can remember at most 2 islands' population
     - think: we don't know the normalizing constant
@@ -347,11 +348,13 @@ get sequence of samples $x_1, \dots, x_n$ s.t.
 - assume $X=(X_1,X_2,X_3)$ and $p(x)=P(x_1,x_2,x_3)$
 - start with $x^0=(x_1^0,x_2^0,x_3^0)$
 - at iteration $t$ of the Gibbs sampler, we have $x^{i-1}$ and need to generate $x^{i}$
-    - $x_1^{i} \sim  P(x_1|x_2^{i-1},x_3^{i-1})$
-    - $x_2^{i} \sim  P(x_2|x_1^{i},x_3^{i-1})$
-    - $x_3^{i} \sim  P(x_3|x_1^{i},x_2^{i})$
+    - $x_1^{i} \sim  P(x_1 \mid x_2^{i-1},x_3^{i-1})$
+    - $x_2^{i} \sim  P(x_2 \mid x_1^{i},x_3^{i-1})$
+    - $x_3^{i} \sim  P(x_3 \mid x_1^{i},x_2^{i})$
 - for a large $n$, $x^n$ will be a sample from $P(x)$
-    - $x^n_k$ will be a sample from $P(x_k)$ (marginal distribution)
+  - $x^n_1$ will be a sample from the <span style = "color:firebrick">marginal distribution</span>  $P(x_1)$:
+    
+$$ P(x_1) = \int P(\tuple{x_1, x_2, x_3}) \ \text{d} \tuple{x_2, x_3}$$     
 
 ## example: 2 coin flips
 
@@ -390,13 +393,17 @@ clever software helps determine when/how to do Gibbs and how to tune MH's propos
 
 ## problem statements
 
-convergence/representativeness
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">convergence/representativeness</span>
 
 - we have samples from MCMC, ideally several chains
 - in the limit, samples must be representative of $P$
 - how do we know that our meagre finite samples are representative?
 
-efficiency
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">efficiency</span>
 
 - ideally, we'd like the shortest samples that are representative
 - how do we measure that we have "enough" samples?
@@ -414,7 +421,9 @@ require('ggmcmc')
 <img src="http://i.huffpost.com/gen/1063477/original.jpg" alt="islands" style="width: 300px;"/>
 </div>
 
-*coda* and *ggmcmc* basically do the same thing, but they differ in, say, aesthetics
+`coda` and `ggmcmc` basically do the same thing, but they differ in, say, aesthetics
+
+`ggmcmc` lives in the tidyverse
 
 </div>
 
@@ -466,9 +475,8 @@ out = MH(f, 60000,2,10000)
 
 
 ```{r}
-out = MH(f, 60000,2,10000) # self-made MH infers mu and sigma of a Gaussian
-                           # returns MCMC-list from package 'coda'
-head(out[[1]])
+out = MH(f, iterations = 60000, chains = 2, burnIn = 10000) # self-made MH 
+head(out[[1]])      # returns MCMC-list from package 'coda'
 ```
 
 ## example MCMC data
@@ -520,6 +528,20 @@ trace plots from multiple chains should look like:
 <div class = "centered">
 <img src="pics/Kruschke_Fig7_11_Diagnostics2.png" alt="KruschkeFig7.11" style="width: 610px;"/>
 </div>
+
+## burn-in & thinning
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">burn-in</span>
+
+remove initial chunk of sample sequence to discard effects of (random) starting position
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">thinning</span>
+
+only consider every $i$-th sample to remove autocorrelation
 
 ## R hat
 
@@ -613,3 +635,6 @@ effectiveSize(out)
 
 - install [JAGS](http://mcmc-jags.sourceforge.net) & peak into its documentation
     - careful: most recent JAGS version is 4.2.0, but most recent documentation is for 4.0.0
+    
+- browse Gelman et al ([2014](http://www.stat.columbia.edu/~gelman/book/)) Part III for more on Bayesian computation
+    - more later in this course as well

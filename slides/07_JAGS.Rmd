@@ -1,0 +1,605 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "07: JAGS"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+## roadmap
+
+- JAGS
+    - background
+    - model specification syntax
+    - workflow
+    - tips & tricks
+
+## recap
+
+Bayes rule for data analysis:
+
+$$\underbrace{P(\theta \, | \, D)}_{posterior} \propto \underbrace{P(\theta)}_{prior} \times \underbrace{P(D \, | \, \theta)}_{likelihood}$$
+
+normalizing constant:
+
+$$ \int P(\theta') \times P(D \mid \theta') \, \text{d}\theta' = P(D) $$
+
+easy to solve only if:
+
+- $\theta$ is a single discrete variable with reasonably sized domain
+- $P(\theta)$ is conjugate prior for the likelihood function $P(D \mid \theta)$
+- we are very lucky
+
+## recap 
+
+<span style = "color:firebrick">Markov Chain Monte Carlo</span>
+
+get sequence of samples $x_1, \dots, x_n$ s.t.
+
+1. sequence has the <span style = "color:firebrick">Markov property</span> ($x_{i+1}$ depends only on $x_i$), and
+2. the <span style = "color:firebrick">stationary distribution</span> of the chain is $P$.
+
+<span style = "color:firebrick">MCMC algorithms</span>
+
+- Metropolis Hastings
+    - versatile but often inefficient
+    - depends on proposal distribution
+- Gibbs sampling
+    - fast and efficient, but not universally applicable
+    - depends on availability of conditional posterior
+    
+## recap     
+
+<span style = "color:firebrick">assessing quality of sample chains</span>
+
+- convergence / representativeness
+    - trace plots
+    - $\hat{R}$
+- efficiency
+    - autocorrelation
+    - effective sample size
+
+# JAGS
+
+## history
+
+<div style = "float:left; width:45%;">
+
+BUGS project (1989 - present ???)
+
+- Bayesian inference Using Gibbs Sampling
+- developed by UK-based biostatisticians
+
+<span style = "color:white"> &nbsp; </span>
+
+
+[WinBUGS](http://www.mrc-bsu.cam.ac.uk/software/bugs/) (1997 - 2007)
+
+- Windows based; with GUI
+- component pascal
+
+  
+</div>
+<div style = "float:right; width:45%;">
+
+[OpenBUGS](http://openbugs.net/w/FrontPage) (2005 - present) 
+
+- Windows & Linux; MacOS through [Wine](https://www.winehq.org)
+- component pascal
+
+<span style = "color:white"> &nbsp; </span>
+
+
+
+[JAGS](http://mcmc-jags.sourceforge.net) (2007 - present)
+
+- Windows, Linux, MacOS
+- no GUI
+- written in C++
+  
+</div>  
+
+
+## JAGS
+
+<span style = "color:firebrick">Just Another Gibbs Sampler</span>
+
+- declarative language
+    - model as a directed acyclic graph
+    - nodes are variables, edges are deterministic or probabilistic dependencies
+- automatically selects adequate sampler
+- call from & process output in R via packages:
+    - `R2Jags`, `rjags` ...
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  coded by [Martyn Plummer](https://www.iarc.fr/en/staffdirectory/displaystaff.php?id=10118)
+</div>
+
+
+## example
+
+```{r, results='hide', warning=FALSE, message=FALSE}
+require('rjags') # also loads `coda` package
+modelString = "
+model{
+  theta ~ dbeta(1,1)
+  k ~ dbinom(theta, N)
+}"
+# prepare for JAGS
+dataList = list(k = 7, N = 24)
+# set up and run model
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList,
+                       n.chains = 2)
+update(jagsModel, n.iter = 5000)
+codaSamples = coda.samples(jagsModel, 
+                           variable.names = c("theta"),
+                           n.iter = 5000)
+```
+
+## example
+
+```{r}
+ms = ggmcmc::ggs(codaSamples)
+ms %>% group_by(Parameter) %>% 
+   summarise(mean = mean(value),
+             HDIlow  = coda::HPDinterval(as.mcmc(value))[1], 
+             HDIhigh = coda::HPDinterval(as.mcmc(value))[2])
+```
+
+## example
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5}
+  tracePlot = ggmcmc::ggs_traceplot(ms)  
+  densPlot = ggmcmc::ggs_density(ms) + 
+    stat_function(fun = function(x) dbeta(x, 15,7), color = "black")
+```
+
+```{r, echo = FALSE}
+  tracePlot = tracePlot +
+    theme(plot.background=element_blank())
+  densPlot = densPlot + 
+    theme(plot.background=element_blank())
+```
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5}
+  gridExtra::grid.arrange(tracePlot, densPlot, ncol = 2) 
+```
+
+# Using JAGS
+
+## about JAGS
+
+- current version 4
+    - faster, allows for use of `=`
+    - added samplers and distributions (not yet all documented!?)
+- syntax is a mix of BUGS and R
+    - careful with parameterization of probability distributions !!!
+- declarative model specification
+    - directed acyclic graphs / Bayes nets
+        - nodes are variables, vertices are dependencies
+    - order invariant
+    - no variable reassignment, no control flow statements etc.
+        - exception: `ifelse`, `step` ... commands for boolean switching
+        - `for` loops for vector construction
+- $\exists$ command-line interface (not used in this course)
+
+## structure of a JAGS model description
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r, eval = FALSE}
+# declare size of variables if needed
+var ... ; 
+# do some data massaging (usually done in R)
+data{
+  ...
+}
+# specify model
+model{
+  ...
+}
+```
+
+
+<span style = "color:white"> &nbsp; </span>
+
+- you could write this into a separtate file called "myModel.jags.R"
+    - this is untidy file naming but gives you default R syntax highlighting
+
+## (nonsense) example
+
+```{r, eval = FALSE}
+
+var myData[5,100], myMu[5], myTau[5]; 
+data{
+  N = sum(counts) # counts is input to JAGS from R
+  indVector = c(3,2,4) # works like in R
+  specialConditions = counts[indVector] # like R; new in JAGS 4
+}
+model{
+  for (i in 1:dim(myData)[1]){
+    for (j in 1:dim(myData)[2]){
+      myData[i,j] ~ dnorm(myMu[i], myTau[i])
+    }
+  }
+  for (i in 1:5){
+    tmp[i] ~ dbeta(1,1)
+    myMu[i] = 100 + tmp[i] - 0.5
+    myTau[i] ~ dunif(0, 1000)
+  }
+}
+```
+
+
+## caveats
+
+- semicolon after declaration of variable dimensions
+- declare dimensions to avoid confusing the JAGS compiler
+- JAGS error messages are occassionally underinformative
+- all model specification lines are probabilistic ("~") or deterministic ("=" or "<-")
+    - "=" only works for JAGS 4+
+- all probabilistic dependencies must be samples from a distribution known to JAGS!
+    - this is therefore all ruled out:
+    
+```{r, eval = FALSE}
+
+  x ~ dbeta(1,1) - 0.5
+
+  myCostumDistribution = ... # something fancy
+  x ~ myCustomDistribution(0,1)
+  
+```
+    
+## another example    
+   
+Your turn: what's this model good for?
+
+- `obs` is a vector of 100 observations (real numbers)
+
+```{r, eval = FALSE}
+model{
+  mu ~ dunif(-2,2)
+  var ~ dunif(0, 100)
+  tau = 1/var
+  for (i in 1:100){
+    obs[i] ~ dnorm(mu,tau)
+  }
+}
+``` 
+
+NB: JAGS uses precision $\tau = 1/\sigma^2$, not standard deviation $\sigma$ in `dnorm`
+
+## model specifications, formally
+
+```{r, eval = FALSE}
+model{
+  mu ~ dunif(-2,2)
+  var ~ dunif(0, 100)
+  tau = 1/var
+  for (i in 1:100){
+    obs[i] ~ dnorm(mu,tau)
+  }
+}
+``` 
+
+$$\mu \sim \text{Unif}(-2,2)$$
+$$\sigma^2 \sim \text{Unif}(0,100)$$
+$$obs_i \sim \text{Norm}(\mu, \sigma)$$
+    
+# running a JAGS script    
+
+
+
+```{r, echo = FALSE}
+require('coda')
+
+MH = function(f, iterations = 50, chains = 2, burnIn = 0){
+  out = array(0, dim = c(chains, iterations - burnIn, 2))
+  dimnames(out) = list("chain" = 1:chains, 
+                       "iteration" = 1:(iterations-burnIn), 
+                       "variable" = c("mu", "sigma"))
+  for (c in 1:chains){
+    mu = runif(1, min = -2, max = 2)
+    sigma = runif(1, min = 0, max = 4)
+    for (i in 1:iterations){
+      muNext = mu + runif(1, min = -1.25, max = 0.25)
+      sigmaNext = sigma + runif(1, min = -0.25, max = 0.25)
+      rndm = runif(1, 0, 1)
+      if (f(mu, sigma) < f(muNext, sigmaNext) | f(muNext, sigmaNext) >= f(mu, sigma) * rndm) {
+        mu = muNext
+        sigma = sigmaNext
+      }
+      if (i >= burnIn){
+        out[c,i-burnIn,1] = mu
+        out[c,i-burnIn,2] = sigma
+      }
+    }
+  }
+  return(mcmc.list(mcmc(out[1,,]), mcmc(out[2,,])))
+}
+```
+
+## homebrew MH samples
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5}
+set.seed(1789)
+
+fakeData = rnorm(200, mean = 0, sd = 1)
+
+f = function(mu, sigma){
+  if (sigma <=0){
+    return(0)
+  }
+  priorMu = dunif(mu, min = -4, max = 4)
+  priorSigma = dunif(sigma, min = 0, max = 4)
+  likelihood =  prod(dnorm(fakeData, mean = mu, sd = sigma))
+  return(priorMu * priorSigma * likelihood)
+}
+
+samplesMH = MH(f, 
+               iterations = 60000,
+               chains = 2,
+               burnIn = 10000) # outputs mcmc.list from `coda` package
+```
+
+
+
+## back to the future
+
+```{r, results = 'hide'}
+modelString = "
+model{
+  mu ~ dunif(-4,4)
+  sigma ~ dunif(0,4)
+  tau = 1/sigma^2
+  for (i in 1:length(obs)){
+    obs[i] ~ dnorm(mu,tau)
+  }
+}"
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = list(obs = fakeData),
+                       n.chains = 2)
+update(jagsModel, n.iter = 5000)
+samplesJAGS = coda.samples(jagsModel, 
+                           variable.names = c("mu", "sigma"),
+                           n.iter = 5000)
+```
+
+
+## compare sample outputs
+
+```{r, echo = FALSE}
+library('ggmcmc')
+library('gridExtra')
+```
+
+
+```{r, fig.align='center', fig.width=7, fig.height=4.5}
+grid.arrange(ggs_density(ggs(samplesMH)) ,       ggs_density(ggs(samplesJAGS)) )
+```
+
+## compare sample outputs
+
+```{r, fig.align='center', fig.width=7, fig.height=4.5}
+grid.arrange(ggs_traceplot(ggs(samplesMH)) + theme(plot.background=element_blank()),
+      ggs_traceplot(ggs(samplesJAGS)) + theme(plot.background=element_blank()))
+```
+
+## compare sample outputs
+
+```{r, echo = FALSE}
+DbdaAcfPlot = function( codaObject , parName=varnames(codaObject)[1] , plColors=NULL ) {
+  if ( all( parName != varnames(codaObject) ) ) { 
+    stop("parName must be a column name of coda object")
+  }
+  nChain = length(codaObject)
+  if ( is.null(plColors) ) plColors=1:nChain
+  xMat = NULL
+  yMat = NULL
+  for ( cIdx in 1:nChain ) {
+    acfInfo = acf(codaObject[,c(parName)][[cIdx]],plot=FALSE) 
+    xMat = cbind(xMat,acfInfo$lag)
+    yMat = cbind(yMat,acfInfo$acf)
+  }
+  matplot( xMat , yMat , type="o" , pch=20 , col=plColors , ylim=c(0,1) ,
+           main="" , xlab="Lag" , ylab="Autocorrelation" )
+  abline(h=0,lty="dashed")
+  EffChnLngth = effectiveSize(codaObject[,c(parName)])
+  text( x=max(xMat) , y=max(yMat) , adj=c(1.0,1.0) , cex=1.25 ,
+        labels=paste("ESS =",round(EffChnLngth,1)) )
+}
+```
+
+
+```{r, fig.align='center', fig.width=7, fig.height=5}
+# function from Kruschke, defined in 'DBDA2E-utilities.R' 
+DbdaAcfPlot(samplesMH) + theme(plot.background=element_blank())
+```
+
+## compare sample outputs
+
+```{r, fig.align='center', fig.width=7, fig.height=5}
+# function from Kruschke, defined in 'DBDA2E-utilities.R'
+DbdaAcfPlot(samplesJAGS) + theme(plot.background=element_blank())
+```
+
+
+# tips and tricks
+
+## debugging
+
+develop step by step & monitor each new intermediate variable
+
+```{r, results = 'hide', fig.align='center', fig.width=4, fig.height=2.5}
+modelString = "
+model{
+  mu ~ dnorm(0,1)
+}"
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = list(obs = fakeData),
+                       n.chains = 2, n.adapt = 10)
+update(jagsModel, n.iter = 10)
+codaSamples = coda.samples(jagsModel, variable.names = c("mu"), n.iter = 5000)
+ggs_density(ggs(codaSamples))
+```
+
+## prior and posterior predictive
+
+```{r, eval = FALSE}
+
+model{
+  thetaPost ~ beta(1,1)
+  thetaPrior ~ beta(1,1)
+  # generate data from prior distribution
+  priorPredictive ~ dbin(thetaPrior,n) 
+  # here `thetaPost` is conditioned on observed data!!
+  kObs ~ dbin(thetaPost, n) 
+  # generate data from posterior
+  posteriorPredictive ~ dbin(thetaPost, n) 
+}
+```
+
+<div style = "float:left; width:35%;">
+
+<span style = "color:firebrick">prior predictive</span>
+
+$$ P(D) = \int P(\theta) \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+</div>
+<div style = "float:right; width:55%;">
+
+<span style = "color:firebrick">posterior predictive</span>
+
+$$ P(D \mid D') = \int P(\theta \mid D') \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+</div>  
+
+
+## conditioning
+
+- boolean operations `x <= y`, `x != y`, `x || y` as usual (see manual)
+- functions `ifelse`, `equals` and `step` for boolean conditioning
+
+```{r, eval = FALSE}
+model{
+  flag ~ dbern(0.5)
+  parameter1 = ifelse(flag, 0, -100)
+  parameter2 = ifelse(flag, 1, 100)
+}
+```
+
+## a problem
+
+What is this model trying to achieve? And, why does it not work?
+
+```{r, eval = FALSE}
+model{
+  flag ~ dbern(0.5)
+  SOMEPDF = ifelse(flag, dnorm, dunif)
+  parameter1 = ifelse(flag, 0, -100)
+  parameter2 = ifelse(flag, 1, 100)
+  for(i in 1:length(obs)){
+    obs[i] ~ SOMEPDF(parameter1, parameter2)
+  }
+}
+```
+
+## solution
+
+```{r, eval = FALSE}
+data{
+  for (i in 1:length(obs)){
+    ones[i] = 1 # create a vector of ones
+  }
+}
+model{
+  flag ~ dbern(0.5)
+  parameter1 = ifelse(flag, 0, -100)
+  parameter2 = ifelse(flag, 1, 100)
+  for(i in 1:length(obs)){
+    theta[i] = ifelse(flag, 
+                      dnorm(obs[i],parameter1, parameter2), 
+                      dunif(obs[i],parameter1, parameter2))
+    ones[i] ~ dbern(theta[i])
+  }
+}
+```
+
+
+# fini
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- 1st practice session
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- more complex (interesting) models
+
+## next class ::: we need you prepared!!
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">totally obligatory</span>
+
+- have installed on your laptop, newest versions of:
+    - `R` and `JAGS` (optional and recommended: `RStudio`)
+    - packages: `R2jags`, `rjags` and `runjags`
+    
+- obtain access to chapters 3 & 4 of [Lee & Wagenmakers](https://bayesmodels.com) (university library!)
+    - download the [example code for JAGS](https://webfiles.uci.edu/mdlee/Code.zip)
+    - make sure that you can execute the file `Code/ParameterEstimation/Binomial/Rate_1_jags.R`
+        - hint: you may need to plan a rendevous with line 10 of this file
+

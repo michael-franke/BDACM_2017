@@ -17,7 +17,8 @@ Optional reading:
     
 ## Cognitive Modeling
 
-We will use selected chapters and exercises from Michael D. Lee and Eric-Jan Wagenmakers [Bayesian modeling for cognitive science](https://bayesmodels.com/)) from 2014.
+We will use selected chapters and exercises from Michael D. Lee and Eric-Jan Wagenmakers [Bayesian modeling for cognitive science](https://bayesmodels.com/)) from 2014. Code for this book is available for download for [JAGS](https://webfiles.uci.edu/mdlee/Code.zip)
+and [Stan](https://github.com/stan-dev/example-models/tree/master/Bayesian_Cognitive_Modeling).
 
 Optional reading:
 

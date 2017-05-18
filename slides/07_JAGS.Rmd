@@ -190,7 +190,7 @@ ms %>% group_by(Parameter) %>%
 ```{r, fig.align='center', fig.width=7, fig.height=3.5}
   tracePlot = ggmcmc::ggs_traceplot(ms)  
   densPlot = ggmcmc::ggs_density(ms) + 
-    stat_function(fun = function(x) dbeta(x, 15,7), color = "black")
+    stat_function(fun = function(x) dbeta(x, 8,18), color = "black")
 ```
 
 ```{r, echo = FALSE}
@@ -215,7 +215,7 @@ ms %>% group_by(Parameter) %>%
     - careful with parameterization of probability distributions !!!
 - declarative model specification
     - directed acyclic graphs / Bayes nets
-        - nodes are variables, vertices are dependencies
+        - nodes are variables, edges are dependencies
     - order invariant
     - no variable reassignment, no control flow statements etc.
         - exception: `ifelse`, `step` ... commands for boolean switching
@@ -342,7 +342,7 @@ MH = function(f, iterations = 50, chains = 2, burnIn = 0){
     mu = runif(1, min = -2, max = 2)
     sigma = runif(1, min = 0, max = 4)
     for (i in 1:iterations){
-      muNext = mu + runif(1, min = -1.25, max = 0.25)
+      muNext = mu + runif(1, min = -1.25, max = 1.25)
       sigmaNext = sigma + runif(1, min = -0.25, max = 0.25)
       rndm = runif(1, 0, 1)
       if (f(mu, sigma) < f(muNext, sigmaNext) | f(muNext, sigmaNext) >= f(mu, sigma) * rndm) {

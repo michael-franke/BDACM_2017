@@ -454,7 +454,7 @@ MH = function(f, iterations = 50, chains = 2, burnIn = 0){
     mu = runif(1, min = -4, max = 4)
     sigma = runif(1, min = 0, max = 4)
     for (i in 1:iterations){
-      muNext = mu + runif(1, min = -1.25, max = 0.25)
+      muNext = mu + runif(1, min = -1.25, max = 1.25)
       sigmaNext = sigma + runif(1, min = -0.25, max = 0.25)
       rndm = runif(1, 0, 1)
       if (f(mu, sigma) < f(muNext, sigmaNext) | f(muNext, sigmaNext) >= f(mu, sigma) * rndm) {

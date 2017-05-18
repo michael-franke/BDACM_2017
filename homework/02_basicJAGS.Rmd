@@ -1,0 +1,134 @@
+---
+title: "BDA+CM_2017: Homework 2"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+require('forcats')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+This homework assignment is due May 26th 2017 before class. Submit your results in a zipped archive with name `BDA+CM_HW2_YOURLASTNAME.zip` which includes both Rmarkdown and a compiled version (preferably HTML). Use the same naming scheme for the `*.Rmd` and `*.html` files. All other files, if needed, should start with `BDA+CM_HW1_YOURLASTNAME_` as well. Upload the archive to the Dropbox folder.
+
+Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. All of the exercises below are required and count equally to the final score.
+
+# Exercise 1: What do you believe after a single coin flip?
+
+A prominent method of parameter inference is maximum likelihood estimation (MLE). MLE looks at the observed data $D$ and a likelihood function $P(D \mid \theta$ given values for parameter $\theta$. We then estimate the best fitting parameter $\theta^*$ which maximizes the likelihood:
+
+$$ \theta^* = \arg\max_\theta P(D \mid \theta) $$ 
+
+MLE is used, for example, to obtain point-estimates for regression coefficients and to compare models with notions such as AIC (more on this later during the course).
+
+Suppose Jones draws a coin from her pocket and flips it once. It's a success. Let's assume that the relevant likelihood function is the Binomial distribution. 
+
+1. What is the MLE for the coin's bias $\theta$?
+2. Does the MLE change if we assume a negative binomial distribution as the likelihood function?
+2. Is the MLE what you would reasonably believe about Jones' coin? I.e., would you bet on this being the actual bias of the coin? Why? Why not?
+3. What could a plausible Bayesian point estimate (i.e., a single value for $\theta$) be? Is this more in line with your intuition?
+
+# Exercise 2: Metropolis Hastings
+
+The lectures used a homebrew (and hacky) version of the Metropolis Hastings algorithm. Here is a version of the code with some changes.
+
+```{r}
+library('coda')
+
+# generate fake data
+fakeData = rnorm(100, mean = 0.5, sd = 1) 
+
+# target function to approximate:
+#   non-normalized posterior: prior times likelihood
+f = function(mu, sigma){
+  if (sigma <=0){
+    return(0)
+  }
+  priorMu = dunif(mu, min = -3.5, max = 5)
+  priorSigma = dunif(sigma, min = 0, max = 4)
+  likelihood =  prod(dnorm(fakeData, mean = mu, sd = sigma))
+  return(priorMu * priorSigma * likelihood)
+}
+
+MH = function(f, iterations = 50, chains = 2, burnIn = 0){
+  out = array(0, dim = c(chains, iterations - burnIn, 2))
+  dimnames(out) = list("chain" = 1:chains, 
+                       "iteration" = 1:(iterations-burnIn), 
+                       "variable" = c("mu", "sigma"))
+  for (c in 1:chains){
+    mu = runif(1, min = -4, max = 4)
+    sigma = runif(1, min = 0, max = 4)
+    for (i in 1:iterations){
+      muNext = mu + rnorm(1, mean = 0.5, sd = 1)
+      sigmaNext = sigma + runif(1, min = -0.25, max = 0.25)
+      rndm = runif(1, 0, 1)
+      if (f(mu, sigma) < f(muNext, sigmaNext) | f(muNext, sigmaNext) >= f(mu, sigma) * rndm) {
+        mu = muNext
+        sigma = sigmaNext
+      }
+      if (i >= burnIn){
+        out[c,i-burnIn,1] = mu
+        out[c,i-burnIn,2] = sigma
+      }
+    }
+  }
+  return(mcmc.list(mcmc(out[1,,]), mcmc(out[2,,])))
+}
+```
+
+
+1. What is this code trying to achieve? (Hint: fill in the blank in "Approximating the Bayesian inference of ... given ...")
+2. The code does not implement MH correctly. Find the mistake in the code. You might want to stare intently at [slide 13 from lecture 6](https://michael-franke.github.io/BDACM_2017/slides/06_MCMC_unshined.html#13).
+3. There are two ways of fixing the code. (One is simple, the other a bit more tricky.) Provide two minimal code snippets that implement each fix. (Change as little as possible, even if, admittedly, the code provided is suboptimal in so many ways.)
+4. Set a seed with `set.seed(1789)` (so that we all get the same samples and results, do so before generating your `fakeData`). Collect 2 chains of 50,000 samples each after a burn-in of 10,000 using the fixed code. (If you failed to solve the previous exercise, use the code from the lecture, provided in the Rmarkdown for the slides of lectures 6 and 7).
+    a. Show a traceplot and comment on what this tells you about the quality of the samples.
+    b. Calculate the $\hat{R}$ statistic and comment on what the resulting value means.
+    c. Calculate the effective sample size.
+    d. Plot the estimated density of variables `mu` and `sigma`.
+    e. Report a summary of the samples for each variable, including the mean and the 95% HDIs.
+    f. Use your samples to assess whether it is credible that the true $\mu$ is zero.
+    g. Use your samples to approximate your posterior belief in the proposition that the true $\mu$ is bigger than zero.
+    
+
+# Exercise 3: Infer and compare means for two samples
+
+Suppose we have observed a vector $\vec{x}$ and a vector $\vec{y}$ of data, of which we are fairly certain that they come from a normal distribution, but we do not know their mean or standard deviation. We are interested in whether the mean could be the same.
+
+Here's our data.
+
+```{r}
+set.seed(2017)
+x_obs = rnorm(50,0,1)
+y_obs = rnorm(25,0.3,1.5)
+```
+
+A standard statistical test to assess whether means are equal would be:
+
+```{r}
+t.test(x_obs,y_obs)
+```
+
+1. What would you conclude from this?
+2. Implement the following model in JAGS:
+$$ \begin{align*} 
+x_i & \sim \mathcal{N}(\mu_x, \sigma_x) \\
+y_i & \sim \mathcal{N}(\mu_y, \sigma_y) \\
+\mu_{x,y} & \sim \text{Uniform}(-10, 10) \\
+\sigma_{x,y} & \sim \text{Uniform}(0, 5) \\
+\end{align*} $$ 
+3. Run the model and collect samples from the posterior distribution over all relevant parameters.
+4. Check convergence and well-behavedness of your samples.
+5. Use your samples to express approximate quantitative beliefs about the relation of the true means which have generated the data. (Whatever you think is (most) relevant and (most) informative will do.)
+
+
+
+
+
+
+
+
+
+
+
+

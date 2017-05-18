@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
                       dev.args = list(bg = 'transparent'), fig.align='center',
-                      cache=TRUE)
+                      cache=FALSE)
 require('tidyverse')
 require('forcats')
 theme_set(theme_bw() + theme(plot.background=element_blank()) )

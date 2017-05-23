@@ -23,7 +23,7 @@ n | date | topic | reading (main) | extra info
 6 | 12/5 | [MCMC sampling](slides/06_MCMC_unshined.html) | Kruschke ch. 7 | [HW1](homework/01_warmingup.html) due |
 7 | 16/5 | [JAGS](slides/07_JAGS.html) | Kruschke ch. 8 |  |
 8 | 19/5 | practice: parameter inference 1 | Lee & Wagenmakers ch. 3, 4 | |
-9 | 23/5 | hierarchical modeling | Kruschke ch. 9 |  |
+9 | 23/5 | [hierarchical modeling](slides/09_hierMods.html) | Kruschke ch. 9 |  |
 10 | 26/5 | practice: parameter inference 2 | Lee & Wagenmakers ch. 5, 6 | [HW2](homework/02_basicJAGS.html) due |
 11 | 30/5 | theory: model comparison | Kruschke ch 10, Lee & Wagenmakers ch. 7  | |
 12 | 2/6 | practice: model comparison | Lee & Wagenmakers ch. 7, 8  | |

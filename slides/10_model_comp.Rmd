@@ -1,0 +1,528 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "Session 10: model comparison"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+---
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+show = function(x) { x }
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+## key notions
+
+- (recap) 3 pillars of Bayesian data analysis:
+    - estimation 
+    - comparison
+    - prediction
+- maximum likelihood estimation
+- Akaike's information criterion
+    - free parameters
+    - model complexity
+- Bayes factors
+    - Savage-Dickey method (next time!)
+
+# 3 pillars of BDA
+
+## estimation
+
+<span style = "color:white"> &nbsp; </span>
+
+given model and data, which parameter values should we believe in?
+
+$$\underbrace{P(\theta \, | \, D)}_{posterior} \propto \underbrace{P(\theta)}_{prior} \ \underbrace{P(D \, | \, \theta)}_{likelihood}$$
+
+## model comparison
+
+which of two models is more likely, given the data?
+
+$$\underbrace{\frac{P(M_1 \mid D)}{P(M_2 \mid D)}}_{\text{posterior odds}} = \underbrace{\frac{P(D \mid M_1)}{P(D \mid M_2)}}_{\text{Bayes factor}} \ \underbrace{\frac{P(M_1)}{P(M_2)}}_{\text{prior odds}}$$
+
+## prediction
+
+<span style = "color:white"> &nbsp; </span>
+
+which future observations do we expect (after seeing some data)?
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">prior predictive</span>
+
+$$ P(D) = \int P(\theta) \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">posterior predictive</span>
+
+$$ P(D \mid D') = \int P(\theta \mid D') \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+</div>  
+
+
+<span style = "color:white"> &nbsp; </span>
+<span style = "color:white"> &nbsp; </span>
+
+
+requires sampling distribution (more on this later)
+
+special case: prior/posterior predictive $p$-value (model criticism)
+
+
+# preliminaries
+
+## summary
+
+|    | standard | Bayes | 
+|:---|:---:|:---:|
+| today's focus | Akaike's information criterion | Bayes factor
+| what counts as model to be compared? | likelihood function $P(D \mid \theta)$ | likelihood $P(D \mid \theta)$ + prior $P(\theta)$
+| from which point of view do we compare models? | <span style = "font-style: italic">ex post</span>: after seeing the data | <span style = "font-style: italic">ex ante</span>: before seeing the data
+| how to penalize model complexity? | count number of free parameters | implicitly weigh how effective a parameter is
+| are we guaranteed to select the true model in the end? | no | yes
+| hard to compute? | relatively easy | relatively hard
+
+
+  
+# maximum likelihood
+
+## forgetting data
+
+- subjects each where asked to remember items (Murdoch 1961)
+- recall rates `y` for 100 subjects after time `t` in seconds
+
+```{r}
+y = c(.94, .77, .40, .26, .24, .16)
+t = c(  1,   3,   6,   9,  12,  18)
+obs = y*100
+```
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+example from Myung (2007), JoMP, tutorial on MLE  
+</div>
+
+
+## forgetting models
+
+recall probabilities for different times $t$
+
+
+<div style = "float:left; width:45%;">
+<span style = "color:firebrick">
+exponential model
+</span>
+
+$$P(t \ ; \ a, b) = a \exp (-bt)$$ 
+
+$$\text{where } a,b>0 $$
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=3}
+forgetData = data.frame(t = t, obs = obs, y = y)
+myCols = c("firebrick", "coral", "darkgreen")
+expo = function(x, c, d) return( c* exp(-x*d) )
+power = function(x, a, b) return( a*x^(-b) )
+forgetPlotExpo = ggplot(data.frame(x = c(1,20)), aes(x)) +
+         stat_function(fun = function(x) expo(x, 1,1), aes(color = "a,b=1")) +
+         stat_function(fun = function(x) expo(x, 2,2), aes(color = "a,b=2")) +
+         stat_function(fun = function(x) expo(x, 1,0.2), aes(color = "a=1,b=0.1")) +
+         scale_colour_manual("Function", breaks = c("a,b=1", "a,b=2", "a=1,b=0.1"), values = myCols) +
+          ggtitle("exponential") + geom_point(data = forgetData, aes(x = t, y = y))
+show(forgetPlotExpo)
+```
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">
+power model
+</span>
+
+$$P(t \ ; \ c, d) = ct^{-d}$$
+
+$$\text{where } c,d>0 $$
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=3}
+forgetPlotPower = ggplot(data.frame(x = c(1,20)), aes(x)) +
+         stat_function(fun = function(x) power(x, 1,1), aes(color = "c,d=1")) +
+         stat_function(fun = function(x) power(x, 2,2), aes(color = "c,d=2")) +
+         stat_function(fun = function(x) power(x, 2,1), aes(color = "c=2,d=1")) +
+         scale_colour_manual("Function", breaks = c("c,d=1", "c,d=2", "c=2,d=1"), values = myCols) +
+          ggtitle("power") + geom_point(data = forgetData, aes(x = t, y = y))
+show(forgetPlotPower)
+```
+</div>
+
+## negative log-likelihood
+
+<div style = "float:left; width:45%;">
+<span style = "color:firebrick">
+exponential
+</span>
+```{r}
+nLL.exp <- function(w1,w2) {
+  if (w1 < 0 | w2 < 0 | 
+      w1 > 20 | w2 > 20) {
+    return(NA)
+  }
+  p = w1*exp(-w2*t)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  - sum(dbinom(x = obs, prob = p, 
+               size = 100, log = T))
+}
+show(nLL.exp(1,1))
+```
+</div>
+<div style = "float:right; width:45%;">
+<span style = "color:firebrick">
+power
+</span>
+```{r}
+nLL.pow <- function(w1,w2) {
+  if (w1 < 0 | w2 < 0 |
+      w1 > 20 | w2 > 20) {
+    return(NA)
+  }
+  p = w1*t^(-w2)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  - sum(dbinom(x = obs, prob = p, 
+               size = 100, log = T))
+}
+show(nLL.pow(1,1))
+```
+</div>
+
+## MLE
+
+```{r}
+require('stats4')
+bestExpo = mle(nLL.exp, start = list(w1=1,w2=1))
+bestPow  = mle(nLL.pow, start = list(w1=1,w2=1))
+MLEstimates = data.frame(model = rep(c("expo", "power"), each = 2),
+                         parameter = c("a", "b", "c", "d"),
+                         value = c(coef(bestExpo), coef(bestPow)))
+knitr::kable(MLEstimates)
+```
+
+## best fits visualization
+
+```{r, echo = FALSE}
+a = coef(bestExpo)[1]
+b = coef(bestExpo)[2]
+c = coef(bestPow)[1]
+d = coef(bestPow)[2]
+forgetPlotBest = ggplot(data.frame(x = c(1,20)), aes(x)) +
+         stat_function(fun = function(x) expo(x, a, b), aes(color = "expo")) +
+         stat_function(fun = function(x) power(x, c, d), aes(color = "power")) +
+         scale_colour_manual("Function", breaks = c("expo", "power"), values = myCols) +
+          ggtitle("MLE fits") + geom_point(data = forgetData, aes(x = t, y = y))
+show(forgetPlotBest)
+```
+
+## model comparison
+
+which model is better?
+
+```{r, echo = TRUE}
+predExp = expo(t,a,b)
+predPow = power(t,c,d)
+modelStats = data.frame(model = c("expo", "power"),
+                        logLike = round(c(logLik(bestExpo), logLik(bestPow)),3),
+                        pData = exp(c(logLik(bestExpo), logLik(bestPow))),
+                        r = round(c(cor(predExp, y), cor(predPow,y)),3),
+                        LSE = round(c( sum((predExp-y)^2), sum((predPow-y)^2)),3))
+modelStats
+```
+
+# Akaike information criterion
+
+## Akaike information criterion
+
+<span style = "color:firebrick">
+motivation
+</span>
+
+- model is better, the higher $P(D \mid \hat{\theta})$
+    - where $\hat{\theta} \in \arg \max_\theta P(D \mid \theta)$ is the maximum likelihood estimate
+- model is worse, the more parameters it has
+    - principle of parsimony (Ockham's razor)
+- information theoretic notion:
+    - amount of information lost when assuming data was generated with $\hat{\theta}$
+
+<span style = "color:firebrick">
+definition
+</span>
+
+Let $M$ be a model with $k$ parameters, and $D$ be some data:
+
+$$\text{AIC}(M, D) = 2k - \ln P(D \mid \hat{\theta})$$
+
+The smaller the AIC, the better the model.
+
+## model comparison by AIC
+
+```{r, echo = FALSE}
+predExp = expo(t,a,b)
+predPow = power(t,c,d)
+modelStats = data.frame(model = c("expo", "power"),
+                        logLike = round(c(logLik(bestExpo), logLik(bestPow)),3),
+                        pData = exp(c(logLik(bestExpo), logLik(bestPow))),
+                        r = round(c(cor(predExp, y), cor(predPow,y)),3),
+                        LSE = round(c( sum((predExp-y)^2), sum((predPow-y)^2)),3),
+                        AIC = AIC(bestExpo, bestPow)$AIC)
+show(modelStats)
+```
+
+```{r}
+show(AIC(bestExpo, bestPow))
+```
+
+## concluding remarks
+
+- given more and more data, repeated model selection by AIC does not guarantee ending up with the true model
+- "model" for AICs is just likelihood; no prior
+- discounting number of parameters, like AIC does, does not take effective strength of parameters into account
+    - think: individual-level parameters harnessed by hierarchical population-level prior
+- there are other information criteria that overcome some of these problems:
+    - Bayesian information criterion
+    - deviance information criterion
+
+# Bayes factors
+
+## Bayes factors
+
+- take two models:
+    - $P(\theta_1 \mid M_1)$ and $P(D \mid \theta_1, M_1)$
+    - $P(\theta_2 \mid M_2)$ and $P(D \mid \theta_2, M_2)$
+- ideally, we'd want to know the <span style = "color:firebrick">absolute probability</span> of $M_i$ given the data
+    - but then we'd need to know set of all models (for normalization)
+- alternatively, we take odds of models given the data:
+
+$$\underbrace{\frac{P(M_1 \mid D)}{P(M_2 \mid D)}}_{\text{posterior odds}} = \underbrace{\frac{P(D \mid M_1)}{P(D \mid M_2)}}_{\text{Bayes factor}} \ \underbrace{\frac{P(M_1)}{P(M_2)}}_{\text{prior odds}}$$
+
+The <span style = "color:firebrick">Bayes factor</span> is the factor by which our prior odds are changed by the data.
+
+## marginal likelihood
+
+Bayes factor in favor of model $M_1$
+
+$$\text{BF}(M_1 > M_2) = \frac{P(D \mid M_1)}{P(D \mid M_2)}$$
+
+<span style = "color:firebrick">marginal likelihood of data</span> under model $M_i$
+
+$$P(D \mid M_i) = \int P(\theta_i \mid M_i) \ P(D \mid \theta_i, M_i) \text{ d}\theta_i$$
+
+
+
+- we marginalize out parameters $\theta_i$ 
+- this is a function of the prior and the likelihood
+
+## how to interpret Bayes factors
+
+BF(M1 > M2) | interpretation
+:---:|:---:|
+1 | irrelevant data
+1 - 3 | hardly worth ink or breath
+3 - 6 | anecdotal
+6 - 10 | now we're talking: substantial
+10 - 30 | strong
+30 - 100 | very strong
+100 + | decisive (bye, bye $M_2$!)
+
+## how to caculate Bayes factors
+
+1. get each model's marginal likelihood 
+    - grid approximation        <div style="float: right; margin: 0px;">(today)</div>
+    - brute force clever math   <div style="float: right; margin: 0px;">(next time)</div>
+    - by Monte Carlo sampling   <div style="float: right; margin: 0px;">(next time)</div>
+2. get Bayes factor directly
+    - Savage-Dickey method      <div style="float: right; margin: 0px;">(today)</div>
+    - transdimensional MCMC     <div style="float: right; margin: 0px;">(next time)</div>
+
+# grid approximation
+
+## grid approximation
+
+- consider discrete values for $\theta$
+- compute evidence in terms of them
+- works well for low-dimensional $\theta$
+
+## example
+
+```{r}
+priorExpo = function(a, b){
+  dunif(a, 0, 1.5) * dunif(b, 0, 1.5)
+}
+lhExpo = function(a, b){
+  p = a*exp(-b*t)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  prod(dbinom(x = obs, prob = p, size = 100)) # no log!
+}
+```
+
+```{r}
+priorPow = function(c, d){
+  dunif(c, 0, 1.5) * dunif(d, 0, 1.5)
+}
+lhPow = function(c, d){
+  p = c*t^(-d)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  prod(dbinom(x = obs, prob = p, size = 100)) # no log!
+}
+```
+
+## example
+
+flat priors cancel out
+
+```{r}
+grid = seq(0.005, 1.495, by = 0.01)
+margLikeExp = sum(sapply(grid, function(a) 
+      sum(sapply (grid, function(b) lhExpo(a,b)))) )
+margLikePow = sum(sapply(grid, function(a) 
+      sum(sapply (grid, function(b) lhPow(a,b)))) )
+show(as.numeric(margLikeExp / margLikePow))
+```
+
+overwhelming evidence in favor of the exponential model
+
+# Savage-Dickey method
+
+## Savage-Dickey method
+
+let $M_0$ be <span style = "color:firebrick">properly nested</span> under $M_1$ s.t. $M_0$ fixes $\theta_i = x_i, \dots, \theta_n = x_n$
+
+$$
+\begin{align*}
+\text{BF}(M_0 > M_1) & = \frac{P(D \mid M_0)}{P(D \mid M_1)} \\
+  & = \frac{P(\theta_i = x_i, \dots, \theta_n = x_n \mid D, M_1)}{P(\theta_i = x_i, \dots, \theta_n = x_n \mid M_1)}
+\end{align*}
+$$
+
+```{r, echo = FALSE, results='hide', warning=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=3}
+plotData = data.frame(theta = seq(0.01,1, by = 0.01),
+                      posterior = dbeta(seq(0.01,1, by = 0.01), 8, 18 ),
+                      prior = dbeta(seq(0.01,1, by = 0.01), 1, 1))
+plotData = melt(plotData, measure.vars = c("posterior", "prior"))
+pointData = data.frame(x = c(0.5,0.5), y = c(dbeta(0.5,8,18),1))
+
+ggplot(plotData, aes(x = theta, y = value, color = variable)) + xlim(0,1) + geom_line() + ylab("posterior") +
+  geom_segment(aes(x = 0.52, y = 0, xend = 0.52, yend = 1), color = "darkgray") +
+  geom_segment(aes(x = 0.48, y = 0, xend = 0.48, yend = dbeta(0.5,8,18)), color = "darkgray") +
+  geom_segment(aes(x = 0.5, y = 1, xend = 0.52, yend = 1), color = "darkgray") +
+  geom_segment(aes(x = 0.5, y = dbeta(0.5,8,18), xend = 0.48, yend = dbeta(0.5,8,18)), color = "darkgray") +
+  annotate("point", x = 0.5, y = 1, color = "black") +
+  annotate("point", x = 0.5, y = dbeta(0.5,8,18), color = "black") + 
+  annotate("text", x = 0.3, y = 0.25, color = "darkgray", label = "P(0.5 | D, M1) = 0.516", size = 3) +
+  annotate("text", x = 0.68, y = 0.75, color = "darkgray", label = "P(0.5 | M1) = 1", size = 3)
+
+```
+
+
+## proof
+
+- $M_0$ has parameters $\theta = \tuple{\phi, \psi}$ with $\phi = \phi_0$
+- $M_1$ has parameters $\theta = \tuple{\phi, \psi}$ with $\phi$ free to vary
+- <span style = "color:firebrick">crucial assumption</span>: $\lim_{\phi \rightarrow \phi_0} P(\psi \mid \phi, M_1) = P(\psi \mid M_2)$
+- rewrite marginal likelihood under $M_0$: 
+
+$$ \begin{align*}
+P(D \mid M_0) & = \int P(D \mid \psi, M_0) P(\psi \mid M_0) \ \text{d}\psi \\
+ & = \int P(D \mid \psi, \phi = \phi_0, M_1) P(\psi \mid \phi = \phi_0, M_1)  \ \text{d}\psi\\
+ & = P(D \mid \phi = \phi_0, M_1) \ \ \ \ \ \ \text{(by Bayes rule)} \\
+ & = \frac{P(\phi = \phi_0 \mid D, M_1) P(D \mid M_1)}{P(\phi = \phi_0 \mid M_1)}
+\end{align*} $$
+
+
+# fini
+
+## summary
+
+|    | standard | Bayes | 
+|:---|:---:|:---:|
+| today's focus | Akaike's information criterion | Bayes factor
+| what counts as model to be compared? | likelihood function $P(D \mid \theta)$ | likelihood $P(D \mid \theta)$ + prior $P(\theta)$
+| from which point of view do we compare models? | <span style = "font-style: italic">ex post</span>: after seeing the data | <span style = "font-style: italic">ex ante</span>: before seeing the data
+| how to penalize model complexity? | count number of free parameters | implicitly weigh how effective a parameter is
+| are we guaranteed to select the true model in the end? | no | yes
+| hard to compute? | relatively easy | relatively hard
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- boot camp on model comparison & Savage-Dickey
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- more on Bayes factor computation & model comparison
+    - Monte Carlo simulation to approximate marginal likelihood
+    - transdimensional MCMC
+
+
+## to prevent boredom
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">obligatory</span>
+
+- read Lee & Wagenmakers chapter 7
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">optional</span>
+
+- skim examples from Lee & Wagenmakers chapters 8 & 9

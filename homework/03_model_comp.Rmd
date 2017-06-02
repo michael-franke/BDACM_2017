@@ -1,0 +1,33 @@
+---
+title: "BDA+CM_2017: Homework 2"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+require('forcats')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+This homework assignment is due June 16th 2017 before class. Submit your results in a zipped archive with name `BDA+CM_HW3_YOURLASTNAME.zip` which includes both Rmarkdown and a compiled version (preferably HTML). Use the same naming scheme for the `*.Rmd` and `*.html` files. All other files, if needed, should start with `BDA+CM_HW3_YOURLASTNAME_` as well. Upload the archive to the Dropbox folder.
+
+Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. All of the exercises below are required and count equally to the final score.
+
+# Exercise 1: AIC model comparison for a ridiculous model
+
+Consider again the data on forgetting from Lecture 10 (slide 10, see also Myung [2017](http://www.sciencedirect.com/science/article/pii/S0022249602000287)). Let's consider a model for this data with 6 free parameters $\theta_1, \dots, \theta_6$ where $\theta_i$ is the predicted recall rate at the $i$th time point of measurement. (There were only 6 time points of measurement in the data set we look at here!) As before, the predicted recall rate feeds into a binomial likelihood model for the observed number of successful recalls.
+
+1. What is the maximum likelihood fit for this model?
+2. What is the AIC?
+3. Which model is the best according to AIC scores?
+4. In informal and intuitive terms: why might model comparison based on Bayes factors yield a different conclusion, based on this data set?
+5. Thinking beyond model comparison based on this data set: why is this model ridiculous and non-competitive to begin with? 
+
+# Exercise 2: Effect size?
+
+Look at Section 8.3 from the Lee & Wagenmakers text book. The data-generating model specified in this section allows to draw conclusions about the difference of means in two sets of measures. This is essentially the same as what we did in Homework 2, Exercise 3. Irrespective of how these two models are used (think: parameter estimation or model comparison), what is the main advantage of formalizing the data-generating process in terms of effect sizes, as Lee & Wagenmakers do?
+
+# Exercise 3: Self-testing
+
+Look at the results from our in-class survey in `data/01_merged_enquetes.csv`. Formulate a (null)-hypothesis about this data that you fancy and test it against a reasonable alternative, using the Savage-Dickey method for nested Bayesian model comparison. If you are out of ideas, test whether participants who said to be familiar with at least 2 out of R, BDA and Cognitive Modeling spend more or less time cooking than the others.

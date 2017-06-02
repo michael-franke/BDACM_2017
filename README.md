@@ -29,7 +29,7 @@ n | date | topic | reading (main) | extra info
 12 | 2/6 | practice: model comparison | Lee & Wagenmakers ch. 7, 8  | |
 -- | -- | <span style = "color:firebrick">pentecoast</span> | --  | |
 13 | 13/6 | more on Bayes factors | tba |
-14 | 16/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | HW3 due |
+14 | 16/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | [HW3](homework/03_model_comp.html) due |
    | 20/6 | <span style = "color:firebrick">no class</span> |
 15 | 23/6 | estimation, comparison & criticism | Kruschke 11, 12 |
 16 | 27/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV |

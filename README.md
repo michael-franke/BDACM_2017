@@ -39,5 +39,5 @@ n | date | topic | reading (main) | extra info
 20 | 11/7 | GLM: further topics | Kruschke ch 17-22 |
 21 | 14/7 | practice: regression in Stan 1 | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |
 22 | 18/7 | practice: regression in Stan 2 | | HW5 due |
-23 | 21/7 | rounding off, project topics | |
+23 | 21/7 | rounding off, project topics | | 
 

@@ -425,7 +425,7 @@ ggplot(data.frame(i = seq(10000,nSamples, by = 200), BF = BFVec), aes(x=i, y=BF)
 
 <p>\[
 \begin{align*}
-\frac{1}{D} &amp; = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)}\\
+\frac{1}{P(D)} &amp; = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)}\\
 &amp; = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)} \int h(\theta) \text{d}\theta  \\
 &amp; = \int \frac{h(\theta) P(\theta \mid D)}{P(D \mid \theta) P(\theta)}  \text{d}\theta \\
   &amp; \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta \mid D)} \frac{h(\theta)}{P(D \mid \theta) P(\theta)}

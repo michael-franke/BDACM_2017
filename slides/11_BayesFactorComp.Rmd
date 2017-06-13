@@ -361,7 +361,7 @@ take an arbitrary function $h(\theta)$ such that $\int h(\theta) \text{d}\theta 
 
 $$
 \begin{align*}
-\frac{1}{D} & = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)}\\
+\frac{1}{P(D)} & = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)}\\
 & = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)} \int h(\theta) \text{d}\theta  \\
 & = \int \frac{h(\theta) P(\theta \mid D)}{P(D \mid \theta) P(\theta)}  \text{d}\theta \\
   & \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta \mid D)} \frac{h(\theta)}{P(D \mid \theta) P(\theta)}

@@ -220,8 +220,8 @@ ex ante</span>: before seeing the data</td>
 \begin{align*}
 \text{BF}(M_0 &gt; M_1) &amp; = \frac{P(D \mid M_0)}{P(D \mid M_1)} \\
   &amp; = \frac{\text{Binomial}(k,N,0.5)}{\int_0^1 \text{Beta}(\theta, 1, 1) \ \text{Binomial}(k,N, \theta) \text{ d}\theta} \\
-  &amp; = \frac{{{N}\choose{k}} 0.5^{k} \, (1-0.5)^{N - k}}{\int_0^1 {{N}\choose{k}} \theta^{k} \, (1-\theta)^{N - k} \text{ d}\theta} \\
-  &amp; = \frac{{{N}\choose{k}} 0.5^{N}}{{{N}\choose{k}} \int_0^1  \theta^{k} \, (1-\theta)^{N - k} \text{ d}\theta} \\
+  &amp; = \frac{\binom{N}{k} 0.5^{k} \, (1-0.5)^{N - k}}{\int_0^1 \binom{N}{k} \theta^{k} \, (1-\theta)^{N - k} \text{ d}\theta} \\
+  &amp; = \frac{\binom{N}{k} 0.5^{N}}{\binom{N}{k} \int_0^1  \theta^{k} \, (1-\theta)^{N - k} \text{ d}\theta} \\
   &amp; = \frac{0.5^{N}}{BetaFunction(k+1, N-k+1)} \approx 0.516
 \end{align*}
 \]</p>
@@ -235,7 +235,7 @@ ex ante</span>: before seeing the data</td>
 BetaFunction(k+1, N-k+1) &amp; = \frac{\Gamma(k+1) \Gamma(N-k+1)}{\Gamma(N+2)} \\
  &amp; = \frac{(k)! (N-k)!}{(N+1)!} \\
  &amp; = \frac{(k)! (N-k)!}{(N)!} \frac{1}{N+1} \\
- &amp; = \frac{1}{{{N}\choose{k}}} \frac{1}{N+1} \\
+ &amp; = \frac{1}{\binom{N}{k}} \frac{1}{N+1} \\
 \end{align*}
 \]</p>
 
@@ -245,7 +245,7 @@ BetaFunction(k+1, N-k+1) &amp; = \frac{\Gamma(k+1) \Gamma(N-k+1)}{\Gamma(N+2)} \
 \begin{align*}
 \text{BF}(M_0 &gt; M_1) &amp; = \frac{P(D \mid M_0)}{P(D \mid M_1)} \\
   &amp; = \frac{0.5^{N}}{BetaFunction(k+1, N-k+1)}  \\
-  &amp; = {{N}\choose{k}} 0.5^{N} (N + 1) \approx 0.516
+  &amp; = \binom{N}{k} 0.5^{N} (N + 1) \approx 0.516
 \end{align*}
 \]</p>
 

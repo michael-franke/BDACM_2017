@@ -28,7 +28,7 @@ n | date | topic | reading (main) | extra info
 11 | 30/5 | [theory: model comparison](slides/10_model_comp.html) | Kruschke ch 10, Lee & Wagenmakers ch. 7  | |
 12 | 2/6 | practice: model comparison | Lee & Wagenmakers ch. 7, 8  | |
 -- | -- | <span style = "color:firebrick">pentecoast</span> | --  | |
-13 | 13/6 | [computing Bayes factors](slides/11_BayesFactorComp.Rmd) | -- |
+13 | 13/6 | [computing Bayes factors](slides/11_BayesFactorComp.html) | -- |
 14 | 16/6 | more on Bayes factors | -- | [HW3](homework/03_model_comp.html) due |
    | 20/6 | <span style = "color:firebrick">no class</span> |
 15 | 23/6 | estimation, comparison & criticism | Kruschke 11, 12 |

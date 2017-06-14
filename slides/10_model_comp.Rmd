@@ -302,7 +302,7 @@ definition
 
 Let $M$ be a model with $k$ parameters, and $D$ be some data:
 
-$$\text{AIC}(M, D) = 2k - \ln P(D \mid \hat{\theta})$$
+$$\text{AIC}(M, D) = 2k - 2\ln P(D \mid \hat{\theta})$$
 
 The smaller the AIC, the better the model.
 

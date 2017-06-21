@@ -340,7 +340,7 @@ b = runif(nSamples, 0, 1.5)
 lhExpVec = lhExp(a,b)
 lhPowVec = lhPow(a,b)
 paste0("BF in favor of exponential model: ", 
-            with(evidence, sum(lhExpVec)/ sum(lhPowVec)) %>% round(2))
+            sum(lhExpVec)/ sum(lhPowVec) %>% round(2))
 
 ```
 

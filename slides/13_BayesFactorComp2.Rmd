@@ -1,0 +1,672 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "Session 13: Bayes Factor computation 2"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+    smaller: yes
+---
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+require('reshape2')
+require('runjags')
+require('dplyr')
+require('gridExtra')
+show = function(x) { x }
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+
+# recap
+
+## roadmap for today
+
+- mid-term survey results
+- Bayes factor computation
+    - Monte Carlo simulation
+        - naive
+        - importance sampling
+    - transdimensional MCMC
+    - supermodels
+- Generalized Context Model
+- JASP
+
+# survey results
+
+```{r}
+tag_order = c("practice sessions helpful", "HW amount adequate", "HW too difficult", "HW too time consuming", "more practice sessions hereafter", "more technical/computational stuff", "more philosophy", "more cognitive models", "more regression modeling")
+d = readr::read_csv(file = "../data/03_mid_term_survey.csv") %>% 
+  mutate(tags = factor(tags, levels = rev(tag_order), ordered = T))
+
+ggplot(d, aes(x = tags, y = answer)) + geom_boxplot() + coord_flip()
+
+```
+
+
+
+# memory models
+
+## recall data & models
+
+- recall rates `y` for 100 trials after time `t` in seconds
+
+```{r}
+y = c(.94, .77, .40, .26, .24, .16)
+t = c(  1,   3,   6,   9,  12,  18)
+obs = y*100
+```
+
+<div style = "float:left; width:45%;">
+<span style = "color:firebrick">
+exponential model
+</span>
+
+$$P(t \ ; \ a, b) = a \exp (-bt)$$ 
+
+$$\text{where } a,b>0 $$
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2}
+forgetData = data.frame(t = t, obs = obs, y = y)
+myCols = c("firebrick", "coral", "darkgreen")
+expo = function(x, c, d) return( c* exp(-x*d) )
+power = function(x, a, b) return( a*x^(-b) )
+forgetPlotExpo = ggplot(data.frame(x = c(1,20)), aes(x)) +
+         stat_function(fun = function(x) expo(x, 1,1), aes(color = "a,b=1")) +
+         stat_function(fun = function(x) expo(x, 2,2), aes(color = "a,b=2")) +
+         stat_function(fun = function(x) expo(x, 1,0.2), aes(color = "a=1,b=0.1")) +
+         scale_colour_manual("Function", breaks = c("a,b=1", "a,b=2", "a=1,b=0.1"), values = myCols) +
+          ggtitle("exponential") + geom_point(data = forgetData, aes(x = t, y = y))
+show(forgetPlotExpo)
+```
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">
+power model
+</span>
+
+$$P(t \ ; \ c, d) = ct^{-d}$$
+
+$$\text{where } c,d>0 $$
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2}
+forgetPlotPower = ggplot(data.frame(x = c(1,20)), aes(x)) +
+         stat_function(fun = function(x) power(x, 1,1), aes(color = "c,d=1")) +
+         stat_function(fun = function(x) power(x, 2,2), aes(color = "c,d=2")) +
+         stat_function(fun = function(x) power(x, 2,1), aes(color = "c=2,d=1")) +
+         scale_colour_manual("Function", breaks = c("c,d=1", "c,d=2", "c=2,d=1"), values = myCols) +
+          ggtitle("power") + geom_point(data = forgetData, aes(x = t, y = y))
+show(forgetPlotPower)
+```
+</div>
+
+
+## model specification (priors & likelihood function)
+
+<div style = "float:left; width:45%;">
+<span style = "color:firebrick">
+exponential
+</span>
+
+```{r}
+priorExp = function(a, b){
+  dunif(a, 0, 1.5) * dunif(b, 0, 1.5)
+}
+lhExp = function(a, b){
+  p = a*exp(-b*t)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  prod(dbinom(x = obs, prob = p, size = 100))
+}
+```
+
+</div>
+<div style = "float:right; width:45%;">
+<span style = "color:firebrick">
+power
+</span>
+
+```{r}
+priorPow = function(c, d){
+  dunif(c, 0, 1.5) * dunif(d, 0, 1.5)
+}
+lhPow = function(c, d){
+  p = c*t^(-d)
+  p[p <= 0.0] = 1.0e-5
+  p[p >= 1.0] = 1-1.0e-5
+  prod(dbinom(x = obs, prob = p, size = 100))
+}
+```
+
+</div>
+
+
+## BF by grid approximation
+
+```{r}
+lhExp = Vectorize(lhExp)
+lhPow = Vectorize(lhPow)
+start.time <- Sys.time()
+stepsize = 0.01
+evidence = expand.grid(x = seq(0.005, 1.495, by = stepsize),
+                       y = seq(0.005, 1.495, by = stepsize)) %>% 
+  mutate(lhExp = lhExp(x,y), priExp = 1 / length(x),  # uniform priors!
+         lhPow = lhPow(x,y), priPow = 1 / length(x))
+end.time <- Sys.time()
+BF_grid = with(evidence, sum(priExp*lhExp)/ sum(priPow*lhPow))
+time.taken_grid <- end.time - start.time
+paste0("BF in favor of exponential model: ", round(BF_grid,2))
+```
+
+overwhelming evidence in favor of the exponential model
+
+# naive Monte Carlo simulation
+
+## recap: why simulate?
+
+generally:
+
+$$\int f(\theta) \ P(\theta) \ \text{d}\theta \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta)} f(\theta)$$
+
+in particular: 
+
+$$P(D) = \int P(D \mid \theta) \ P(\theta) \ \text{d}\theta \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta)} P(D \mid \theta)$$
+
+## example: naive sampling
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5, eval = TRUE}
+nSamples = 200000
+start.time <- Sys.time()
+a = runif(nSamples, 0, 1.5)
+b = runif(nSamples, 0, 1.5)
+lhExpVec = lhExp(a,b)
+lhPowVec = lhPow(a,b)
+BF_naive = sum(lhExpVec)/ sum(lhPowVec)
+end.time <- Sys.time()
+time.taken_naive <- end.time - start.time
+paste0("BF in favor of exponential model: ", round(BF_naive,2))
+```
+
+## time course of estimate
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5, eval = TRUE}
+BFVec = sapply(seq(10000,nSamples, by = 500), 
+     function(i) sum(lhExpVec[1:i]) / sum(lhPowVec[1:i]))
+ggplot(data.frame(i = seq(10000,nSamples, by = 500), BF = BFVec), aes(x=i, y=BF)) +
+  geom_line() + geom_hline(yintercept = 1221, color = "firebrick") + xlab("number of samples")
+```
+
+# importance sampling
+
+## importance sampling
+
+take an arbitrary function $h(\theta)$ such that $\int h(\theta) \text{d}\theta = 1$
+
+$$
+\begin{align*}
+\frac{1}{P(D)} & = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)}\\
+& = \frac{P(\theta \mid D)}{P(D \mid \theta) P(\theta)} \int h(\theta) \text{d}\theta  \\
+& = \int \frac{h(\theta) P(\theta \mid D)}{P(D \mid \theta) P(\theta)}  \text{d}\theta \\
+  & \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta \mid D)} \frac{h(\theta)}{P(D \mid \theta) P(\theta)}
+\end{align*}
+$$
+
+choose a $h(\theta)$ that resembles the posterior
+
+## posterior over parameters for exponential model
+
+```{r, results='hide', warning=FALSE, message=FALSE, echo = TRUE}
+modelString = "
+model{
+  a ~ dunif(0,1.5)
+  b ~ dunif(0,1.5)
+  for (i in 1: 6){
+    pT[i] = a*exp(-t[i]*b)
+    p[i] = min(max( pT[i], 0.00001), 0.99999)
+    obs[i] ~ dbinom(p[i], 100)
+  }
+}"
+# prepare for JAGS
+dataList = list(obs = obs, t = t)
+# set up and run model
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList,
+                       n.chains = 2)
+update(jagsModel, n.iter = 25000)
+codaSamples = coda.samples(jagsModel, 
+                           variable.names = c("a", "b"),
+                           n.iter = 5000)
+ms = ggs(codaSamples)
+```
+
+## parametric approximation for posteriors
+
+```{r, fig.align = 'center', fig.width=4, fig.height=3}
+getGammaApprox = function(samples){
+  s = sd(samples)
+  m = mean(samples)
+  ra = ( m + sqrt( m^2 + 4*s^2 ) ) / ( 2 * s^2 )
+  sh = 1 + m * ra
+  return(c(shape = sh, rate = ra))
+}
+paramA = getGammaApprox(filter(ms, Parameter == "a")$value)
+paramB = getGammaApprox(filter(ms, Parameter == "b")$value)
+```
+
+<div style = "float:left; width:45%;">
+```{r, fig.align = 'center', fig.width=4, fig.height=3, echo = FALSE}
+ggs_density(ms, family = "a") + stat_function(fun = function(x) 
+  dgamma(x, rate = paramA["rate"], shape = paramA["shape"]), color = "black") 
+```
+</div>
+
+<div style = "float:right; width:45%;">
+```{r, fig.align = 'center', fig.width=4, fig.height=3, echo = FALSE}
+ggs_density(ms, family = "b") + stat_function(fun = function(x) 
+  dgamma(x, rate = paramB["rate"], shape = paramB["shape"]), color = "black") 
+```
+</div>
+
+## parameter estimation for power model
+
+```{r, results='hide', warning=FALSE, message=FALSE, echo = FALSE}
+modelString = "
+model{
+  c ~ dunif(0,1.5)
+  d ~ dunif(0,1.5)
+  for (i in 1: 6){
+    pT[i] = c*t[i]^(-d)
+    p[i] = min(max( pT[i], 0.00001), 0.99999)
+    obs[i] ~ dbinom(p[i], 100)
+  }
+}"
+# prepare for JAGS
+dataList = list(obs = obs, t = t)
+# set up and run model
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList,
+                       n.chains = 2)
+update(jagsModel, n.iter = 25000)
+codaSamples = coda.samples(jagsModel, 
+                           variable.names = c("c", "d"),
+                           n.iter = 5000)
+ms = ggs(codaSamples)
+```
+
+<div style = "float:left; width:45%;">
+```{r, fig.align = 'center', fig.width=4, fig.height=3, echo = FALSE}
+paramC = getGammaApprox(filter(ms, Parameter == "c")$value)
+ggs_density(ms, family = "c") + stat_function(fun = function(x) 
+  dgamma(x, rate = paramC["rate"], shape = paramC["shape"]), color = "black") 
+```
+</div>
+<div style = "float:right; width:45%;">
+```{r, fig.align = 'center', fig.width=4, fig.height=3, echo = FALSE}
+paramD = getGammaApprox(filter(ms, Parameter == "d")$value)
+ggs_density(ms, family = "d") + stat_function(fun = function(x) 
+  dgamma(x, rate = paramD["rate"], shape = paramD["shape"]), color = "black") 
+```
+</div>
+
+## summary of estimated parameters
+
+```{r, echo = FALSE}
+params = data.frame(parameter = c("a", "b", "c", "d"),
+           shape = c(paramA["shape"], paramB["shape"], paramC["shape"], paramD["shape"]),
+           rate = c(paramA["rate"], paramB["rate"], paramC["rate"], paramD["rate"]))
+show(params)
+```
+
+
+## convenience function for parameters and samples
+
+```{r}
+get_posterior_approximation = function(modelIndex = 0, nSamples = 50000) {
+  modelString = "model{
+  a ~ dunif(0,1.5)
+  b ~ dunif(0,1.5)
+  for (i in 1: 6){
+  pT[i] = ifelse(m == 0, a*exp(-t[i]*b), a*t[i]^(-b))
+  p[i] = min(max( pT[i], 0.0001), 0.9999)
+  obs[i] ~ dbinom(p[i], 100)
+  }}"
+  dataList = list(obs = obs, t = t, m = modelIndex) # includes flag for model
+  jagsModel = jags.model(file = textConnection(modelString), 
+                         data = dataList,
+                         n.chains = 2)
+  update(jagsModel, n.iter = 25000)
+  codaSamples = coda.samples(jagsModel, 
+                                 variable.names = c("a", "b"),
+                                 n.iter = nSamples)
+  ms = ggs(codaSamples)
+  a = getGammaApprox(filter(ms, Parameter == "a")$value)
+  b = getGammaApprox(filter(ms, Parameter == "b")$value)
+  return(list(a_shape = a[["shape"]], a_rate = a[["rate"]],
+              b_shape = b[["shape"]], b_rate = b[["rate"]],
+              a_samples = filter(ms, Parameter == "a")$value,
+              b_samples = filter(ms, Parameter == "b")$value)  )
+}
+
+```
+
+## implement this
+
+```{r, echo = F}
+lhPow = Vectorize(function(a, b){
+  p = a*t^(-b)
+  p[p <= 0.0] = 1.0e-15
+  p[p >= 1.0] = 1-1.0e-15
+  prod(dbinom(x = obs, prob = p, size = 100))
+})
+```
+
+
+```{r, results='hide', warning=FALSE, message=FALSE}
+nSamples = 50000
+start.time <- Sys.time()
+post_exp = get_posterior_approximation(0, nSamples)
+post_pow = get_posterior_approximation(1, nSamples)
+estimate_evidence = function(post, i, lhFun = "lhExp") {
+  quotients = dgamma(post$a_samples[1:i], shape = post$a_shape, rate = post$a_rate) * 
+    dgamma(post$b_samples[1:i], shape = post$b_shape, rate = post$b_rate) /
+    do.call(lhFun, list(a = post$a_samples[1:i], b = post$b_samples[1:i]) )
+  1/mean(quotients)
+}
+BF_importance = estimate_evidence(post_exp, nSamples, "lhExp") / 
+                    estimate_evidence(post_pow, nSamples, "lhPow")
+end.time <- Sys.time()
+time.taken_importance <- end.time - start.time
+paste0("BF in favor of Exponential Model (using importance sampling): ", 
+            round(BF_importance,2))
+```
+
+recall:
+
+$$
+\begin{align*}
+\frac{1}{P(D)} & 
+  & \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta \mid D)} \frac{h(\theta)}{P(D \mid \theta) P(\theta)}
+\end{align*}
+$$
+
+## temporal development
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r, fig.align='center', fig.width=7, fig.height=3.5, eval = TRUE, echo = FALSE}
+
+
+BFVec_importance = sapply(seq(10000,nSamples, by = 500), 
+               function(i) estimate_evidence(post_exp, i, "lhExp") / 
+                 estimate_evidence(post_pow, i, "lhPow"))
+
+# combine with naive MCMC approach
+plot_data = rbind(data.frame(i = seq(10000,50000, by = 500), BF = BFVec_importance, approach = "importance"),
+                  data.frame(i = seq(10000,200000, by = 500), BF = BFVec, approach = "naive"))
+
+ggplot(plot_data, aes(x=i, y=BF, color = approach)) +
+  geom_line() + geom_hline(yintercept = 1221, color = "firebrick") + xlab("number of samples")
+
+
+```
+
+
+# transcendental MCMC
+
+## idea
+
+make model index a parameter $M \in \set{0,1}$
+
+<span style = "color:white"> &nbsp; </span>
+<span style = "color:white"> &nbsp; </span>
+
+<div align = 'center'>
+<img src="pics/modelGraphs/transDimBF.png" alt="probMod" style="width: 450px;"/>
+</div>
+
+<span style = "color:white"> &nbsp; </span>
+
+e.g., posterior likelihood of $M = 1$:
+
+$$ P(M = 1 \mid D ) \propto P(D \mid M = 1) P(M = 1)$$
+
+## JAGS model
+
+```{r, eval = FALSE}
+model{
+  m ~ dbern(0.5)
+  a ~ dunif(0,1.5)
+  b ~ dunif(0,1.5)
+  c ~ dunif(0,1.5)
+  d ~ dunif(0,1.5)
+  for (i in 1: 6){
+    pT[i] = ifelse(m == 0, a*exp(-t[i]*b), c*t[i]^(-d))
+    p[i] = min(max( pT[i], 0.0001), 0.9999)
+    obs[i] ~ dbinom(p[i], 100)
+  }
+}
+```
+
+
+<div align = 'center'>
+<img src="pics/modelGraphs/transDimBF.png" alt="probMod" style="width: 450px;"/>
+</div>
+
+## posteriors
+
+
+```{r, results='hide', warning=FALSE, message=FALSE, echo = FALSE}
+modelString = "
+model{
+  m ~ dbern(0.5)
+  a ~ dunif(0,1.5)
+  b ~ dunif(0,1.5)
+  c ~ dunif(0,1.5)
+  d ~ dunif(0,1.5)
+  for (i in 1: 6){
+    pT[i] = ifelse(m == 0, a*exp(-t[i]*b), c*t[i]^(-d))
+    p[i] = min(max( pT[i], 0.0001), 0.9999)
+    obs[i] ~ dbinom(p[i], 100)
+  }
+}"
+# prepare for JAGS
+dataList = list(obs = obs, t = t)
+# set up and run model
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList,
+                       n.chains = 2)
+update(jagsModel, n.iter = 50000)
+codaSamples = coda.samples(jagsModel, 
+                           variable.names = c("m", "a", "b", "c", "d"),
+                           n.iter = 5000)
+ms = ggs(codaSamples)
+wideSamples = dcast(ms, Iteration + Chain ~ Parameter)
+```
+
+
+
+<div style = "float:left; width:45%;">
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2.5}
+expSamples = melt(filter(wideSamples, m == 0), measure.vars = c("a", "b"), id.vars = "Iteration")
+postAB = ggplot(expSamples, aes(x = value)) + geom_density() + facet_wrap(~ variable, nrow = 2, scales = "free")
+show(postAB)
+```
+</div>
+<div style = "float:right; width:45%;">
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2.5}
+powSamples = melt(wideSamples, measure.vars = c("c", "d"), id.vars = "Iteration")
+if (nrow(powSamples) > 1) {
+  postCD = ggplot(powSamples, aes(x = value)) + geom_density() + facet_wrap(~ variable, nrow = 2, scales = "free")
+  show(postCD)
+}
+```
+</div>
+
+<div style = "float:left; width:45%;">
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2.5}
+postM = ggplot(data.frame(m = factor(c(0,1,wideSamples$m), levels = c(0,1))), aes(x = m)) + geom_bar()
+show(postM)
+```
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">problem:</span>
+
+while MCMC chain "spends time" with one model, the other model's parameters are free to meander around in low likelihood regions, thus preventing the transcendental jump
+  
+</div>  
+
+## trickery
+
+tweaking prior model odds & using <span style = "color:firebrick">pseudo-priors</span>
+
+```{r, eval = FALSE}
+model{
+  mT ~ dbern(0.9995)
+  m = mT + 1
+  a[1] ~ dunif(0,1.5)
+  b[1] ~ dunif(0,1.5)
+  c[2] ~ dunif(0,1.5)
+  d[2] ~ dunif(0,1.5)
+  a[2] ~ dgamma(1145, 1078)
+  b[2] ~ dgamma(203, 1555)
+  c[1] ~ dgamma(2246, 2373)
+  d[1] ~ dgamma(242, 485)
+for (i in 1: 6){
+    pExp[i] = a[m]*exp(-t[i]*b[m])
+    pPow[i] = c[m]*t[i]^(-d[m]) 
+    pT[i] = ifelse(m == 1, pExp[i], pPow[i])
+    p[i] = min(max( pT[i], 0.00001), 0.99999)
+    obs[i] ~ dbinom(p[i], 100)
+  }  
+}
+```
+
+## posteriors
+
+```{r, results='hide', warning=FALSE, message=FALSE, echo = FALSE}
+start.time <- Sys.time()
+modelString = "
+model{
+  mT ~ dbern(0.9995)
+  m = mT + 1
+  a[1] ~ dunif(0,1.5)
+  b[1] ~ dunif(0,1.5)
+  c[2] ~ dunif(0,1.5)
+  d[2] ~ dunif(0,1.5)
+  a[2] ~ dgamma(1145, 1078)
+  b[2] ~ dgamma(203, 1555)
+  c[1] ~ dgamma(2246, 2373)
+  d[1] ~ dgamma(242, 485)
+for (i in 1: 6){
+    pExp[i] = a[m]*exp(-t[i]*b[m])
+    pPow[i] = c[m]*t[i]^(-d[m]) 
+    pT[i] = ifelse(m == 1, pExp[i], pPow[i])
+    p[i] = min(max( pT[i], 0.00001), 0.99999)
+    obs[i] ~ dbinom(p[i], 100)
+  }  
+}"
+# prepare for JAGS
+dataList = list(obs = obs, t = t)
+# set up and run model
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList,
+                       n.chains = 2)
+update(jagsModel, n.iter = 50000)
+codaSamples = coda.samples(jagsModel, 
+                           # variable.names = c("m","a","b","c", "d"),
+                           # variable.names = c("c[1]", "d[1]", "c[2]", "d[2]", "m"),
+                           # variable.names = c("a[1]", "b[1]", "a[2]", "b[2]"),
+                           variable.names = c("m"),
+                           n.iter = 100000, thin = 4)
+ms = ggs(codaSamples)
+
+```
+
+
+```{r, echo = T, fig.align='center', fig.width=4, fig.height=3}
+filter(ms, Parameter == "m") -> tmc
+posterior = prop.table(table(tmc$value))
+prior = c(0.0005, 0.9995)
+BF_transdim = posterior[1]/posterior[2] * prior[2]/prior[1]
+end.time = Sys.time()
+time.taken_transdim <- end.time - start.time
+show(paste0("BF in favor of Exponential Model (using transdimensional MCMC): ", round(BF_transdim,2)))
+```
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=2}
+wideSamples = dcast(ms, Iteration + Chain ~ Parameter)
+postM = ggplot(data.frame(m = factor(c(2,1,wideSamples$m), levels = c(1,2))), aes(x = m)) + geom_bar()
+show(postM)
+```
+
+# intermediate summary
+
+## summary
+
+<span style = "color:white"> &nbsp; </span>
+
+| method | computation time | BF result | 
+|:---|:---:|:---:|
+| grid approximation | `r as.double(time.taken_grid)` | `r BF_grid`
+| naive Monte Carlo | `r as.double(time.taken_naive)` | `r BF_naive`
+| importance sampling | `r as.double(time.taken_importance)` | `r BF_importance`
+| transdimensional MCMC | `r as.double(time.taken_transdim)` | `r BF_transdim`
+
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- philosophy of Bayes Factors, some more tricks and applications
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- <span style = "color:firebrick">no class!</span>
+
+

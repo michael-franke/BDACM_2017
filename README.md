@@ -31,9 +31,9 @@ n | date | topic | reading (main) | extra info
 13 | 13/6 | [computing Bayes factors](slides/11_BayesFactorComp.html) | -- |
 14 | 16/6 | [Bayes in philosophy of science](slides/12_PhilosophyOfScience.pdf) | -- | [HW3](homework/03_model_comp.html) due |
    | 20/6 | <span style = "color:firebrick">no class</span> |
-15 | 23/6 | estimation, comparison & criticism | Kruschke 11, 12 |
-16 | 27/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV |
-17 | 30/6 | WebPPL & probabilistic cognitive models | | HW4 due |
+15 | 23/6 | [computing Bayes factors 2](slides/13_BayesFactorComp2.html) | -- |
+16 | 27/6 | estimation, comparison & criticism | Kruschke 11, 12 |
+17 | 30/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | HW4 due |
 18 | 4/7 | intro: generalized linear model | Kruschke ch. 15 & 16 |
 19 | 7/7 | using Stan | [Stan manual](http://mc-stan.org/documentation/), Kruschke ch 14 |
 20 | 11/7 | GLM: further topics | Kruschke ch 17-22 |

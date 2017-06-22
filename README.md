@@ -33,7 +33,7 @@ n | date | topic | reading (main) | extra info
    | 20/6 | <span style = "color:firebrick">no class</span> |
 15 | 23/6 | [computing Bayes factors 2](slides/13_BayesFactorComp2.html) | -- |
 16 | 27/6 | estimation, comparison & criticism | Kruschke 11, 12 |
-17 | 30/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | HW4 due |
+17 | 30/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | [HW4](homework/04_model_comp2.html) due |
 18 | 4/7 | intro: generalized linear model | Kruschke ch. 15 & 16 |
 19 | 7/7 | using Stan | [Stan manual](http://mc-stan.org/documentation/), Kruschke ch 14 |
 20 | 11/7 | GLM: further topics | Kruschke ch 17-22 |

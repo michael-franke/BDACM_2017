@@ -52,28 +52,58 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 ```
 
 
-
-# recap
-
 ## roadmap for today
 
+- announcements
 - mid-term survey results
 - Bayes factor computation
     - Monte Carlo simulation
         - naive
         - importance sampling
     - transdimensional MCMC
-    - supermodels
-- Generalized Context Model
+
+# announcements
+
+## talk today by Jonathan Love (Tasmania) on jamovi
+
+<span style = "color:firebrick">title</span>
+
+"jamovi: an R powered, open, user-friendly, reproducible, community-driven alternative to SPSS" 
+
+<span style = "color:firebrick">time & venue</span>
+
+AFK 4.503 at the Institute of Psychology, Fr, 23.06., 17:00 - 18:00
+
+<span style = "color:firebrick">from the abstract</span>
+
+jamovi is a free and open statistical spreadsheet which is easy to use and designed to be familiar to users of SPSS. Analyses in jamovi are implemented in R, and jamovi is able to provide the underlying R syntax for each analysis. Additionally, jamovi is modular and provides the 'jamovi library', a collection of analyses developed by third parties. Analyses in jamovi are reproducible, allowing anyone to return to an earlier analysis and inspect what options were used. jamovi is rich and accessible like RShiny, familiar like SPSS, reproducible like Rmarkdown, and, like R, open and inviting to methodologists and developers. This talk begins by exploring the motivations and recent developments in statistical software, and how these have lead to the jamovi vision. The talk then leads on to introduce jamovi, demonstrates its features, and explores its broader goals.
+
+## talk on Monday by Judith Degen (Stanford)
+
+<span style = "color:firebrick">title</span>
+
+"Mentioning atypical properties of objects is communicatively efficient" 
+
+<span style = "color:firebrick">time & venue</span>
+
+Wilhelmstr. 19 room 1.13, Mo, 26.06., 10:00 - 12:00
+
+<span style = "color:firebrick">abstract</span>
+
+What governs how much information speakers include in referring expressions? Atypical properties of objects are more likely to be included in referring expressions than typical ones (Sedivy 2003; Westerbeek et al 2015). For example, speakers are more likely to call a blue banana a “blue banana” and a yellow banana a "banana". A unified account of this phenomenon is lacking. We ask: when should a rational speaker mention an object’s color? Reference production is modeled within the Rational Speech Act framework (Frank & Goodman 2012). Utterances (e.g., “banana”, “blue”, and “blue banana”) are taken to have a graded semantics: rather than assuming all bananas are equally good instances of “banana”, we empirically elicited object-utterance typicality values for all possible utterances. Pragmatic speakers select utterances proportionally to the probability that a literal listener using a graded semantics will select the intended referent. We evaluate the proposed model on a dataset of freely produced referring expressions collected in an interactive reference game experiment via the web. We conclude that the systematicity with which speakers redundantly mention color implicates a system geared towards communicative efficiency rather than towards wasteful overinformativeness, and discuss potential extensions of this approach to other production phenomena, such as optional instrument mention.
 
 # survey results
 
-```{r}
+##  survey results
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r, echo = F}
 tag_order = c("practice sessions helpful", "HW amount adequate", "HW too difficult", "HW too time consuming", "more practice sessions hereafter", "more technical/computational stuff", "more philosophy", "more cognitive models", "more regression modeling")
-# d = readr::read_csv(file = "../data/03_mid_term_survey.csv") %>% 
-#   mutate(tags = factor(tags, levels = rev(tag_order), ordered = T))
-# 
-# ggplot(d, aes(x = tags, y = answer)) + geom_boxplot() + coord_flip()
+d = readr::read_csv(file = "../data/03_mid_term_survey.csv") %>%
+  mutate(tags = factor(tags, levels = rev(tag_order), ordered = T))
+ggplot(d, aes(x = tags, y = answer)) + geom_boxplot() + coord_flip()
 
 ```
 
@@ -411,18 +441,19 @@ BF_importance = estimate_evidence(post_exp, nSamples, "lhExp") /
                     estimate_evidence(post_pow, nSamples, "lhPow")
 end.time <- Sys.time()
 time.taken_importance <- end.time - start.time
-paste0("BF in favor of Exponential Model (using importance sampling): ", 
-            round(BF_importance,2))
 ```
-
-recall:
 
 $$
 \begin{align*}
-\frac{1}{P(D)} & 
+\text{recall: } \ \ \ \ \ \ \ \ \frac{1}{P(D)} & 
   & \approx \frac{1}{n} \sum^{n}_{\theta_i \sim P(\theta \mid D)} \frac{h(\theta)}{P(D \mid \theta) P(\theta)}
 \end{align*}
 $$
+
+```{r}
+paste0("BF in favor of Exponential Model (using importance sampling): ", 
+            round(BF_importance,2))
+```
 
 ## temporal development
 
@@ -640,7 +671,7 @@ postM = ggplot(data.frame(m = factor(c(2,1,wideSamples$m), levels = c(1,2))), ae
 show(postM)
 ```
 
-# intermediate summary
+# summary
 
 ## summary
 

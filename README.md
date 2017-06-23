@@ -30,14 +30,14 @@ n | date | topic | reading (main) | extra info
 -- | -- | <span style = "color:firebrick">pentecoast</span> | --  | |
 13 | 13/6 | [computing Bayes factors](slides/11_BayesFactorComp.html) | -- |
 14 | 16/6 | [Bayes in philosophy of science](slides/12_PhilosophyOfScience.pdf) | -- | [HW3](homework/03_model_comp.html) due |
-   | 20/6 | <span style = "color:firebrick">no class</span> |
+-- | 20/6 | <span style = "color:firebrick">no class</span> | |
 15 | 23/6 | [computing Bayes factors 2](slides/13_BayesFactorComp2.html) | -- |
 16 | 27/6 | estimation, comparison & criticism | Kruschke 11, 12 |
-17 | 30/6 | practice: cognitive models 1 | Lee & Wagenmakers part IV | [HW4](homework/04_model_comp2.html) due |
-18 | 4/7 | intro: generalized linear model | Kruschke ch. 15 & 16 |
-19 | 7/7 | using Stan | [Stan manual](http://mc-stan.org/documentation/), Kruschke ch 14 |
-20 | 11/7 | GLM: further topics | Kruschke ch 17-22 |
+17 | 30/6 | practice: Generalized Context Model | Lee & Wagenmakers ch. 17 | [HW4](homework/04_model_comp2.html) due |
+18 | 4/7 | Stan | Kruschke ch. 14, [Stan manual](http://mc-stan.org/documentation/) |
+19 | 7/7 | practice: cognitive models 2 | Lee & Wagenmakers ch. TBA, 
+20 | 11/7 | generalized linear model | Kruschke ch 15 & 16 |
 21 | 14/7 | practice: regression in Stan 1 | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |
-22 | 18/7 | practice: regression in Stan 2 | | HW5 due |
+22 | 18/7 | more on GLM | Kruschke ch 17-22 | HW5 due |
 23 | 21/7 | rounding off, project topics | | 
 

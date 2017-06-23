@@ -1,0 +1,127 @@
+id,question,tags,answer
+1,The practice sessions have been helpful.,practice sessions helpful,85
+2,The practice sessions have been helpful.,HW amount adequate,70
+3,The practice sessions have been helpful.,HW too difficult,83
+4,The practice sessions have been helpful.,HW too time consuming,90
+5,The practice sessions have been helpful.,more practice sessions hereafter,70
+6,The practice sessions have been helpful.,more technical/computational stuff,65
+7,The practice sessions have been helpful.,more philosophy,65
+8,The practice sessions have been helpful.,more cognitive models,65
+9,The practice sessions have been helpful.,more regression modeling,50
+10,The practice sessions have been helpful.,practice sessions helpful,90
+11,The practice sessions have been helpful.,HW amount adequate,60
+12,The practice sessions have been helpful.,HW too difficult,100
+13,The practice sessions have been helpful.,HW too time consuming,50
+14,The practice sessions have been helpful.,more practice sessions hereafter,70
+1,The amount of homework exercises so far has been adequate.,more technical/computational stuff,80
+2,The amount of homework exercises so far has been adequate.,more philosophy,80
+3,The amount of homework exercises so far has been adequate.,more cognitive models,97
+4,The amount of homework exercises so far has been adequate.,more regression modeling,100
+5,The amount of homework exercises so far has been adequate.,practice sessions helpful,80
+6,The amount of homework exercises so far has been adequate.,HW amount adequate,40
+7,The amount of homework exercises so far has been adequate.,HW too difficult,40
+8,The amount of homework exercises so far has been adequate.,HW too time consuming,60
+9,The amount of homework exercises so far has been adequate.,more practice sessions hereafter,40
+10,The amount of homework exercises so far has been adequate.,more technical/computational stuff,95
+11,The amount of homework exercises so far has been adequate.,more philosophy,60
+12,The amount of homework exercises so far has been adequate.,more cognitive models,0
+13,The amount of homework exercises so far has been adequate.,more regression modeling,100
+14,The amount of homework exercises so far has been adequate.,practice sessions helpful,60
+1,The homework exercises have been too difficult.,HW amount adequate,27
+2,The homework exercises have been too difficult.,HW too difficult,60
+3,The homework exercises have been too difficult.,HW too time consuming,30
+4,The homework exercises have been too difficult.,more practice sessions hereafter,5
+5,The homework exercises have been too difficult.,more technical/computational stuff,60
+6,The homework exercises have been too difficult.,more philosophy,70
+7,The homework exercises have been too difficult.,more cognitive models,70
+8,The homework exercises have been too difficult.,more regression modeling,70
+9,The homework exercises have been too difficult.,practice sessions helpful,50
+10,The homework exercises have been too difficult.,HW amount adequate,20
+11,The homework exercises have been too difficult.,HW too difficult,60
+12,The homework exercises have been too difficult.,HW too time consuming,50
+13,The homework exercises have been too difficult.,more practice sessions hereafter,0
+14,The homework exercises have been too difficult.,more technical/computational stuff,40
+1,The homework exercises have been too time consuming.,more philosophy,30
+2,The homework exercises have been too time consuming.,more cognitive models,70
+3,The homework exercises have been too time consuming.,more regression modeling,38
+4,The homework exercises have been too time consuming.,practice sessions helpful,15
+5,The homework exercises have been too time consuming.,HW amount adequate,80
+6,The homework exercises have been too time consuming.,HW too difficult,80
+7,The homework exercises have been too time consuming.,HW too time consuming,75
+8,The homework exercises have been too time consuming.,more practice sessions hereafter,85
+9,The homework exercises have been too time consuming.,more technical/computational stuff,75
+10,The homework exercises have been too time consuming.,more philosophy,15
+11,The homework exercises have been too time consuming.,more cognitive models,80
+12,The homework exercises have been too time consuming.,more regression modeling,50
+13,The homework exercises have been too time consuming.,practice sessions helpful,0
+14,The homework exercises have been too time consuming.,HW amount adequate,50
+1,There should be more practice sessions in the remainder of the course.,HW too difficult,70
+2,There should be more practice sessions in the remainder of the course.,HW too time consuming,30
+3,There should be more practice sessions in the remainder of the course.,more practice sessions hereafter,26
+4,There should be more practice sessions in the remainder of the course.,more technical/computational stuff,50
+5,There should be more practice sessions in the remainder of the course.,more philosophy,70
+6,There should be more practice sessions in the remainder of the course.,more cognitive models,50
+7,There should be more practice sessions in the remainder of the course.,more regression modeling,75
+8,There should be more practice sessions in the remainder of the course.,practice sessions helpful,70
+9,There should be more practice sessions in the remainder of the course.,HW amount adequate,50
+10,There should be more practice sessions in the remainder of the course.,HW too difficult,95
+11,There should be more practice sessions in the remainder of the course.,HW too time consuming,50
+12,There should be more practice sessions in the remainder of the course.,more practice sessions hereafter,50
+13,There should be more practice sessions in the remainder of the course.,more technical/computational stuff,0
+14,There should be more practice sessions in the remainder of the course.,more philosophy,40
+1,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more cognitive models,60
+2,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more regression modeling,80
+3,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,practice sessions helpful,83
+4,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,HW amount adequate,60
+5,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,HW too difficult,70
+6,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,HW too time consuming,60
+7,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more practice sessions hereafter,70
+8,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more technical/computational stuff,70
+9,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more philosophy,40
+10,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more cognitive models,100
+11,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,more regression modeling,90
+12,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,practice sessions helpful,100
+13,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,HW amount adequate,100
+14,I would like to learn more about technical and computational issues related to Bayesian Data Analysis.,HW too difficult,70
+1,I would like head more about philosophical questions related to statistical inference and scientific practices.,HW too time consuming,65
+2,I would like head more about philosophical questions related to statistical inference and scientific practices.,more practice sessions hereafter,95
+3,I would like head more about philosophical questions related to statistical inference and scientific practices.,more technical/computational stuff,82
+4,I would like head more about philosophical questions related to statistical inference and scientific practices.,more philosophy,50
+5,I would like head more about philosophical questions related to statistical inference and scientific practices.,more cognitive models,30
+6,I would like head more about philosophical questions related to statistical inference and scientific practices.,more regression modeling,55
+7,I would like head more about philosophical questions related to statistical inference and scientific practices.,practice sessions helpful,50
+8,I would like head more about philosophical questions related to statistical inference and scientific practices.,HW amount adequate,80
+9,I would like head more about philosophical questions related to statistical inference and scientific practices.,HW too difficult,0
+10,I would like head more about philosophical questions related to statistical inference and scientific practices.,HW too time consuming,0
+11,I would like head more about philosophical questions related to statistical inference and scientific practices.,more practice sessions hereafter,90
+12,I would like head more about philosophical questions related to statistical inference and scientific practices.,more technical/computational stuff,0
+13,I would like head more about philosophical questions related to statistical inference and scientific practices.,more philosophy,20
+14,I would like head more about philosophical questions related to statistical inference and scientific practices.,more cognitive models,60
+1,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more regression modeling,70
+2,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,practice sessions helpful,85
+3,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW amount adequate,100
+4,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW too difficult,60
+5,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW too time consuming,90
+6,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more practice sessions hereafter,80
+7,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more technical/computational stuff,70
+8,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more philosophy,90
+9,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more cognitive models,5
+10,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,more regression modeling,90
+11,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,practice sessions helpful,75
+12,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW amount adequate,50
+13,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW too difficult,40
+14,I would like to look more at particular cognitive models and a Bayesian Data Analysis for them,HW too time consuming,50
+1,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more practice sessions hereafter,70
+2,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more technical/computational stuff,95
+3,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more philosophy,4
+4,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more cognitive models,40
+5,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more regression modeling,80
+6,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,practice sessions helpful,50
+7,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,HW amount adequate,50
+8,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,HW too difficult,70
+9,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,HW too time consuming,30
+10,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more practice sessions hereafter,90
+11,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more technical/computational stuff,90
+12,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more philosophy,100
+13,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more cognitive models,100
+14,I would like to learn more about regression modeling in the context of Bayesian Data Analysis,more regression modeling,90

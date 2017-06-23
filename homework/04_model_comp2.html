@@ -124,24 +124,24 @@ $(document).ready(function () {
 <p>Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. All of the exercises below are required and count equally to the final score.</p>
 <div id="general-remarks-on-this-homework-set" class="section level1">
 <h1>General remarks on this homework set</h1>
-<p>This homework set uses the Generalized Context Model (GCM, see chapter 17 of the Lee &amp; Wagenmakers textbook). Please read chapter 17.1 to familiarize yourself with the model. You will need the data in <code>BDACM_2017/data/04_GCMKruschkeData.Rdata</code> which is also supplied by Lee &amp; Wagenmakers.</p>
-<p>The general idea of this homework set is to compare different ways of probing the same model in the light of the data. We infer posterior distributions over parameters of interest, compare models in different way and perform model criticism. This is to demonstrate how these notions relate to each other. A secondary purpose is to showcase different ways in which we can use JAGS, e.g., to get samples from the posterior, the prior or posterior predictive distribution and to obtain measures of likelihood for the (repeat) data.</p>
+<p>This homework set revolves around the Generalized Context Model (GCM). Please read chapter 17.1 of Lee &amp; Wagenmakers’ textbook to familiarize yourself with the model and the particular implementation we will use here. You will need the data in <code>BDACM_2017/data/04_GCMKruschkeData.Rdata</code> which is also supplied by Lee &amp; Wagenmakers.</p>
+<p>The general motivation of this homework set is to learn about different ways of probing the same model in the light of the data. We infer posterior distributions over parameters of interest (exercise 1), compare models by Bayes factors computed in different ways (exercises 2 &amp; 3) and perform model criticism using posterior predictive <span class="math">\(p\)</span>-values (exercise 4). Seeing all of this side-by-side for the very same models and data is meant to sharpen our intuitions as to how these notions relate to each other. A secondary purpose is to showcase different ways in which we can use JAGS, e.g., to get samples from the posterior distribution (exercises 1 &amp; 3), the prior (exercise 2), or the posterior predictive distribution (exercise 4) and to obtain measures of likelihood for the (repeat) data (exercise 2 &amp; 4).</p>
 </div>
 <div id="exercise-1-posterior-inference-for-hypothesis-testing" class="section level1">
 <h1>Exercise 1: posterior inference for hypothesis testing</h1>
 <p>Look at the script <code>BDACM_2017/homework/04_GCM_files/GCM_1_posterior_inference.R</code> and the corresponding JAGS code. Use this script to compute the following:</p>
 <ol style="list-style-type: lower-alpha">
 <li>Check convergence with the R-hat measure.</li>
-<li>Estimate the density of the posterior for parameter <span class="math">\(w = 0.5\)</span>, using the <code>polspline</code> package. For help on how to do this, check Chapter 8.1 and 8.2 of Lee &amp; Wagenmakers, with the accompanying code.</li>
-<li>Use the estimate of <span class="math">\(P(w = 0.5 \mid D)\)</span> from the previous part to compute, via the Savage-Dickey method, the Bayes factor in favor of the nesting model with <span class="math">\(w \sim \text{Beta}(1,1)\)</span> over the nested model with <span class="math">\(w = 0.5\)</span>. Give a one sentence interpretation of this result.</li>
+<li>Estimate the posterior density <span class="math">\(P(w = 0.5 \mid D)\)</span>, using the <code>polspline</code> package. For help on how to do this, check Chapter 8.1 and 8.2 of Lee &amp; Wagenmakers, with the accompanying code.</li>
+<li>Use this estimate of <span class="math">\(P(w = 0.5 \mid D)\)</span> to compute, via the Savage-Dickey method, the Bayes factor in favor of the nesting model with <span class="math">\(w \sim \text{Beta}(1,1)\)</span> over the nested model with <span class="math">\(w = 0.5\)</span>. Give a one sentence interpretation of this result.</li>
 <li>Compute the 95% HDI of the posterior of <span class="math">\(w\)</span> and check whether <span class="math">\(w=0.5\)</span> lies inside. Give a one sentence interpretation of this result.</li>
 </ol>
 </div>
 <div id="exercise-2-bayes-factor-approximation-using-naive-monte-carlo" class="section level1">
 <h1>Exercise 2: Bayes Factor approximation using naive Monte Carlo</h1>
-<p>Look at the script <code>BDACM_2017/homework/04_GCM_files/GCM_2_BF_naiveMC.R</code> and the corresponding JAGS code and try to understand what it does. Make sure you understand that this script generates samples from the prior predictive distribution and returns a their likelihoods. Use this script to compute the following:</p>
+<p>Look at the script <code>BDACM_2017/homework/04_GCM_files/GCM_2_BF_naiveMC.R</code> and the corresponding JAGS code and try to understand what it does. Make sure you understand that this script generates samples from the prior distribution and returns a vector of likelihoods of the data for each of prior sample. Use this script to compute the following:</p>
 <ol style="list-style-type: lower-alpha">
-<li>Call the function <code>sample_likelihoods</code> once for parameter 1 and once for 50000. Make sure that you understand why the latter is a very close approximation of the nested model from the previous exercise.</li>
+<li>Call the function <code>sample_likelihoods</code> once for parameter 1 and once for 50000 as argument. Make sure that you understand why the latter is a very close approximation of the nested model from the previous exercise.</li>
 <li>Use the output from each call of <code>sample_likelihoods</code> to compute the marginal likelihood of the two models.</li>
 <li>Use the marginal likelihoods to compute the Bayes factor in favor of the model with <span class="math">\(w \sim \text{Beta}(1,1)\)</span> over the moel with <span class="math">\(w \sim \text{Beta}(50000,50000)\)</span>. Give a one sentence interpretation of this result, possibly relating it to your result from exercise 1.</li>
 </ol>
@@ -150,7 +150,7 @@ $(document).ready(function () {
 <h1>Exercise 3: Bayes Factor approximation using transdimensional MCMC</h1>
 <p>Look at the script <code>BDACM_2017/homework/04_GCM_files/GCM_3_BF_transdimensional.R</code> and the corresponding JAGS code and try to understand what it does. Answer the following questions:</p>
 <ol style="list-style-type: lower-alpha">
-<li>What is are the prior model odds assumed in the JAGS script? In which line do you find this information?</li>
+<li>What are the prior model odds assumed in the JAGS script? In which line of the JAGS script do you find this information?</li>
 <li>Does the JAGS script use pseudo-priors, as we did in the lecture?</li>
 <li>Compute the Bayes factor based on the samples computed by this script. Relate it to the previous results in one or two sentences.</li>
 </ol>
@@ -160,7 +160,7 @@ $(document).ready(function () {
 <p>Look at the script <code>BDACM_2017/homework/04_GCM_files/GCM_4_PPV.R</code> and the corresponding JAGS code and try to understand that this is meant to help you compute posterior predictive <span class="math">\(p\)</span>-values with likelihood as the test statistic.</p>
 <ol style="list-style-type: lower-alpha">
 <li>Use the supplied function <code>sample_likelihoods</code> to obtain samples of likelihoods of the observed data and of replicate data, both under the posterior distribution over parameters. Do this once for <span class="math">\(w \sim \text{Beta}(1,1)\)</span> and once for <span class="math">\(w \sim \text{Beta}(50000,50000)\)</span>.</li>
-<li>Use the output to compute the posterior predictive <span class="math">\(p\)</span>-value for both models. To do so, you should pair each sample of <code>lh</code> and <code>lhRep</code> and check the proportion of how often the former was larger than the latter. Comment briefly on your result.</li>
+<li>Use the output to compute the posterior predictive <span class="math">\(p\)</span>-value for both models. To do so, you should compare each sample of <code>lh</code> and <code>lhRep</code> that you obtained from the same MCMC step and check the proportion of how often the former was larger than the latter. Comment briefly on your result.</li>
 </ol>
 </div>
 

@@ -65,16 +65,15 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
     - transdimensional MCMC
     - supermodels
 - Generalized Context Model
-- JASP
 
 # survey results
 
 ```{r}
 tag_order = c("practice sessions helpful", "HW amount adequate", "HW too difficult", "HW too time consuming", "more practice sessions hereafter", "more technical/computational stuff", "more philosophy", "more cognitive models", "more regression modeling")
-d = readr::read_csv(file = "../data/03_mid_term_survey.csv") %>% 
-  mutate(tags = factor(tags, levels = rev(tag_order), ordered = T))
-
-ggplot(d, aes(x = tags, y = answer)) + geom_boxplot() + coord_flip()
+# d = readr::read_csv(file = "../data/03_mid_term_survey.csv") %>% 
+#   mutate(tags = factor(tags, levels = rev(tag_order), ordered = T))
+# 
+# ggplot(d, aes(x = tags, y = answer)) + geom_boxplot() + coord_flip()
 
 ```
 
@@ -659,14 +658,14 @@ show(postM)
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Friday</span>
+<span style = "color:firebrick">Tuesday</span>
 
-- philosophy of Bayes Factors, some more tricks and applications
+- parameter inference, model comparison & model critcism
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Tuesday</span>
+<span style = "color:firebrick">Friday</span>
 
-- <span style = "color:firebrick">no class!</span>
+- <span style = "color:firebrick">bootcamp on cognitive models</span>
 
 

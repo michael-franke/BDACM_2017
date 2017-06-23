@@ -16,24 +16,24 @@ Keep your descriptions and answers as short and concise as possible, without rev
 
 # General remarks on this homework set
 
-This homework set uses the Generalized Context Model (GCM, see chapter 17 of the Lee & Wagenmakers textbook). Please read chapter 17.1 to familiarize yourself with the model. You will need the data in `BDACM_2017/data/04_GCMKruschkeData.Rdata` which is also supplied by Lee & Wagenmakers.
+This homework set revolves around the Generalized Context Model (GCM). Please read chapter 17.1 of  Lee & Wagenmakers' textbook to familiarize yourself with the model and the particular implementation we will use here. You will need the data in `BDACM_2017/data/04_GCMKruschkeData.Rdata` which is also supplied by Lee & Wagenmakers.
 
-The general idea of this homework set is to compare different ways of probing the same model in the light of the data. We infer posterior distributions over parameters of interest, compare models in different way and perform model criticism. This is to demonstrate how these notions relate to each other. A secondary purpose is to showcase different ways in which we can use JAGS, e.g., to get samples from the posterior, the prior or posterior predictive distribution and to obtain measures of likelihood for the (repeat) data.
+The general motivation of this homework set is to learn about different ways of probing the same model in the light of the data. We infer posterior distributions over parameters of interest (exercise 1), compare models by Bayes factors computed in different ways (exercises 2 & 3) and perform model criticism using posterior predictive $p$-values (exercise 4). Seeing all of this side-by-side for the very same models and data is meant to sharpen our intuitions as to how these notions relate to each other. A secondary purpose is to showcase different ways in which we can use JAGS, e.g., to get samples from the posterior distribution (exercises 1 & 3), the prior (exercise 2), or the posterior predictive distribution (exercise 4) and to obtain measures of likelihood for the (repeat) data (exercise 2 & 4).
 
 # Exercise 1: posterior inference for hypothesis testing
 
 Look at the script `BDACM_2017/homework/04_GCM_files/GCM_1_posterior_inference.R` and the corresponding JAGS code. Use this script to compute the following:
 
 a. Check convergence with the R-hat measure.
-b. Estimate the density of the posterior for parameter $w = 0.5$, using the `polspline` package. For help on how to do this, check Chapter 8.1 and 8.2 of Lee & Wagenmakers, with the accompanying code.
-c. Use the estimate of $P(w = 0.5 \mid D)$ from the previous part to compute, via the Savage-Dickey method, the Bayes factor in favor of the nesting model with $w \sim \text{Beta}(1,1)$ over the nested model with $w = 0.5$. Give a one sentence interpretation of this result.
+b. Estimate the posterior density $P(w = 0.5 \mid D)$, using the `polspline` package. For help on how to do this, check Chapter 8.1 and 8.2 of Lee & Wagenmakers, with the accompanying code.
+c. Use this estimate of $P(w = 0.5 \mid D)$ to compute, via the Savage-Dickey method, the Bayes factor in favor of the nesting model with $w \sim \text{Beta}(1,1)$ over the nested model with $w = 0.5$. Give a one sentence interpretation of this result.
 d. Compute the 95% HDI of the posterior of $w$ and check whether $w=0.5$ lies inside. Give a one sentence interpretation of this result.
 
 # Exercise 2: Bayes Factor approximation using naive Monte Carlo
 
-Look at the script `BDACM_2017/homework/04_GCM_files/GCM_2_BF_naiveMC.R` and the corresponding JAGS code and try to understand what it does. Make sure you understand that this script generates samples from the prior predictive distribution and returns a their likelihoods. Use this script to compute the following:
+Look at the script `BDACM_2017/homework/04_GCM_files/GCM_2_BF_naiveMC.R` and the corresponding JAGS code and try to understand what it does. Make sure you understand that this script generates samples from the prior distribution and returns a vector of likelihoods of the data for each of prior sample. Use this script to compute the following:
 
-a. Call the function `sample_likelihoods` once for parameter 1 and once for 50000. Make sure that you understand why the latter is a very close approximation of the nested model from the previous exercise.
+a. Call the function `sample_likelihoods` once for parameter 1 and once for 50000 as argument. Make sure that you understand why the latter is a very close approximation of the nested model from the previous exercise.
 b. Use the output from each call of `sample_likelihoods` to compute the marginal likelihood of the two models.
 c. Use the marginal likelihoods to compute the Bayes factor in favor of the model with $w \sim \text{Beta}(1,1)$ over the moel with $w \sim \text{Beta}(50000,50000)$. Give a one sentence interpretation of this result, possibly relating it to your result from exercise 1.
 
@@ -41,7 +41,7 @@ c. Use the marginal likelihoods to compute the Bayes factor in favor of the mode
 
 Look at the script `BDACM_2017/homework/04_GCM_files/GCM_3_BF_transdimensional.R` and the corresponding JAGS code and try to understand what it does. Answer the following questions:
 
-a. What is are the prior model odds assumed in the JAGS script? In which line do you find this information?
+a. What are the prior model odds assumed in the JAGS script? In which line of the JAGS script do you find this information?
 b. Does the JAGS script use pseudo-priors, as we did in the lecture?
 c. Compute the Bayes factor based on the samples computed by this script. Relate it to the previous results in one or two sentences.
 
@@ -50,7 +50,7 @@ c. Compute the Bayes factor based on the samples computed by this script. Relate
 Look at the script `BDACM_2017/homework/04_GCM_files/GCM_4_PPV.R` and the corresponding JAGS code and try to understand that this is meant to help you compute posterior predictive $p$-values with likelihood as the test statistic. 
 
 a. Use the supplied function `sample_likelihoods` to obtain samples of likelihoods of the observed data and of replicate data, both under the posterior distribution over parameters. Do this once for $w \sim \text{Beta}(1,1)$ and once for $w \sim \text{Beta}(50000,50000)$.
-b. Use the output to compute the posterior predictive $p$-value for both models. To do so, you should pair each sample of `lh` and `lhRep` and check the proportion of how often the former was larger than the latter. Comment briefly on your result.
+b. Use the output to compute the posterior predictive $p$-value for both models. To do so, you should compare each sample of `lh` and `lhRep` that you obtained from the same MCMC step and check the proportion of how often the former was larger than the latter. Comment briefly on your result.
 
 
 

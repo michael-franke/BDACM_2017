@@ -14,7 +14,7 @@ library(polspline)
 #### nsubj -> number of subjects (=8)
 #################################################
 
-load("KruschkeData.Rdata")
+load("04_KruschkeData.Rdata")
 
 #################################################
 ## prepare data

@@ -16,7 +16,7 @@ Keep your descriptions and answers as short and concise as possible, without rev
 
 # General remarks on this homework set
 
-This homework set revolves around the Generalized Context Model (GCM). Please read chapter 17.1 of  Lee & Wagenmakers' textbook to familiarize yourself with the model and the particular implementation we will use here. You will need the data in `BDACM_2017/data/04_GCMKruschkeData.Rdata` which is also supplied by Lee & Wagenmakers.
+This homework set revolves around the Generalized Context Model (GCM). Please read chapter 17.1 of  Lee & Wagenmakers' textbook to familiarize yourself with the model and the particular implementation we will use here. You will need the data in `BDACM_2017/data/04_KruschkeData.Rdata` which is also supplied by Lee & Wagenmakers.
 
 The general motivation of this homework set is to learn about different ways of probing the same model in the light of the data. We infer posterior distributions over parameters of interest (exercise 1), compare models by Bayes factors computed in different ways (exercises 2 & 3) and perform model criticism using posterior predictive $p$-values (exercise 4). Seeing all of this side-by-side for the very same models and data is meant to sharpen our intuitions as to how these notions relate to each other. A secondary purpose is to showcase different ways in which we can use JAGS, e.g., to get samples from the posterior distribution (exercises 1 & 3), the prior (exercise 2), or the posterior predictive distribution (exercise 4) and to obtain measures of likelihood for the (repeat) data (exercise 2 & 4).
 

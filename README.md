@@ -32,7 +32,7 @@ n | date | topic | reading (main) | extra info
 14 | 16/6 | [Bayes in philosophy of science](slides/12_PhilosophyOfScience.pdf) | -- | [HW3](homework/03_model_comp.html) due |
 -- | 20/6 | <span style = "color:firebrick">no class</span> | |
 15 | 23/6 | [computing Bayes factors 2](slides/13_BayesFactorComp2.html) | -- |
-16 | 27/6 | estimation, comparison & criticism | Kruschke 11, 12 |
+16 | 27/6 | [estimation, comparison & criticism](slides/14_Inference_Copmarison_Criticism.html) | Kruschke 11, 12 |
 17 | 30/6 | practice: Generalized Context Model | Lee & Wagenmakers ch. 17 | [HW4](homework/04_model_comp2.html) due |
 18 | 4/7 | Stan | Kruschke ch. 14, [Stan manual](http://mc-stan.org/documentation/) |
 19 | 7/7 | practice: cognitive models 2 | Lee & Wagenmakers ch. TBA, 

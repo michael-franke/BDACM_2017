@@ -1,0 +1,274 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "Session 14: inference, comparison & criticism"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+    smaller: yes
+---
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+require('reshape2')
+require('runjags')
+require('dplyr')
+require('gridExtra')
+show = function(x) { x }
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+HDIofICDF = function( ICDFname , credMass=0.95 , tol=1e-8 , ... ) {
+  # Arguments:
+  #   ICDFname is R's name for the inverse cumulative density function
+  #     of the distribution.
+  #   credMass is the desired mass of the HDI region.
+  #   tol is passed to R's optimize function.
+  # Return value:
+  #   Highest density iterval (HDI) limits in a vector.
+  # Example of use: For determining HDI of a beta(30,12) distribution, type
+  #   HDIofICDF( qbeta , shape1 = 30 , shape2 = 12 )
+  #   Notice that the parameters of the ICDFname must be explicitly named;
+  #   e.g., HDIofICDF( qbeta , 30 , 12 ) does not work.
+  # Adapted and corrected from Greg Snow's TeachingDemos package.
+  incredMass =  1.0 - credMass
+  intervalWidth = function( lowTailPr , ICDFname , credMass , ... ) {
+    ICDFname( credMass + lowTailPr , ... ) - ICDFname( lowTailPr , ... )
+  }
+  optInfo = optimize( intervalWidth , c( 0 , incredMass ) , ICDFname=ICDFname ,
+                      credMass=credMass , tol=tol , ... )
+  HDIlowTailPr = optInfo$minimum
+  return( c( ICDFname( HDIlowTailPr , ... ) ,
+             ICDFname( credMass + HDIlowTailPr , ... ) ) )
+}
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+# introduction
+
+## 3 pillars of BDA (recap)
+
+<span style = "color:firebrick">parameter estimation</span>: 
+
+$$\underbrace{P(\theta \, | \, D)}_{posterior} \propto \underbrace{P(\theta)}_{prior} \ \underbrace{P(D \, | \, \theta)}_{likelihood}$$
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">model comparison</span>
+
+$$\underbrace{\frac{P(M_1 \mid D)}{P(M_2 \mid D)}}_{\text{posterior odds}} = \underbrace{\frac{P(D \mid M_1)}{P(D \mid M_2)}}_{\text{Bayes factor}} \ \underbrace{\frac{P(M_1)}{P(M_2)}}_{\text{prior odds}}$$
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">prediction</span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">prior predictive</span>
+
+$$ P(D) = \int P(\theta) \ P(D \mid \theta) \ \text{d}\theta $$
+
+<span style = "color:white"> &nbsp; </span>
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">posterior predictive</span>
+
+$$ P(D \mid D') = \int P(\theta \mid D') \ P(D \mid \theta) \ \text{d}\theta $$
+
+
+</div>  
+
+## why model predictions?
+
+<span style = "color:white"> &nbsp; </span>
+
+1. model-based beliefs about what is likely to happen
+    - practical decision making
+2. model comparison
+    - information criteria
+    - Bayes factor
+3. model criticism
+    - is the model any good?
+    - given belief in the model, should we be shocked by <span style = "font-style: italic">this</span> new observation? <div style="float: right; margin: 0px;">[<span style = "color:firebrick">$p$-values</span> ]</div>
+        
+    
+
+## overview
+
+|    | estimation | comparison | criticism
+|:---|:---:|:---:|:---:|
+|goal | which $\theta$, given $M$ & $D$? | which better: $M_0$ or $M_1$? | $M$ good model of $D$?
+| method | Bayes rule | Bayes factor | $p$-value
+|no. of models | 1 | 2 | 1
+|$H_0$ | subset of $\theta$  | $P(\theta \mid M_0), P(D \mid \theta, M_0)$ | $P(\theta), P(D \mid \theta)$
+|$H_1$ | ---  | $P(\theta \mid M_1), P(D \mid \theta, M_1)$ | ---
+| prerequisites | $P(\theta), \alpha \times P(D \mid \theta)$  | --- | test statistic
+| pros | lean, easy | intuitive, plausible, Ockham's razor | absolute
+| cons | vagueness in ROPE | prior dependence, computational load | sample space?
+
+## road map for today
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">NHST</span>
+
+- inference, HDIs & ROPEs
+- nested model comparison
+- $p$-values
+
+</div>
+<div style = "float:right; width:45%;">
+  
+<span style = "color:firebrick">model criticism</span>  
+  
+- posterior predictive checks
+- prior/posterior $p$-values
+  
+</div>  
+
+# testing a null
+
+## up next {.build}
+
+<span style = "color:white"> &nbsp; </span>
+
+compare 3 methods for testing a null hypothesis:
+
+1. $p$-values
+2. parameter inference with ROPEs
+3. nested model comparison
+
+<span style = "color:white"> &nbsp; </span>
+
+running example:
+
+<div style = "float:left; width:35%;">
+
+$k=7$, $N=24$ $\rightarrow$ $\theta = 0.5?$
+  
+</div>
+<div style = "float:right; width:55%;">
+
+<img src="http://www.peainthepodcast.com/images/bored-baby-758547.jpg" alt="boring" style="width: 100px;"/>
+  
+</div>  
+
+## definition $p$-value
+
+<span style = "color:white"> &nbsp; </span>
+
+in the <span style = "color:firebrick">general case</span>, the <span style = "color:firebrick">$p$-value of observation $x$</span> under null hypothesis $H_0$, with sample space $X$, sampling distribution $P(\cdot \mid H_0) \in \Delta(X)$ and test statistic $t \colon X \rightarrow \mathbb{R}$ is:
+
+$$ p(x ; H_0, X, P(\cdot \mid H_0), t) = \int_{\left\{ \tilde{x} \in X \ \mid \ t(\tilde{x}) \ge t(x) \right\}} P(\tilde{x} \mid H_0) \ \text{d}\tilde{x}$$ 
+
+intuitive slogan: <span style = "color:firebrick">probability of at least as extreme outcomes</span>
+
+<span style = "color:white"> &nbsp; </span>
+
+for an <span style = "color:firebrick">exact test</span> we get:
+
+$$ p(x ; H_0, X, P(\cdot \mid H_0)) = \int_{\left\{ \tilde{x} \in X \ \mid \ P(\tilde{x} \mid H_0) \le P(x \mid H_0) \right\}} P(\tilde{x} \mid H_0) \ \text{d}\tilde{x}$$ 
+
+intuitive slogan: <span style = "color:firebrick">probability of at least as unlikely outcomes</span>
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  notation: $\Delta(X)$ -- set of all probability measures over $X$
+</div>
+
+## example
+
+<span style = "color:firebrick">fair coin?</span>
+
+- data: we flip $n=24$ times and observe $k = 7$ successes
+- null hypothesis: $\theta = 0.5$
+- sampling distribution: binomial distribution
+
+$$ B(k ; n = 24, \theta = 0.5) = \binom{n}{k} \theta^{k} \, (1-\theta)^{n-k} $$
+
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=3}
+  
+plotData = data.frame(x = 0:24, y = dbinom(0:24, 24, 0.5))
+plotData2 = data.frame(x = c(0:7, 17:24), y = dbinom(c(0:7, 17:24), 24, 0.5))
+sig.plot = ggplot(plotData, aes(x = x , y = y )) + geom_bar(stat = "identity", fill = "skyblue", width = 0.35) +
+  geom_bar(data = plotData2, aes(x = x, y = y), stat = "identity", fill = "darkblue", width = 0.35) +
+  geom_hline(yintercept=dbinom(7,24,0.5)) + xlab("k") + ylab("B(k | n = 24, theta = 0.5)") +
+  # geom_text(data.frame(x = 3, y = 0.05, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = "")), aes(x = x, y = y, label = label)) 
+  geom_text(x = 3, y = 0.03, label = paste0("p = " , round(1-sum(dbinom(8:16, 24, 0.5)),3), collapse = ""))
+sig.plot
+```
+
+## posterior inference
+
+
+
+# summary
+
+## summary
+
+<span style = "color:white"> &nbsp; </span>
+
+|    | estimation | comparison | criticism
+|:---|:---:|:---:|:---:|
+|goal | which $\theta$, given $M$ & $D$? | which better: $M_0$ or $M_1$? | $M$ good model of $D$?
+| method | Bayes rule | Bayes factor | $p$-value
+|no. of models | 1 | 2 | 1
+|$H_0$ | subset of $\theta$  | $P(\theta \mid M_0), P(D \mid \theta, M_0)$ | $P(\theta), P(D \mid \theta)$
+|$H_1$ | ---  | $P(\theta \mid M_1), P(D \mid \theta, M_1)$ | ---
+| prerequisites | $P(\theta), \alpha \times P(D \mid \theta)$  | --- | test statistic
+| pros | lean, easy | intuitive, plausible, Ockham's razor | absolute
+| cons | vagueness in ROPE | prior dependence, computational load | sample space?
+
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- bootcampling GCM (Lee & Wagenmakers ch. 17)
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- introduction to Stan
+
+

@@ -1,0 +1,40 @@
+# Generalized Context Model With Individual Differences
+model{
+  # Decision Data
+  for (i in 1:nstim){
+    for (k in 1:nsubj){
+      y[i,k] ~ dbin(r[i,k],n)
+      predy[i,k] ~ dbin(r[i,k],n)
+    }
+  }
+  # Decision Probabilities
+  for (i in 1:nstim){
+    for (k in 1:nsubj){
+      r[i,k] <- sum(numerator[i,k,])/sum(denominator[i,k,])
+    }
+  }
+  # Base Decision Probabilities
+  for (i in 1:nstim){
+    for (j in 1:nstim){
+      for (k in 1:nsubj){
+        numerator[i,k,j] <- equals(a[j],1)*b*s[i,k,j]
+        denominator[i,k,j] <- equals(a[j],1)*b*s[i,k,j]
+                              + equals(a[j],2)*(1-b)*s[i,k,j]
+      }
+    }
+  } 
+  # Similarities
+  for (i in 1:nstim){
+    for (j in 1:nstim){
+      for (k in 1:nsubj){
+        s[i,k,j] <- exp(-c[k]*(w[k]*d1[i,j]+(1-w[k])*d2[i,j]))
+      }
+    }
+  }
+  # Parameters and Priors
+  for (k in 1:nsubj){
+    c[k] ~ dunif(0,5)
+    w[k] ~ dbeta(1,1)
+  }
+  b <- 0.5 
+}

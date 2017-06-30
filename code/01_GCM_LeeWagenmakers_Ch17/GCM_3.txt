@@ -1,0 +1,89 @@
+# Generalized Context Model With Contaminants and Two Attention Groups
+model{
+  # Decision Data
+  for (i in 1:nstim){
+    # Subjects
+    for (k in 1:nsubj){
+      y[i,k] ~ dbin(r[i,k],n)
+    }
+    # Groups
+    for (g in 1:3){
+      predyg[g,i] ~ dbin(rpredg[g,i],n)
+    }
+  }
+  # Decision Probabilities
+  for (i in 1:nstim){
+    for (k in 1:nsubj){
+      r[i,k] <- equals(zc[k],0)*sum(numerator[i,k,])/sum(denominator[i,k,])
+                + equals(zc[k],1)*0.5
+    }
+    for (g in 1:2){
+      rpredg[g,i] <- sum(numeratorpredg[g,i,])/sum(denominatorpredg[g,i,])
+    }
+    rpredg[3,i] <- 0.5
+  }
+  # Base Decision Probabilities
+  for (i in 1:nstim){
+    for (j in 1:nstim){
+      for (k in 1:nsubj){
+        numerator[i,k,j] <- equals(a[j],1)*b*s[i,k,j]
+        denominator[i,k,j] <- equals(a[j],1)*b*s[i,k,j]
+                              + equals(a[j],2)*(1-b)*s[i,k,j]
+      }
+      for (g in 1:2){
+        numeratorpredg[g,i,j] <- equals(a[j],1)*b*spredg[g,i,j]
+        denominatorpredg[g,i,j] <- equals(a[j],1)*b*spredg[g,i,j]
+                                   + equals(a[j],2)*(1-b)*spredg[g,i,j]
+      }
+    }
+  }
+  # Similarities
+  for (i in 1:nstim){
+    for (j in 1:nstim) {
+      for (k in 1:nsubj){
+        s[i,k,j] <- exp(-c[k]*(w[k]*d1[i,j]+(1-w[k])*d2[i,j]))
+      }
+      for (g in 1:2){
+        spredg[g,i,j] <- exp(-cpredg[g]*(wpredg[g]*d1[i,j]+(1-wpredg[g])*d2[i,j]))
+      }
+    }
+  }
+  # Subject Parameters
+  for (k in 1:nsubj){
+    c[k] ~ dnorm(muc,lambdac)T(0,)
+    w[k] ~ dnorm(muw[zg1[k]],lambdaw)T(0,1)    
+  }
+  # Predicted Group Parameters
+  for (g in 1:2){
+    wpredg[g] ~ dnorm(muw[g],lambdaw)T(0,1)
+    cpredg[g] ~ dnorm(muc,lambdac)T(0,)
+  }
+  # Priors
+  b <- 0.5
+  # Latent Mixture
+  phic ~ dbeta(1,1)
+  phig ~ dbeta(1,1)
+  for (k in 1:nsubj){
+    zc[k] ~ dbern(phic)
+    zg[k] ~ dbern(phig)
+    zg1[k] <- zg[k]+1
+    z[k] <- equals(zc[k],0)*zg1[k] + 3*equals(zc[k],1)
+  }	
+  # Mean Generalization
+  muctmp ~ dbeta(1,1)
+  muc <- 5*muctmp
+  # Mean Attention
+  muwtmp ~ dbeta(1,1)
+  muw[1] <- muwtmp
+  delta ~ dbeta(1,1)
+  muw[2] <- min(1,delta+muw[1])
+  # Standard Deviation Generalization
+  sigmactmp ~ dbeta(1,1)
+  sigmac <- max(.01,3*sigmactmp)
+  # Standard Deviation Attention
+  sigmawtmp ~ dbeta(1,1)
+  sigmaw <- max(.01,sigmawtmp)
+  # Precision
+  lambdac <- 1/pow(sigmac,2)
+  lambdaw <- 1/pow(sigmaw,2)  
+}

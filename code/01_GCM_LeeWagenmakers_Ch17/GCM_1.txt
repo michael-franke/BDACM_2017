@@ -26,5 +26,5 @@ model{
   # Priors
   c  ~ dunif(0,5)
   w  ~ dbeta(1,1)
-  b <- 0.5 
+  b  ~ dbeta(1,1)
 }

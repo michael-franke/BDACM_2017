@@ -35,8 +35,8 @@ model {
   c ~ normal(0, inv_sqrt(2));
   
   // Observed counts
-  h ~ binomial(s, thetah);
-  f ~ binomial(n, thetaf);
+  // h ~ binomial(s, thetah);
+  // f ~ binomial(n, thetaf);
 }
 generated quantities {
   int<lower=0> hRep[k] ;
@@ -90,21 +90,21 @@ samples = stan(model_code=model,
 # Now the values for the monitored parameters are in the "samples" object, 
 # ready for inspection.
 
-d1 = extract(samples)$d[,1]
-d2 = extract(samples)$d[,2]
-d3 = extract(samples)$d[,3]
+d1 = rstan::extract(samples)$d[,1]
+d2 = rstan::extract(samples)$d[,2]
+d3 = rstan::extract(samples)$d[,3]
 
-c1 = extract(samples)$c[,1]
-c2 = extract(samples)$c[,2]
-c3 = extract(samples)$c[,3]
+c1 = rstan::extract(samples)$c[,1]
+c2 = rstan::extract(samples)$c[,2]
+c3 = rstan::extract(samples)$c[,3]
 
-h1 = extract(samples)$thetah[,1]
-h2 = extract(samples)$thetah[,2]
-h3 = extract(samples)$thetah[,3]
+h1 = rstan::extract(samples)$thetah[,1]
+h2 = rstan::extract(samples)$thetah[,2]
+h3 = rstan::extract(samples)$thetah[,3]
 
-f1 = extract(samples)$thetaf[,1]
-f2 = extract(samples)$thetaf[,2]
-f3 = extract(samples)$thetaf[,3]
+f1 = rstan::extract(samples)$thetaf[,1]
+f2 = rstan::extract(samples)$thetaf[,2]
+f3 = rstan::extract(samples)$thetaf[,3]
 
 #make the four panel plot:
 layout(matrix(c(1,2,3,4), 2, 2, byrow = TRUE))

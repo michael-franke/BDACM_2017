@@ -21,7 +21,11 @@ require('reshape2')
 require('runjags')
 require('dplyr')
 require('gridExtra')
-require('rstan')
+# require('rstan')
+library(GGally)
+library(BayesFactor)
+# library(brms)
+
 show = function(x) { x }
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
 ```
@@ -65,8 +69,7 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
     - ordinary least squares regresssion
     - maximum likelihood regression
     - Bayesian approaches
-- generalization to $t$-test & one-way ANOVA
-- robust regression
+- generalization to simplest $t$-test scenario
 
 # generalized linear model
 
@@ -113,10 +116,11 @@ model = likelihood $P(D \mid \theta)$ + prior $P(\theta)$
 <span style = "color:white"> &nbsp; </span>
 
 
+<div style = "float:left; width:35%;">
 <span style = "color:firebrick">terminology</span>
 
-- $y_i$ data, observation, <span style = "color:darkgreen">predicted variable</span>, ...
-- $x_i$ vector of <span style = "color:darkgreen">predictors</span> for $y_i$, explanatory variables, ...
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
 
 <span style = "color:white"> &nbsp; </span>
 
@@ -125,156 +129,444 @@ model = likelihood $P(D \mid \theta)$ + prior $P(\theta)$
 
 $$ 
 \begin{align*} 
-\text{linear_predictor} & = \text{linear_combination}(x_i)  \\
-\text{central_tendency} & = \text{link_fun}( \ \text{linear_predictor}, \theta_{\text{LF}} \ )  \\
-y_i & \sim \text{lh_fun}( \ \text{predicted_value}, \ \theta_{\text{LH}} \ )
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
 \end{align*}
-$$ 
+$$   
+</div>
+<div style = "float:right; width:55%;">
 
 <div align = 'center'>
-  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 550px;"/>
-</div>
-
-# old stuff
-
-# link functions in the generalized linear model
-
-## recap: simple regression
-
-<span style = "color:firebrick">data</span>
-
-
-<div style = "float:left; width:35%;">
-```{r, warnings = FALSE, message = FALSE}
-head(cars) 
-```
-  
-</div>
-<div style = "float:right; width:65%;">
-```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
-coeff = coef(lm(formula = dist ~ speed, data = cars)) # get slope & intercept of linear model
-qplot(cars[,'speed'], cars[,'dist']) + xlab('speed') + ylab('distance') + theme_bw() + 
-  geom_abline(intercept = coeff[1], slope = coeff[2], color = "firebrick")
-```  
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
 </div>  
 
-<span style = "color:white"> dummy </span>
 
-<span style = "color:firebrick">model</span>
 
-<div style = "float:left; width:45%;">
-$$\beta_0, \beta_1 \sim \text{Norm}(0, 1000)$$
-$$\sigma^2_{\epsilon} \sim \text{Unif}(0, 1000)$$
-</div>
-<div style = "float:right; width:45%;">
-$$\mu_i = \beta_0 + \beta_1 x_i$$
-$$y_i \sim \text{Norm}(\mu_i, \sigma^2_{\epsilon})$$
-</div>  
 
 ## types of variables
 
+<span style = "color:white"> &nbsp; </span>
+
+
 | type | examples 
-|:---|:---:|
-| metric |  speed of a car, reading time
-| binary | coin flip, truth-value judgement
-| nominal | gender, political party
-| ordinal | level of education, rating scale judgement
+|:---|:---|
+| metric | speed of a car, reading time, average time spent cooking p.d., ...
+| binary | coin flip, truth-value judgement, experience with R, ...
+| nominal | gender, political party, favorite philosopher, ... 
+| ordinal | level of education, rating scale judgement, ... 
+| count | number of cars passing under bridge in 1h, ...
 
-## generalized linear model
+## common link & likelihood function
 
-<div align = 'center'>
-  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 550px;"/>
-</div>
+<span style = "color:white"> &nbsp; </span>
 
-## common link & likelihood functions
 
 | type of $y$ | (inverse) link function | likelihood function | 
 |:---|:---:|:---:|
 | metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
 | binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
-| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}(\vec{\mu})$
-| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, \vec{\delta})$ | $y \sim \text{Multinomial}(\vec{\mu})$
+| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
+| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
 | count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
 
-<span style = "color:white"> dummy </span>
+# linear regression
 
-<span style = "color:white"> dummy </span>
+## muder rate data set
 
-<span style = "color:white"> dummy </span>
+<span style = "color:white"> &nbsp; </span>
 
 
-<div style = "position:absolute; top: 620px; right:60px; color:darkblue;">
-  (c.f., Kruschke (2015), Doing Bayesian Data Analysis, Chapter 15)
-</div>
+```{r}
+murder_data = readr::read_csv('../data/06_murder_rates.csv') %>% 
+  rename(murder_rate = annual_murder_rate_per_million_inhabitants,
+         low_income = percentage_low_income, 
+         unemployment = percentage_unemployment) %>% 
+  select(murder_rate, low_income, unemployment,population)
+murder_data %>% head
+```
 
-## logistic function
+## visualize data
 
-$$\text{logistic}(\eta, \theta, \gamma) = \frac{1}{(1 + \exp(-\gamma (\eta - \theta)))}$$
+```{r}
+GGally::ggpairs(murder_data, 
+                title = "Murder rate data")
+```
 
-<span style = "color:white"> dummy </span>
+## zooming in
 
-<span style = "color:white"> dummy </span>
+```{r}
+murder_sub = select(murder_data, murder_rate, low_income) 
+rate_income_plot = ggplot(murder_sub, 
+    aes(x = low_income, y = murder_rate)) + geom_point()
+rate_income_plot
+```
+
+## linear regression
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">given</span>
+
+- predicted variable $y$: murder rates <div style="float: right; margin: 0px;"> metric </div>
+- predictor variable $x$: percentage low income <div style="float: right; margin: 0px;"> metric </div> 
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">question</span>
+
+wich linear function --in terms of intercept $\beta_0$ and slope $\beta_1$-- approximates the data best?
+
+$$ y_{\text{pred}} = \beta_0 + \beta_1 x $$ 
+
+
+## ordinary linear regression
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">"geometric" approach</span>
+
+find $\beta_0$ and $\beta_1$ that minimize the squared error between predicted $y_\text{pred}$ and observed $y$
+
+
+<span style = "color:white"> &nbsp; </span>
 
 <div style = "float:left; width:45%;">
 
-<span style = "color:firebrick">threshold $\theta$</span>
-```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+```{r}
+mse = function(y, x, beta_0, beta_1) {
+  yPred = beta_0 + x * beta_1
+  (y-yPred)^2 %>% mean
+}
+fit_mse = optim(par = c(0, 1), 
+  fn = function(par) with(murder_data,
+    mse(murder_rate,low_income, 
+        par[1], par[2])))
+fit_mse$par
+```
+  
+</div>
+<div style = "float:right; width:55%;">
 
-gamma = c(1.5, 1.5, 4, 4)
-theta = c(0, 1, 0, 1)
-myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
-myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
-myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
-myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=3}
+rate_income_plot + geom_abline(intercept = fit_mse$par[1], 
+                               slope = fit_mse$par[2], 
+                               color = "firebrick")
+```
 
-ggplot(data.frame(x = c(-5,5)), aes(x)) +
-         stat_function(fun = myFun1, aes(color = "0")) +
-         stat_function(fun = myFun2, aes(color = "1")) +
-        scale_colour_manual("theta", breaks = c("0", "1"), values = c("darkblue", "firebrick")) + ggtitle("gamma = 1.5")
+  
+</div>  
+
+## linear regression: MLE
+
+<span style = "color:firebrick">maximum likelihood approach</span>
+
+find $\beta_0$ and $\beta_1$ and $\sigma$ that maximize the likelihood of observed $y$:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma)
+\end{align*}
+$$
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+```{r}
+nll = function(y, x, beta_0, beta_1, sd) {
+  if (sd <= 0) {return( Inf )}
+  yPred = beta_0 + x * beta_1
+  nll = -dnorm(y, mean=yPred, sd=sd, log = T)
+  sum(nll)
+}
+fit_lh = optim(par = c(0, 1, 1), 
+  fn = function(par) with(murder_data, 
+    nll(murder_rate, low_income,
+        par[1], par[2], par[3])))
+fit_lh$par
+```
+  
+</div>
+<div style = "float:right; width:55%;">
+
+```{r, echo = FALSE, fig.align='center', fig.width=4, fig.height=3}
+rate_income_plot + geom_abline(intercept = fit_lh$par[1], 
+                               slope = fit_lh$par[2], 
+                               color = "firebrick")
+```
+
+  
+</div>  
+
+## compare homebrew to the "real thing"
+
+```{r}
+fit_lm = lm(formula = murder_rate ~ low_income, data = murder_data)
+fit_glm = glm(formula = murder_rate ~ low_income, data = murder_data)
+
+tibble(parameter = c("beta_0", "beta_1"),
+       manual_mse = fit_mse$par,
+       manual_lh = fit_lh$par[1:2],
+       lm = fit_lm %>% coefficients,
+       glm = fit_glm %>% coefficients) %>% show
+```
+
+
+## linear regression: a Bayesian approach
+
+<span style = "color:firebrick">Bayes: likelihood + prior</span>
+
+inspect posterior distribution over $\beta_0$, $\beta_1$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_i & \sim \mathcal{N}(0, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  b1 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    yPred[i] = b0 + b1 * x[i]
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+
+## linear regression: a Bayesian approach
+
+```{r, echo = FALSE, fig.align='center', fig.width=8, fig.height=4.5}
+# specify model
+modelString = "
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  b1 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    mu[i] = b0 + b1 * x[i]
+    y[i] ~ dnorm(mu[i], tau_e)
+  }
+}
+"
+# prepare data for JAGS
+dataList = list(x= murder_sub$low_income, 
+                y = murder_sub$murder_rate,
+                k = nrow(murder_sub))
+
+# set up and run model
+params <- c('b0', 'b1', 'var_e')
+jagsModel = jags.model(file = textConnection(modelString), data = dataList, n.chains = 3, quiet = TRUE)
+update(jagsModel, 5000) # 5000 burn-in samples
+codaSamples = coda.samples(jagsModel, variable.names = params, n.iter = 20000)
+
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+          mean = mean(value),
+          HDI_hi = coda::HPDinterval(as.mcmc(value))[2])  %>% 
+  show
+
+ggmcmc::ggs_density(ggs(codaSamples))
+```
+ 
+# inference with regression models
+
+## inference with regression models
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">parameter estimation</span>
+
+- is coefficient $\beta_i$ significantly/credibly different from, e.g., 0?
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">model comparison</span>
+
+- compare model with $\beta_i$ fixed to model with $\beta_i$ free
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">prediction/model criticism</span>
+
+- predict future data from model
+- could model be a likely generating model of the observed data?
+
+## significance of point-estimates of coefficients
+
+```{r}
+fit_glm = glm(formula = murder_rate ~ low_income, data = murder_data)
+fit_glm %>% summary
+```
+
+## credible intervals for posteriors over coefficients
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r}
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+          mean = mean(value),
+          HDI_hi = coda::HPDinterval(as.mcmc(value))[2])  %>% 
+  show
+```
+
+## model comparison
+
+<span style = "color:firebrick">frequentist</span>
+
+```{r}
+fit_glm_simple = glm(formula = murder_rate ~ 1, data = murder_data)
+AIC(fit_glm_simple, fit_glm)
+```
+
+
+<span style = "color:firebrick">Bayesian</span>
+
+```{r, fig.align='center', fig.width=8, fig.height=4.5}
+# package does not 'like' tibbles
+BayesFactor::regressionBF(formula = murder_rate ~ low_income, 
+            data = as.data.frame(murder_sub))
+```
+
+# $t$-test scenario
+
+## IQ data
+
+```{r}
+iq_data = readr::read_csv('../data/07_Kruschke_TwoGroupIQ.csv')
+summary(iq_data)
+```  
+
+<div style = "float:left; width:45%;">
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=2.8}
+ggplot(iq_data, aes(x=Group, y = Score)) + geom_boxplot()
 ```  
 </div>
 <div style = "float:right; width:45%;">
+<span style = "color:firebrick">possible research questions?</span>  
 
-<span style = "color:firebrick">gain $\gamma$</span>
-```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
-
-gamma = c(1.5, 1.5, 4, 4)
-theta = c(0, 1, 0, 1)
-myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
-myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
-myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
-myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
-
-ggplot(data.frame(x = c(-5,5)), aes(x)) +
-         stat_function(fun = myFun1, aes(color = "1.5")) +
-         stat_function(fun = myFun3, aes(color = "4")) +
-        scale_colour_manual("gamma", breaks = c("1.5", "4"), values = c("darkblue", "firebrick")) + ggtitle("theta = 0")
-```  
+1. is average IQ-score higher than 100 in treatment group?
+2. is average IQ-score higher in treatment group than in control? (<span style = "color:darkorange">next time</span>)
 </div>  
 
-## threshold-Phi model
-
-<div align = 'center'>
-  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/Kruschke_Fig23_6_threshold_Phi.png" alt="threshPhi" style="width: 600px;"/>
+<div style = "position:absolute; top: 620px; right:60px;">
+  from Kruschke (2015, Chapter 16)
 </div>
 
-<div style = "position:absolute; top: 620px; right:60px; color:darkblue;">
-  (c.f., Kruschke (2015), Doing Bayesian Data Analysis, Chapter 23)
-</div>
+## Case 1: IQ-score higher than 100 in treatment group?
 
+<span style = "color:firebrick">Bayesian GLM:</span>
+
+inspect posterior distribution over $\beta_0$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_0 & \sim \mathcal{N}(100, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(100, 1/10000000)
+  for (i in 1:k){
+    yPred[i] = b0
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+  
+
+## posterior inference: results
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=4}
+# specify model
+modelString = "
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    mu[i] = b0
+    y[i] ~ dnorm(mu[i], tau_e)
+  }
+}
+"
+# prepare data for JAGS
+iq_score_treatment = filter(iq_data, Group == "Smart Drug")$Score
+dataList = list(y = iq_score_treatment, 
+                k = length(iq_score_treatment))
+
+# set up and run model
+params <- c('b0', 'var_e')
+jagsModel = jags.model(file = textConnection(modelString), data = dataList, n.chains = 3, quiet = TRUE)
+update(jagsModel, 5000) # 5000 burn-in samples
+codaSamples = coda.samples(jagsModel, variable.names = params, n.iter = 20000)
+
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+          mean = mean(value),
+          HDI_hi = coda::HPDinterval(as.mcmc(value))[2])  %>% 
+  show
+
+ggmcmc::ggs_density(ggs(codaSamples))
+```
 
 # summary
 
-## comparison
+## generalized linear model
 
-|  | JAGS | Stan | 
-|:---|:---:|:---:|
-| syntax-style | BUGS, R | C++, R, BUGS
-| sampler | MH, Gibbs | Hamiltonian
-| paradigm | declarative | procedural
-| precompilation | no | yes
-| latent discrete variables | yes | hard (or impossible)
-| added goodies | DIC | variational Bayes, MAP, improper priors, rstanarm, loo, ...
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$   
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
 
 ## outlook
 
@@ -282,12 +574,14 @@ ggplot(data.frame(x = c(-5,5)), aes(x)) +
 
 <span style = "color:firebrick">Friday</span>
 
-- bootcamping with a cognitive model in Stan
+- robust regression
+- GLM with nominal predictors
+- GLM with nominal & ordinal predicted variables
 
 <span style = "color:white"> &nbsp; </span>
 
 <span style = "color:firebrick">Tuesday</span>
 
-- generalized linear model
-
+- mixed effects models
+- model comparison by cross-validation
 

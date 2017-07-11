@@ -36,8 +36,8 @@ n | date | topic | reading (main) | extra info
 17 | 30/6 | practice: Generalized Context Model | Lee & Wagenmakers ch. 17 | [HW4](homework/04_model_comp2.html) due |
 18 | 4/7 | [Stan](slides/15_Stan.html) | Kruschke ch. 14, [Stan manual](http://mc-stan.org/documentation/) |
 19 | 7/7 | practice: cognitive models 2 | Lee & Wagenmakers ch. 11, 
-20 | 11/7 | generalized linear model | Kruschke ch 15, 16|
-21 | 14/7 | more on the GLM | Kruschke ch 17-22 |
+20 | 11/7 | [generalized linear model](slides/16_GLM_intro.html) | Kruschke ch 15, 16, 17|
+21 | 14/7 | more on the GLM | Kruschke ch 16-22 |
 22 | 18/7 | mixed models | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |  |
 23 | 21/7 | rounding off, project topics | HW5 due | 
 

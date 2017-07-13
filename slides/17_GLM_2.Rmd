@@ -317,6 +317,30 @@ ggmcmc::ggs(post_samples_2 %>% as.mcmc.list) %>%
   facet_wrap(~ Parameter, scales = "free")
 ```
 
+## known model with (un)correlated predictors
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">uncorrelated</span>
+
+<div align = 'center'>
+  <img src="pics/Kruschke_Fig18_1_uncorrelated_predictors.png" alt="Kruschke_Fig18_1" style="width: 400px;"/>
+</div>
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">correlated</span>
+
+<div align = 'center'>
+  <img src="pics/Kruschke_Fig18_2_correlated_predictors.png" alt="Kruschke_Fig18_1" style="width: 400px;"/>
+</div>
+  
+</div>  
+
+
+
+
 
 ## joint posterior distribution
 
@@ -383,7 +407,6 @@ plot(BF_complex)
 
 ## correlated predictors: summary
 
-
 <span style = "color:white"> &nbsp; </span>
 
 <span style = "color:firebrick">general problem</span>
@@ -413,6 +436,105 @@ plot(BF_complex)
 
 </div>  
 
+# robust regression
+
+## noise model in the likelihood function
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">linear model</span> (so far)
+
+standard likelihood function: normal distribution
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y_i & \sim \mathcal{N}(\mu = \eta_i, \sigma_{err}) \\
+\end{align*}
+$$ 
+
+
+<span style = "color:darkgreen"> $\Rightarrow$ encodes an assumption about noise </span>  
+
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">robust regression</span>
+
+uses Student's $t$ distribution instead
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y_i & \sim \mathcal{t}(\mu = \eta_i, \sigma_{err}, \nu) \\
+\end{align*}
+$$ 
+
+## Student's $t$ distribution
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r echo = FALSE, fig.align='center', fig.width=6, fig.height=4}
+
+get_data_frame = function(df, sigma) {
+  tibble(x = seq(-5, 5, length.out = 1000),
+         y = dstudent_t(x, df = df, mu = 0, sigma = sigma),
+         df = paste0("nu = ", df),
+         sigma = paste0("sigma = ", sigma))
+}
+
+
+rbind(get_data_frame(1, 1),
+      get_data_frame(1, 3),
+      get_data_frame(5, 1),
+      get_data_frame(5, 3)) %>% 
+  ggplot(aes(x = x, y = y)) + geom_line() + facet_grid(sigma ~ df)
+
+
+
+```
+
+
+## robustness against outliers
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div align = 'center'>
+  <img src="pics/Kruschke_Fig16_5_tDist_outlier_robustness.png" alt="Kruscke_Fig16_1" style="width: 450px;"/>
+</div>
+
+## many robust noise models conceivable
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">systematic and independent outlier group</span>
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y_i & \sim (1-\epsilon) \mathcal{N}(\mu = \eta_i, \sigma_{err}) + \epsilon \mathcal{N}(\mu = \mu_{\text{outlier}}, \sigma_{err})  \\
+\end{align*}
+$$ 
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">scale-dependent noise</span>
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y_i & \sim \mathcal{N}(\mu = \eta_i, \sigma = a\eta_i + b) \\
+\end{align*}
+$$
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  caveat: these are just gestures towards possibilities; not necessarily fully functional!
+</div>
 
 # $t$-test scenario
 

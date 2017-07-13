@@ -1,0 +1,346 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "Session 17: genearlized linear model 2"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+    smaller: yes
+---
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+require('reshape2')
+require('runjags')
+require('dplyr')
+require('gridExtra')
+# require('rstan')
+library(GGally)
+library(BayesFactor)
+# library(brms)
+
+show = function(x) { x }
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+# recap
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$   
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+## common link & likelihood function
+
+<span style = "color:white"> &nbsp; </span>
+
+
+| type of $y$ | (inverse) link function | likelihood function | 
+|:---|:---:|:---:|
+| metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
+| binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
+| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
+| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
+| count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
+
+## linear regression: a Bayesian approach
+
+<span style = "color:firebrick">Bayes: likelihood + prior</span>
+
+inspect posterior distribution over $\beta_0$, $\beta_1$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_i & \sim \mathcal{N}(0, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  b1 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    yPred[i] = b0 + b1 * x[i]
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+
+# overview
+
+## overview
+
+<span style = "color:white"> &nbsp; </span>
+
+- linear models with several metric predictors
+    - interaction terms
+- GLMs with nominal predictors
+    - subsumes $t$-tests and ANOVAs
+- robust regresssion
+- GLMs with binary predicted variables <div style="float: right; margin: 0px;"> <span style = "color:darkgreen">logistic regression</span> </div> 
+- GLMs with ordinal predicted variables <div style="float: right; margin: 0px;"> <span style = "color:darkgreen">ordinal regression</span> </div> 
+
+ 
+# linear model
+
+## linear model
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">data</span>
+
+- $y$: $n \times 1$ vector of <span style = "color:darkgreen"> predicted values </span> (metric)   
+
+- $X$: $n \times k$ matrix of <span style = "color:darkgreen"> predictor values </span> (metric)  
+
+<span style = "color:firebrick">parameters</span>
+
+- $\beta$: $k \times 1$ vector of coefficients
+- $\sigma_{err}$: standard deviation of Gaussian noise
+
+<span style = "color:firebrick">model</span>
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y_i & \sim \mathcal{N}(\mu = \eta_i, \sigma_{err}) \\
+\end{align*}
+$$ 
+
+</div>
+
+
+
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">example</span>
+
+```{r, echo = FALSE}
+murder_data = readr::read_csv('../data/06_murder_rates.csv') %>% 
+  rename(murder_rate = annual_murder_rate_per_million_inhabitants,
+         low_income = percentage_low_income, 
+         unemployment = percentage_unemployment) %>% 
+  select(murder_rate, low_income, unemployment,population)
+```
+
+```{r}
+murder_data %>% head
+```
+
+
+- predicted variable $y$: `murder_data$murder_rate`
+- predictor matrix $X$: `murder_data[,2:3]` 
+
+  
+</div>  
+
+
+
+
+
+
+# $t$-test scenario
+
+## IQ data
+
+```{r}
+iq_data = readr::read_csv('../data/07_Kruschke_TwoGroupIQ.csv')
+summary(iq_data)
+```  
+
+<div style = "float:left; width:45%;">
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=2.8}
+ggplot(iq_data, aes(x=Group, y = Score)) + geom_boxplot()
+```  
+</div>
+<div style = "float:right; width:45%;">
+<span style = "color:firebrick">possible research questions?</span>  
+
+1. is average IQ-score higher than 100 in treatment group?
+2. is average IQ-score higher in treatment group than in control? (<span style = "color:darkorange">next time</span>)
+</div>  
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  from Kruschke (2015, Chapter 16)
+</div>
+
+## Case 1: IQ-score higher than 100 in treatment group?
+
+<span style = "color:firebrick">Bayesian GLM:</span>
+
+inspect posterior distribution over $\beta_0$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_0 & \sim \mathcal{N}(100, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(100, 1/10000000)
+  for (i in 1:k){
+    yPred[i] = b0
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+  
+
+## posterior inference: results
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=4}
+# specify model
+modelString = "
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    mu[i] = b0
+    y[i] ~ dnorm(mu[i], tau_e)
+  }
+}
+"
+# prepare data for JAGS
+iq_score_treatment = filter(iq_data, Group == "Smart Drug")$Score
+dataList = list(y = iq_score_treatment, 
+                k = length(iq_score_treatment))
+
+# set up and run model
+params <- c('b0', 'var_e')
+jagsModel = jags.model(file = textConnection(modelString), data = dataList, n.chains = 3, quiet = TRUE)
+update(jagsModel, 5000) # 5000 burn-in samples
+codaSamples = coda.samples(jagsModel, variable.names = params, n.iter = 20000)
+
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+          mean = mean(value),
+          HDI_hi = coda::HPDinterval(as.mcmc(value))[2])  %>% 
+  show
+
+ggmcmc::ggs_density(ggs(codaSamples))
+```
+
+# summary
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$   
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- robust regression
+- GLM with nominal predictors
+- GLM with nominal & ordinal predicted variables
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Tuesday</span>
+
+- mixed effects models
+- model comparison by cross-validation
+

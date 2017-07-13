@@ -11,7 +11,7 @@ output:
 ---
 ```{r setup, include=FALSE, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
-                      dev.args = list(bg = 'transparent'), fig.align='center',
+                      dev.args=list(bg = 'transparent'), fig.align='center',
                       cache=TRUE)
 require('tidyverse')
 require('forcats')
@@ -24,7 +24,7 @@ require('gridExtra')
 # require('rstan')
 library(GGally)
 library(BayesFactor)
-# library(brms)
+library(brms)
 
 show = function(x) { x }
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
@@ -138,6 +138,7 @@ model{
 <span style = "color:white"> &nbsp; </span>
 
 - linear models with several metric predictors
+    - correlated predictors
     - interaction terms
 - GLMs with nominal predictors
     - subsumes $t$-tests and ANOVAs
@@ -146,7 +147,7 @@ model{
 - GLMs with ordinal predicted variables <div style="float: right; margin: 0px;"> <span style = "color:darkgreen">ordinal regression</span> </div> 
 
  
-# linear model
+# LM with multiple predictors
 
 ## linear model
 
@@ -188,6 +189,7 @@ murder_data = readr::read_csv('../data/06_murder_rates.csv') %>%
   select(murder_rate, low_income, unemployment,population)
 ```
 
+
 ```{r}
 murder_data %>% head
 ```
@@ -196,12 +198,220 @@ murder_data %>% head
 - predicted variable $y$: `murder_data$murder_rate`
 - predictor matrix $X$: `murder_data[,2:3]` 
 
+</div>  
+
+## predictor variables beyond the raw data
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">intercept</span>
+
+$X_{i,1} = 1$ for all $i$ 
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">interaction terms</span>
+
+$X_{i,l} = X_{i,j} \cdot X_{i,k}$ for all $i$ with $j \neq k$
+
+  
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">quadratic terms</span>
+
+$X_{i,k} = X_{i,j}^2$ for all $i$ with $j \neq k$
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">crazy terms$^*$</span>
+
+$X_{i,l} = \exp((X_{i,j} - X_{i,k})^2 + \sqrt{X_{i,m}})$
+
   
 </div>  
 
 
+<div style = "position:absolute; top: 620px; right:60px;">
+  $^*$ at which point it gets pointless to speak of a "linear model" still, even if formally subsumable
+</div>
+
+## recall: murder data
+
+```{r}
+GGally::ggpairs(murder_data, 
+                title = "Murder rate data")
+```
+
+## multiple predictors
+
+<span style = "color:firebrick">point estimates</span>
+
+```{r}
+glm(murder_rate ~ low_income + population, 
+    data = murder_data) %>% 
+  broom::tidy()
+```
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">Bayes</span>
+
+```{r echo = TRUE}
+BF_fit_1 = BayesFactor::lmBF(
+  murder_rate ~ low_income + population, 
+  data = murder_data %>% as.data.frame)
+post_samples_1 = BayesFactor::posterior(
+  model = BF_fit_1, 
+  iterations = 5000)
+```
+  
+</div>
+<div style = "float:right; width:45%;">
+
+```{r echo = FALSE, fig.align='center', fig.width=4, fig.height=2.75}
+ggmcmc::ggs(post_samples_1 %>% as.mcmc.list) %>% 
+  filter(Parameter %in% c("low_income", "population")) %>% 
+  ggplot(aes(x = value)) + geom_density() +
+  facet_wrap(~ Parameter, scales = "free")
+```
 
 
+</div>  
+
+## correlated predictors
+
+<span style = "color:firebrick">point estimates</span>
+
+```{r}
+glm(murder_rate ~ low_income + unemployment, 
+    data = murder_data) %>% 
+  broom::tidy()
+```
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">Bayes</span>
+
+```{r echo = TRUE}
+BF_fit_2 = BayesFactor::lmBF(
+  murder_rate ~ low_income + unemployment, 
+  data = murder_data %>% as.data.frame)
+post_samples_2 = BayesFactor::posterior(
+  model = BF_fit_2, 
+  iterations = 5000)
+```
+  
+</div>
+<div style = "float:right; width:45%;">
+
+```{r echo = FALSE, fig.align='center', fig.width=4, fig.height=2.75}
+ggmcmc::ggs(post_samples_2 %>% as.mcmc.list) %>% 
+  filter(Parameter %in% c("low_income", "unemployment")) %>% 
+  ggplot(aes(x = value)) + geom_density() +
+  facet_wrap(~ Parameter, scales = "free")
+```
+
+
+## joint posterior distribution
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">murder_rate ~ low_income + population</span>
+
+```{r echo = FALSE, fig.align='center', fig.width=4, fig.height=2.75}
+ggmcmc::ggs(post_samples_1 %>% as.mcmc.list) %>% 
+  spread(Parameter, value = value) %>% 
+  ggplot(aes(x = low_income, y = population)) + geom_point()
+```
+
+  
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">murder_rate ~ low_income + unemployment</span>
+
+```{r echo = FALSE, fig.align='center', fig.width=4, fig.height=2.75}
+ggmcmc::ggs(post_samples_2 %>% as.mcmc.list) %>% 
+  spread(Parameter, value = value) %>% 
+  ggplot(aes(x = low_income, y = unemployment)) + geom_point()
+```
+
+  
+</div>  
+
+## model comparison
+
+```{r}
+BF_group_fit = BayesFactor::regressionBF(
+  murder_rate ~ low_income + unemployment + population,
+  data = murder_data %>% as.data.frame)
+plot(BF_group_fit)
+```
+
+## model comparison: perfect correlation
+
+```{r echo = T, fig.align='center', fig.width=5, fig.height=3.5}
+BF_group_fit = BayesFactor::regressionBF(
+  murder_rate ~ low_income + inv_income,
+  data = murder_data %>% 
+    mutate(inv_income = -low_income) %>% 
+    as.data.frame)
+plot(BF_group_fit)
+```
+
+## model comparison: perfect correlation
+
+```{r echo = T, fig.align='center', fig.width=5, fig.height=3.5}
+BF_complex = BayesFactor::regressionBF(
+  murder_rate ~ low_income + inv_income,
+  rscaleCont = 5, # set a wider prior for all slopes
+  data = murder_data %>% 
+    mutate(inv_income = -low_income) %>% 
+    as.data.frame)
+plot(BF_complex)
+```
+
+
+## correlated predictors: summary
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">general problem</span>
+
+<span style = "color:darkgreen"> correlated predictors distort parameter inference in linear models </span>  
+ (same for point-estimation and Bayes)
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">point estimates</span>
+
+- perfect correlation $\Rightarrow$ no unique best fit $\Rightarrow$ inapplicable
+- strong correlation $\Rightarrow$ estimation algorithm may implode
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">Bayes</span>
+
+- perfect correlation $\Rightarrow$ no conceptual problem
+- computation can be harder but priors can mediate
+    
+
+
+</div>  
 
 
 # $t$-test scenario

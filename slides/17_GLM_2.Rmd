@@ -625,6 +625,154 @@ ggmcmc::ggs(codaSamples) %>%
 ggmcmc::ggs_density(ggs(codaSamples))
 ```
 
+# GLM link functions
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$ 
+
+
+
+
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+## common link & likelihood function
+
+<span style = "color:white"> &nbsp; </span>
+
+
+| type of $y$ | (inverse) link function | likelihood function | 
+|:---|:---:|:---:|
+| metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
+| binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
+| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
+| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
+| count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
+
+## logistic regression for binomial data
+
+<span style = "color:white"> &nbsp; </span>
+
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\mu &= \text{logistic}(\eta, \theta = 0, \gamma = 1) = (1 + \exp(-\eta))^{-1} \\
+y & \sim \text{Bernoulli}(\mu)
+\end{align*}
+$$   
+
+## logistic function
+
+$$\text{logistic}(\eta, \theta, \gamma) = \frac{1}{(1 + \exp(-\gamma (\eta - \theta)))}$$
+
+<span style = "color:white"> dummy </span>
+
+<span style = "color:white"> dummy </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">threshold $\theta$</span>
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+
+gamma = c(1.5, 1.5, 4, 4)
+theta = c(0, 1, 0, 1)
+myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
+myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
+myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
+myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
+
+ggplot(data.frame(x = c(-5,5)), aes(x)) +
+         stat_function(fun = myFun1, aes(color = "0")) +
+         stat_function(fun = myFun2, aes(color = "1")) +
+        scale_colour_manual("theta", breaks = c("0", "1"), values = c("darkblue", "firebrick")) + ggtitle("gamma = 1.5")
+```  
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">gain $\gamma$</span>
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+
+gamma = c(1.5, 1.5, 4, 4)
+theta = c(0, 1, 0, 1)
+myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
+myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
+myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
+myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
+
+ggplot(data.frame(x = c(-5,5)), aes(x)) +
+         stat_function(fun = myFun1, aes(color = "1.5")) +
+         stat_function(fun = myFun3, aes(color = "4")) +
+        scale_colour_manual("gamma", breaks = c("1.5", "4"), values = c("darkblue", "firebrick")) + ggtitle("theta = 0")
+```  
+</div>  
+
+## multi-logit regression for multinomial data
+
+<span style = "color:white"> &nbsp; </span>
+
+- each datum $y_i \in \set{1, \dots, k}$, unordered
+- one linear predictor for all categories $j \in \set{1, \dots, k}$ 
+
+<span style = "color:white"> &nbsp; </span>
+
+
+$$ 
+\begin{align*}
+\eta_j & = X_i \cdot \beta_j  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\mu_j & \propto \exp(\eta_j)  \\
+y & \sim \text{Categorical}(\mu)
+\end{align*}
+$$  
+
+## ordinal (probit) regression
+
+- each datum $y_i \in \set{1, \dots, k}$, ordered
+- $k+1$ latent threshold parameters: $\infty = \theta_0 < \theta_1 < \dots < \theta_k = \infty$
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\mu_j & = \Phi(\theta_{j}) - \Phi(\theta_{j+1})  \\
+y & \sim \text{Categorical}(\mu)
+\end{align*}
+$$  
+
+## threshold-Phi model
+
+<div align = 'center'>
+  <img src="pics/Kruschke_Fig23_6_threshold_Phi.png" alt="threshPhi" style="width: 600px;"/>
+</div>
+
+
+
+
 # summary
 
 ## generalized linear model

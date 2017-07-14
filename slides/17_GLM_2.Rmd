@@ -139,13 +139,12 @@ model{
 
 - linear models with several metric predictors
     - correlated predictors
-    - interaction terms
-- GLMs with nominal predictors
-    - subsumes $t$-tests and ANOVAs
 - robust regresssion
-- GLMs with binary predicted variables <div style="float: right; margin: 0px;"> <span style = "color:darkgreen">logistic regression</span> </div> 
-- GLMs with ordinal predicted variables <div style="float: right; margin: 0px;"> <span style = "color:darkgreen">ordinal regression</span> </div> 
-
+- GLMs with other types of predictor variables
+    - binary outcomes: <span style = "color:darkgreen"> logistic regression </span>  
+    - nominal outcomes <span style = "color:darkgreen"> mulit-logit regression </span>  
+    - ordinal outcomes: <span style = "color:darkgreen"> ordinal (logit/probit) regression </span>  
+  
  
 # LM with multiple predictors
 
@@ -195,7 +194,7 @@ murder_data %>% head
 ```
 
 
-- predicted variable $y$: `murder_data$murder_rate`
+- predicted variable $y$: `murder_data[,1]`
 - predictor matrix $X$: `murder_data[,2:3]` 
 
 </div>  
@@ -222,9 +221,11 @@ $X_{i,l} = X_{i,j} \cdot X_{i,k}$ for all $i$ with $j \neq k$
 </div>
 <div style = "float:right; width:45%;">
 
-<span style = "color:firebrick">quadratic terms</span>
 
-$X_{i,k} = X_{i,j}^2$ for all $i$ with $j \neq k$
+<span style = "color:firebrick">transformed variables</span>
+
+$X_{i,k} = F(X_{i,j})$ (e.g., $F(x) = \log(x)$ or $F(x) = x^2$)
+<span style = "color:white"> &nbsp; </span>
 
 <span style = "color:white"> &nbsp; </span>
 
@@ -554,7 +555,7 @@ ggplot(iq_data, aes(x=Group, y = Score)) + geom_boxplot()
 <span style = "color:firebrick">possible research questions?</span>  
 
 1. is average IQ-score higher than 100 in treatment group?
-2. is average IQ-score higher in treatment group than in control? (<span style = "color:darkorange">next time</span>)
+2. is average IQ-score higher in treatment group than in control?
 </div>  
 
 <div style = "position:absolute; top: 620px; right:60px;">
@@ -565,13 +566,13 @@ ggplot(iq_data, aes(x=Group, y = Score)) + geom_boxplot()
 
 <span style = "color:firebrick">Bayesian GLM:</span>
 
-inspect posterior distribution over $\beta_0$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+only coefficient is intercept $\beta_0$, with prior knowledge encoded in priors:
 
 $$ 
 \begin{align*}
 y_{\text{pred}} & = \beta_0  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
 y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
-\beta_0 & \sim \mathcal{N}(100, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\beta_0 & \sim \mathcal{N}(100, 15)  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
 \frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
 \end{align*}
 $$
@@ -580,13 +581,15 @@ $$
 model{
   sigma_e = 1/sqrt(tau_e)
   tau_e ~ dgamma(0.1,0.1)
-  b0 ~ dnorm(100, 1/10000000)
+  b0 ~ dnorm(100, 1/15^2)
   for (i in 1:k){
     yPred[i] = b0
     y[i] ~ dnorm(yPred[i], tau_e)
   }
 }
 ```
+  
+  
   
 
 ## posterior inference: results
@@ -597,7 +600,7 @@ modelString = "
 model{
   sigma_e = 1/sqrt(tau_e)
   tau_e ~ dgamma(0.1,0.1)
-  b0 ~ dnorm(0, 1/10000000)
+  b0 ~ dnorm(0, 1/15^2)
   for (i in 1:k){
     mu[i] = b0
     y[i] ~ dnorm(mu[i], tau_e)
@@ -611,6 +614,80 @@ dataList = list(y = iq_score_treatment,
 
 # set up and run model
 params <- c('b0', 'var_e')
+jagsModel = jags.model(file = textConnection(modelString), data = dataList, n.chains = 3, quiet = TRUE)
+update(jagsModel, 5000) # 5000 burn-in samples
+codaSamples = coda.samples(jagsModel, variable.names = params, n.iter = 20000)
+
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+          mean = mean(value),
+          HDI_hi = coda::HPDinterval(as.mcmc(value))[2])  %>% 
+  show
+
+ggmcmc::ggs_density(ggs(codaSamples))
+```
+
+
+## Case 2: difference between groups
+
+<span style = "color:firebrick">Bayesian GLM:</span>
+
+- predictor variable for group `x = ifelse(Group == "Control", 0, 1)` (dummy coding)
+- 
+only coefficient is intercept $\beta_0$, with prior knowledge encoded in priors:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_0 & \sim \mathcal{N}(100, 15)  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1) \\
+\beta_1 & \sim \mathcal{N}(0, 30)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(100, 1/1/15^2)
+  b1 ~ dnorm(0, 1/1/30^2)
+  for (i in 1:k){
+    yPred[i] = b0
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+
+
+## posterior inference: results
+
+```{r, echo = FALSE, fig.align='center', fig.width=5, fig.height=4}
+# specify model
+modelString = "
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(100, 1/15^2)
+  b1 ~ dnorm(0, 1/30^2)
+  for (i in 1:k){
+    yPred[i] = b0 + b1 * x[i] 
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+  yPred1 = yPred[1]
+  yPred120 = yPred[120]
+  x1 = x[1]
+  x120 = x[120]
+}
+"
+# prepare data for JAGS
+dataList = list(y = iq_data$Score, 
+                x = ifelse(iq_data$Group == "Placebo", 0, 1),
+                k = nrow(iq_data))
+
+# set up and run model
+params <- c('b0', "b1")
 jagsModel = jags.model(file = textConnection(modelString), data = dataList, n.chains = 3, quiet = TRUE)
 update(jagsModel, 5000) # 5000 burn-in samples
 codaSamples = coda.samples(jagsModel, variable.names = params, n.iter = 20000)
@@ -682,7 +759,7 @@ $$
 
 $$ 
 \begin{align*}
-\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\eta & = X_i \cdot \beta  \\ 
 \mu &= \text{logistic}(\eta, \theta = 0, \gamma = 1) = (1 + \exp(-\eta))^{-1} \\
 y & \sim \text{Bernoulli}(\mu)
 \end{align*}
@@ -745,7 +822,7 @@ ggplot(data.frame(x = c(-5,5)), aes(x)) +
 
 $$ 
 \begin{align*}
-\eta_j & = X_i \cdot \beta_j  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\eta_j & = X_i \cdot \beta_j  \\ 
 \mu_j & \propto \exp(\eta_j)  \\
 y & \sim \text{Categorical}(\mu)
 \end{align*}
@@ -758,8 +835,8 @@ $$
 
 $$ 
 \begin{align*}
-\eta & = X_i \cdot \beta  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
-\mu_j & = \Phi(\theta_{j}) - \Phi(\theta_{j+1})  \\
+\eta & = X_i \cdot \beta  \\ 
+\mu_j & = \Phi(\theta_{j} - \eta) - \Phi(\theta_{j+1} - \eta)  \\
 y & \sim \text{Categorical}(\mu)
 \end{align*}
 $$  
@@ -811,16 +888,16 @@ $$
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Friday</span>
+<span style = "color:firebrick">Tuesday</span>
 
-- robust regression
-- GLM with nominal predictors
-- GLM with nominal & ordinal predicted variables
+- packages & tools for Bayesian regression
+- multi-level / hierarchical / mixed effects regression
+- WAIC & LOO
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Tuesday</span>
+<span style = "color:firebrick">Friday</span>
 
-- mixed effects models
-- model comparison by cross-validation
+- rounding off
+- projects
 

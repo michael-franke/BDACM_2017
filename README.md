@@ -38,7 +38,7 @@ n | date | topic | reading (main) | extra info
 19 | 7/7 | practice: cognitive models 2 | Lee & Wagenmakers ch. 11, 
 20 | 11/7 | [generalized linear model](slides/16_GLM_intro.html) | Kruschke ch 15, 16, 17|
 21 | 14/7 | [more on the GLM](slides/17_GLM_2.html) | Kruschke ch 16-22 |
-22 | 18/7 | mixed models | Sorensen & Vasishth [(2015)](https://arxiv.org/abs/1506.06201) |  |
+22 | 18/7 | mixed models | Sorensen & Vasishth [(2016)](http://www.ling.uni-potsdam.de/~vasishth/pdfs/SorensenHohensteinVasishth2016.pdf) |  |
 23 | 21/7 | rounding off, project topics |  |  
    | 28/7 |  | HW5 due | 
 

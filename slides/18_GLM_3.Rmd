@@ -1,0 +1,545 @@
+---
+title: "Bayesian data analysis & cognitive modeling"
+subtitle: "Session 18: genearlized linear model 3"
+author: "Michael Franke"
+output:
+  ioslides_presentation:
+    css: mistyle.css
+    transition: faster
+    widescreen: yes
+    smaller: yes
+---
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, 
+                      dev.args=list(bg = 'transparent'), fig.align='center',
+                      cache=TRUE)
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+require('reshape2')
+require('runjags')
+require('dplyr')
+require('gridExtra')
+# require('rstan')
+library(GGally)
+library(BayesFactor)
+library(brms)
+
+show = function(x) { x }
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+
+FE = readRDS("18_fixed_effects_fit.rds")
+VarInt = readRDS("18_varying_intercepts_fit.rds")
+VarIntSlo = readRDS("18_varying_intercepts_slopes_uncorrelated_fit.rds")
+MaxME = readRDS("18_varying_intercepts_slopes_fit.rds")
+
+
+```
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  var MML = MathJax.ElementJax.mml,
+      TEX = MathJax.InputJax.TeX;
+
+  TEX.Definitions.macros.bfrac = "myBevelFraction";
+
+  TEX.Parse.Augment({
+    myBevelFraction: function (name) {
+      var num = this.ParseArg(name),
+          den = this.ParseArg(name);
+      this.Push(MML.mfrac(num,den).With({bevelled: true}));
+    }
+  });
+});
+</script>
+
+
+```{r, child = "miincludes.Rmd"}
+
+```
+
+
+# recap
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$   
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+## common link & likelihood function
+
+<span style = "color:white"> &nbsp; </span>
+
+
+| type of $y$ | (inverse) link function | likelihood function | 
+|:---|:---:|:---:|
+| metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
+| binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
+| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
+| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
+| count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
+
+## linear regression: a Bayesian approach
+
+<span style = "color:firebrick">Bayes: likelihood + prior</span>
+
+inspect posterior distribution over $\beta_0$, $\beta_1$ and $\sigma_{\text{err}}$ given the data $y$ and the model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_i & \sim \mathcal{N}(0, \sigma_{\beta})  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1)
+\end{align*}
+$$
+
+```{r, eval = FALSE}
+model{
+  sigma_e = 1/sqrt(tau_e)
+  tau_e ~ dgamma(0.1,0.1)
+  b0 ~ dnorm(0, 1/10000000)
+  b1 ~ dnorm(0, 1/10000000)
+  for (i in 1:k){
+    yPred[i] = b0 + b1 * x[i]
+    y[i] ~ dnorm(yPred[i], tau_e)
+  }
+}
+```
+
+# overview
+
+## overview
+
+<span style = "color:white"> &nbsp; </span>
+
+- GLMs with other types of predictor variables
+    - binary outcomes: <span style = "color:darkgreen"> logistic regression </span>  
+    - nominal outcomes <span style = "color:darkgreen"> mulit-logit regression </span>  
+    - ordinal outcomes: <span style = "color:darkgreen"> ordinal (logit/probit) regression </span>  
+- mixed effects
+- cross-validation, loo and information criteria
+ 
+# GLM link functions
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$ 
+
+
+
+
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+## common link & likelihood function
+
+<span style = "color:white"> &nbsp; </span>
+
+
+| type of $y$ | (inverse) link function | likelihood function | 
+|:---|:---:|:---:|
+| metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
+| binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
+| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
+| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
+| count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
+
+## logistic regression for binomial data
+
+<span style = "color:white"> &nbsp; </span>
+
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  \\ 
+\mu &= \text{logistic}(\eta, \theta = 0, \gamma = 1) = (1 + \exp(-\eta))^{-1} \\
+y & \sim \text{Bernoulli}(\mu)
+\end{align*}
+$$   
+
+## logistic function
+
+$$\text{logistic}(\eta, \theta, \gamma) = \frac{1}{(1 + \exp(-\gamma (\eta - \theta)))}$$
+
+<span style = "color:white"> dummy </span>
+
+<span style = "color:white"> dummy </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">threshold $\theta$</span>
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+
+gamma = c(1.5, 1.5, 4, 4)
+theta = c(0, 1, 0, 1)
+myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
+myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
+myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
+myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
+
+ggplot(data.frame(x = c(-5,5)), aes(x)) +
+         stat_function(fun = myFun1, aes(color = "0")) +
+         stat_function(fun = myFun2, aes(color = "1")) +
+        scale_colour_manual("theta", breaks = c("0", "1"), values = c("darkblue", "firebrick")) + ggtitle("gamma = 1.5")
+```  
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">gain $\gamma$</span>
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+
+gamma = c(1.5, 1.5, 4, 4)
+theta = c(0, 1, 0, 1)
+myFun1 = function(x) return( 1 / (1 + exp(- gamma[1] * (x - theta[1]))) )
+myFun2 = function(x) return( 1 / (1 + exp(- gamma[2] * (x - theta[2]))) )
+myFun3 = function(x) return( 1 / (1 + exp(- gamma[3] * (x - theta[3]))) )
+myFun4 = function(x) return( 1 / (1 + exp(- gamma[4] * (x - theta[4]))) )
+
+ggplot(data.frame(x = c(-5,5)), aes(x)) +
+         stat_function(fun = myFun1, aes(color = "1.5")) +
+         stat_function(fun = myFun3, aes(color = "4")) +
+        scale_colour_manual("gamma", breaks = c("1.5", "4"), values = c("darkblue", "firebrick")) + ggtitle("theta = 0")
+```  
+</div>  
+
+## multi-logit regression for multinomial data
+
+<span style = "color:white"> &nbsp; </span>
+
+- each datum $y_i \in \set{1, \dots, k}$, unordered
+- one linear predictor for all categories $j \in \set{1, \dots, k}$ 
+
+<span style = "color:white"> &nbsp; </span>
+
+
+$$ 
+\begin{align*}
+\eta_j & = X_i \cdot \beta_j  \\ 
+\mu_j & \propto \exp(\eta_j)  \\
+y & \sim \text{Categorical}(\mu)
+\end{align*}
+$$  
+
+## ordinal (probit) regression
+
+- each datum $y_i \in \set{1, \dots, k}$, ordered
+- $k+1$ latent threshold parameters: $\infty = \theta_0 < \theta_1 < \dots < \theta_k = \infty$
+
+$$ 
+\begin{align*}
+\eta & = X_i \cdot \beta  \\ 
+\mu_j & = \Phi(\theta_{j} - \eta) - \Phi(\theta_{j+1} - \eta)  \\
+y & \sim \text{Categorical}(\mu)
+\end{align*}
+$$  
+
+## threshold-Phi model
+
+<div align = 'center'>
+  <img src="pics/Kruschke_Fig23_6_threshold_Phi.png" alt="threshPhi" style="width: 600px;"/>
+</div>
+
+
+# tools for Bayesian regression
+
+## tools for Bayesian regression
+
+<span style = "color:firebrick">package `BayesFactor`</span>
+
+<span style = "color:darkgreen"> pro: </span> extremely fast, nice comparison of nested models, strict conservative priors on coefficients, mixed effects
+
+<span style = "color:darkgreen"> con: </span> only metric predicted variables in regression (does contain analyses of contingency tables though), not (easily) expandable
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">package `brms`</span> (Bayesian Regression Models using Stan)
+
+<span style = "color:darkgreen"> pro: </span> efficient HMC (Stan), supports full GLM family with mixed effects, Bayes factor computation for nested models, Stan code inspection
+
+<span style = "color:darkgreen"> con: </span> slow pre-sampling phase
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">package `rstanarm`</span> (Applied Regression Modelling)
+
+<span style = "color:darkgreen"> pro: </span> efficient HMC (Stan), Stan code inspection, many sources & strong development team
+
+<span style = "color:darkgreen"> con: </span> slow pre-sampling phase, not all GLM with mixed effects supported yet (?)
+
+
+# mixed effects
+
+## background on example data
+
+<span style = "color:white"> &nbsp; </span>
+
+- in most languages <span style = "color:darkgreen"> subject relative clauses </span>  
+ are easier than <span style = "color:darkgreen"> object relative clauses </span>  
+ 
+- but Chinese seems to be an exception
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+<span style = "color:firebrick">subject relative clause</span>
+
+The senator who interrogated the journalist ...
+
+</div>
+<div style = "float:right; width:45%;">
+
+<span style = "color:firebrick">object relative clause</span>
+
+The senator who the journalist interrogated ...
+  
+</div>  
+
+
+
+
+## data: self-paced reading times
+
+37 subjects read 15 sentences either with an SRC or an ORC in a <span style = "color:darkgreen"> self-paced reading task </span>  
+
+
+<span style = "color:white"> &nbsp; </span>
+
+
+```{r}
+rt_data = readr::read_delim('../data/08_gibsonwu2012data.txt', delim = " ") %>% 
+  filter(region == "headnoun") %>% 
+  mutate(so = ifelse(type == "subj-ext", "-1", "1")) %>% 
+  select(subj, item, so, rt)
+head(rt_data)
+```
+
+
+<div style = "position:absolute; top: 440px; right:250px;">
+  $\Leftarrow$ <span style = "color:darkgreen">contrast coding</span> of categorical predictor `so`
+</div>
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  data from Gibson & Wu ([2013](http://tedlab.mit.edu/tedlab_website/researchpapers/Gibson_&_Wu_2013_LCP.pdf))
+</div>
+
+## inspect data
+
+<span style = "color:white"> &nbsp; </span>
+
+<div style = "float:left; width:45%;">
+
+```{r, results='markup'}
+rt_data %>% group_by(so) %>% 
+  summarize(mean_log_rt = rt%>%log%>%mean)
+```
+
+  
+</div>
+<div style = "float:right; width:45%;">
+
+```{r, fig.align="center", fig.width=4, fig.height=2.5}
+rt_data %>% 
+ggplot(aes(x = so, y = log(rt))) + 
+  geom_violin() + 
+  geom_point(position = "jitter", 
+             color = "skyblue")
+```
+  
+</div>  
+
+## fixed effects model
+
+- predict log-reading times as affected by treatment `so`
+
+- assume <span style = "color:darkgreen">improper priors</span> for parameters
+
+
+<span style = "color:white"> &nbsp; </span>
+
+$$
+\begin{align*}
+log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \beta_1 \mathtt{so}_i  \\
+\sigma_{err} & \sim \mathcal{U}(0, \infty) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
+\beta_0, \beta_i & \sim \mathcal{U}(- \infty, \infty)
+\end{align*}
+$$
+<span style = "color:white"> &nbsp; </span>
+
+
+
+```{r, eval = FALSE}
+FE = brms::brm(log(rt) ~ so, data = rt_data) # assumes improper priors per default
+```
+
+## fixed effects model: results
+
+<span style = "color:white"> &nbsp; </span>
+
+```{r}
+summary(FE)
+```
+
+
+## varying intercepts model
+
+- predict log-reading times as affected by treatment `so`
+
+- assume <span style = "color:darkgreen">improper priors</span> for parameters
+
+- assume that different subjects and items could be "slower" or "faster" throughout
+
+<span style = "color:white"> &nbsp; </span>
+
+$$
+\begin{align*}
+log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \underbrace{u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i}}_{\text{varying intercepts}} + \beta_1 \mathtt{so}_i  \\
+u_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{u_0}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
+w_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{w_0}) \\
+\sigma_{err}, \sigma_{u_0}, \sigma_{w_0} & \sim \mathcal{U}(0, \infty) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
+\beta_0, \beta_i & \sim \mathcal{U}(- \infty, \infty)
+\end{align*}
+$$
+<span style = "color:white"> &nbsp; </span>
+
+
+
+```{r, eval = FALSE}
+FE = brms::brm(log(rt) ~ so, data = rt_data) # assumes improper priors per default
+```
+
+## fixed effects model: results
+
+<span style = "color:white"> &nbsp; </span>
+
+```{r}
+summary(FE)
+```
+
+## underlying Stan code
+
+```{r}
+code_FE = brms::stancode(FE)
+```
+
+
+
+# summary
+
+## Stan course
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Introduction to Bayesian Modeling using Stan</span>
+
+taught by Shravan Vasishth and Bruno Nicenboim 
+
+on September 17 2017 in Tübingen (part of [Methoden & Evaluation](http://fgme2017.de/en/))
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  more information [here](http://www.ling.uni-potsdam.de/~vasishth/courses/IntroStanFGME2017.html)
+</div>
+
+## generalized linear model
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<div style = "float:left; width:35%;">
+<span style = "color:firebrick">terminology</span>
+
+- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
+- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
+
+<span style = "color:white"> &nbsp; </span>
+
+
+<span style = "color:firebrick">blueprint of a GLM</span>
+
+$$ 
+\begin{align*} 
+\eta & = \text{linear_combination}(X)  \\
+\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
+y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
+\end{align*}
+$$   
+</div>
+<div style = "float:right; width:55%;">
+
+<div align = 'center'>
+  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
+</div>  
+</div>  
+
+
+## outlook
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">Friday</span>
+
+- rounding off
+- projects
+

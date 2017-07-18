@@ -562,8 +562,8 @@ MaxME = brms::brm(log(rt) ~ so + (1 + so | subj + item), data = rt_data)
 
 <span style = "color:white"> &nbsp; </span>
 
-```{r, fig.align="center", fig.width=6, fig.height=4.5}
-brms::stanplot(VarIntSlo, type = "dens_overlay")
+```{r, fig.align="center", fig.width=7.5, fig.height=4.5}
+brms::stanplot(MaxME, type = "dens_overlay")
 ```
 
 

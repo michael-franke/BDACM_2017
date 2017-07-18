@@ -64,6 +64,19 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 ```
 
 
+# overview
+
+## overview
+
+<span style = "color:white"> &nbsp; </span>
+
+- GLMs with other types of predictor variables
+    - binary outcomes: <span style = "color:darkgreen"> logistic regression </span>  
+    - nominal outcomes <span style = "color:darkgreen"> mulit-logit regression </span>  
+    - ordinal outcomes: <span style = "color:darkgreen"> ordinal (logit/probit) regression </span>  
+- mixed effects
+- cross-validation, loo and information criteria
+ 
 # recap
 
 ## generalized linear model
@@ -88,7 +101,10 @@ $$
 \mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
 y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
 \end{align*}
-$$   
+$$ 
+
+
+
 </div>
 <div style = "float:right; width:55%;">
 
@@ -96,19 +112,6 @@ $$
   <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
 </div>  
 </div>  
-
-## common link & likelihood function
-
-<span style = "color:white"> &nbsp; </span>
-
-
-| type of $y$ | (inverse) link function | likelihood function | 
-|:---|:---:|:---:|
-| metric |  $\mu = \eta$ | $y \sim \text{Normal}(\mu, \sigma)$
-| binary | $\mu = \text{logistic}(\eta, \theta, \gamma) = (1 + \exp(-\gamma (\eta - \theta)))^{-1}$ | $y \sim \text{Binomial}(\mu)$
-| nominal | $\mu_k = \text{soft-max}(\eta_k, \lambda) \propto \exp(\lambda \eta_k)$ | $y \sim \text{Multinomial}({\mu})$
-| ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
-| count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
 
 ## linear regression: a Bayesian approach
 
@@ -138,55 +141,8 @@ model{
 }
 ```
 
-# overview
 
-## overview
-
-<span style = "color:white"> &nbsp; </span>
-
-- GLMs with other types of predictor variables
-    - binary outcomes: <span style = "color:darkgreen"> logistic regression </span>  
-    - nominal outcomes <span style = "color:darkgreen"> mulit-logit regression </span>  
-    - ordinal outcomes: <span style = "color:darkgreen"> ordinal (logit/probit) regression </span>  
-- mixed effects
-- cross-validation, loo and information criteria
- 
 # GLM link functions
-
-## generalized linear model
-
-<span style = "color:white"> &nbsp; </span>
-
-
-<div style = "float:left; width:35%;">
-<span style = "color:firebrick">terminology</span>
-
-- $y$ <span style = "color:darkgreen">predicted variable</span>, data, observation, ...
-- $X$ <span style = "color:darkgreen">predictor variables</span> for $y$, explanatory variables, ...
-
-<span style = "color:white"> &nbsp; </span>
-
-
-<span style = "color:firebrick">blueprint of a GLM</span>
-
-$$ 
-\begin{align*} 
-\eta & = \text{linear_combination}(X)  \\
-\mu & = \text{link_fun}( \ \eta, \theta_{\text{LF}} \ )  \\
-y & \sim \text{lh_fun}( \ \mu, \ \theta_{\text{LH}} \ )
-\end{align*}
-$$ 
-
-
-
-
-</div>
-<div style = "float:right; width:55%;">
-
-<div align = 'center'>
-  <img src="//Users/micha/Desktop/data/svn/ProComPrag/teachings/bda+cm2015/slides/pics/glm_scheme/glm_scheme.png" alt="glm_scheme" style="width: 450px;"/>
-</div>  
-</div>  
 
 ## common link & likelihood function
 
@@ -201,6 +157,8 @@ $$
 | ordinal | $\mu_k = \text{threshold-Phi}(\eta_k, \sigma, {\delta})$ | $y \sim \text{Multinomial}({\mu})$
 | count | $\mu = \exp(\eta)$ | $y \sim \text{Poisson}(\mu)$
 
+
+
 ## logistic regression for binomial data
 
 <span style = "color:white"> &nbsp; </span>
@@ -208,24 +166,21 @@ $$
 
 $$ 
 \begin{align*}
-\eta & = X_i \cdot \beta  \\ 
+\eta & = X \cdot \beta  \\ 
 \mu &= \text{logistic}(\eta, \theta = 0, \gamma = 1) = (1 + \exp(-\eta))^{-1} \\
 y & \sim \text{Bernoulli}(\mu)
 \end{align*}
 $$   
 
-## logistic function
+<span style = "color:white"> &nbsp; </span>
+
 
 $$\text{logistic}(\eta, \theta, \gamma) = \frac{1}{(1 + \exp(-\gamma (\eta - \theta)))}$$
-
-<span style = "color:white"> dummy </span>
-
-<span style = "color:white"> dummy </span>
 
 <div style = "float:left; width:45%;">
 
 <span style = "color:firebrick">threshold $\theta$</span>
-```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.25}
 
 gamma = c(1.5, 1.5, 4, 4)
 theta = c(0, 1, 0, 1)
@@ -243,7 +198,7 @@ ggplot(data.frame(x = c(-5,5)), aes(x)) +
 <div style = "float:right; width:45%;">
 
 <span style = "color:firebrick">gain $\gamma$</span>
-```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.5}
+```{r, message = FALSE, warnings = FALSE, echo = FALSE, fig.width=4, fig.height=2.25}
 
 gamma = c(1.5, 1.5, 4, 4)
 theta = c(0, 1, 0, 1)
@@ -271,7 +226,7 @@ ggplot(data.frame(x = c(-5,5)), aes(x)) +
 
 $$ 
 \begin{align*}
-\eta_j & = X_i \cdot \beta_j  \\ 
+\eta_j & = X \cdot \beta_j  \\ 
 \mu_j & \propto \exp(\eta_j)  \\
 y & \sim \text{Categorical}(\mu)
 \end{align*}
@@ -284,7 +239,7 @@ $$
 
 $$ 
 \begin{align*}
-\eta & = X_i \cdot \beta  \\ 
+\eta & = X \cdot \beta  \\ 
 \mu_j & = \Phi(\theta_{j} - \eta) - \Phi(\theta_{j+1} - \eta)  \\
 y & \sim \text{Categorical}(\mu)
 \end{align*}
@@ -303,9 +258,9 @@ $$
 
 <span style = "color:firebrick">package `BayesFactor`</span>
 
-<span style = "color:darkgreen"> pro: </span> extremely fast, nice comparison of nested models, strict conservative priors on coefficients, mixed effects
+<span style = "color:darkgreen"> pro: </span> very fast, nice comparison of nested models, good default priors on coefficients, mixed effects
 
-<span style = "color:darkgreen"> con: </span> only metric predicted variables in regression (does contain analyses of contingency tables though), not (easily) expandable
+<span style = "color:darkgreen"> con: </span> only metric predicted variables in regression, not (easily) expandable
 
 
 <span style = "color:white"> &nbsp; </span>
@@ -322,7 +277,7 @@ $$
 
 <span style = "color:darkgreen"> pro: </span> efficient HMC (Stan), Stan code inspection, many sources & strong development team
 
-<span style = "color:darkgreen"> con: </span> slow pre-sampling phase, not all GLM with mixed effects supported yet (?)
+<span style = "color:darkgreen"> con: </span> slow pre-sampling phase, not all link functions  supported with mixed effects yet (?)
 
 
 # mixed effects
@@ -420,7 +375,7 @@ ggplot(aes(x = so, y = log(rt))) +
 
 $$
 \begin{align*}
-log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \beta_1 \mathtt{so}_i  \\
+\log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \beta_1 \mathtt{so}_i  \\
 \sigma_{err} & \sim \mathcal{U}(0, \infty) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
 \beta_0, \beta_1 & \sim \mathcal{U}(- \infty, \infty)
 \end{align*}
@@ -465,7 +420,7 @@ brms::stancode(FE)
 
 $$
 \begin{align*}
-log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \underbrace{u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i}}_{\text{varying intercepts}} + \beta_1 \mathtt{so}_i  \\
+\log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \  \eta_{i} & = \beta_0 + \underbrace{u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i}}_{\text{varying intercepts}} + \beta_1 \mathtt{so}_i  \\
 u_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{u_0}) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
 w_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{w_0}) \\
 \sigma_{err}, \sigma_{u_0}, \sigma_{w_0} & \sim \mathcal{U}(0, \infty) & \ \ \ \ \ \ \ \ \ \ \ \ \ \
@@ -503,7 +458,7 @@ brms::stanplot(VarInt, type = "dens_overlay")
 
 $$
 \begin{align*}
-log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) &  \eta_{i} & = \beta_0 + \underbrace{u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i}}_{\text{varying intercepts}} + (\beta_1 + \underbrace{u_{1,\mathtt{subj}_i} + w_{1,\mathtt{item}_i}}_{\text{varying slopes}} ) \mathtt{so}_i  \\
+\log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) &  \eta_{i} & = \beta_0 + \underbrace{u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i}}_{\text{varying intercepts}} + (\beta_1 + \underbrace{u_{1,\mathtt{subj}_i} + w_{1,\mathtt{item}_i}}_{\text{varying slopes}} ) \mathtt{so}_i  \\
 u_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{u_0}) & 
 w_{0,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{w_0}) \\
 u_{1,\mathtt{subj}_i} & \sim \mathcal{N}(0, \sigma_{u_1}) & 
@@ -544,7 +499,7 @@ brms::stanplot(VarIntSlo, type = "dens_overlay")
 
 $$
 \begin{align*}
-log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) &  \eta_{i} & = \beta_0 + u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i} + \left (\beta_1 + u_{1,\mathtt{subj}_i} + w_{1,\mathtt{item}_i} \right ) \mathtt{so}_i  \\
+\log(\mathtt{rt}_i) & \sim \mathcal{N}(\eta_i, \sigma_{err}) &  \eta_{i} & = \beta_0 + u_{0,\mathtt{subj}_i} + w_{0,\mathtt{item}_i} + \left (\beta_1 + u_{1,\mathtt{subj}_i} + w_{1,\mathtt{item}_i} \right ) \mathtt{so}_i  \\
 \begin{pmatrix}u_{0,\mathtt{subj}_i} \\ u_{1,\mathtt{subj}_i} \end{pmatrix} & \sim \mathcal{N} \left (\begin{pmatrix} 0 \\ 0 \end{pmatrix}, \Sigma_{u} \right ) & 
 \Sigma_{w} & = \begin{pmatrix} \sigma_{u_{0}}^2 & \rho_u\sigma_{u{0}}\sigma_{u{1}} \\ \rho_u\sigma_{u{0}}\sigma_{u{1}} & \sigma_{u_{0}}^2  \end{pmatrix} \ \ \ \text{same for } \mathtt{item} \\
 \sigma_{err}, \sigma_{u_{0|1}}, \sigma_{w_{0|1}} & \sim \mathcal{U}(0, \infty) & 
@@ -566,24 +521,84 @@ MaxME = brms::brm(log(rt) ~ so + (1 + so | subj + item), data = rt_data)
 brms::stanplot(MaxME, type = "dens_overlay")
 ```
 
+# leave-one-out cross-validation
+
+## information criteria
+
+<span style = "color:firebrick">deviance score</span>
+  
+$$
+D(y^{(\text{rep})}, \theta) = -2 \log(P(y\mid \theta)) \ \ \ \ \ \ \ \ \ \ \ \ \text{(lower is better)}
+$$
 
 
-# summary
+<span style = "color:firebrick">un-Bayesian IC</span>
 
-## Stan course
+$$ 
+\begin{align*}
+\text{AIC} & = D(y^{(\text{rep})}, \theta^*) + 2 p_{\text{AIC}} & \text{with } \theta^* \in \arg\max_\theta P(y \mid \theta) \text{ and } p_{\text{AIC}} = \text{no. free parameters}
+\end{align*}
+$$
 
-<span style = "color:white"> &nbsp; </span>
+<span style = "color:firebrick">pseudo-Bayesian IC</span>
 
-<span style = "color:firebrick">Introduction to Bayesian Modeling using Stan</span>
+$$ 
+\begin{align*}
+\text{DIC} & = D(y^{(\text{rep})}, \bar{\theta}) + 2 p_{\text{DIC}} && \text{with } \bar{\theta} = E_{P(\theta \mid y)}\theta \\
+&&& \text{ and } p_{\text{DIC}} = \frac{1}{2} Var_{P(\theta \mid y)} D(y^{(\text{rep})}, \theta)
+\end{align*}
+$$
 
-taught by Shravan Vasishth and Bruno Nicenboim 
+<span style = "color:firebrick">rather Bayesian IC</span>
 
-on September 17 2017 in Tübingen (part of [Methoden & Evaluation](http://fgme2017.de/en/))
+$$ 
+\begin{align*}
+\text{WAIC} & = E_{P(\theta \mid y)}  D(y^{(\text{rep})}, \theta) + 2 p_{\text{DIC}} && \text{with } \bar{\theta} = E_{P(\theta \mid y)}\theta \\
+&&& \text{ and } p_{\text{DIC}} = p_{\text{WAIC}}
+\end{align*}
+$$
 
 
 <div style = "position:absolute; top: 620px; right:60px;">
-  more information [here](http://www.ling.uni-potsdam.de/~vasishth/courses/IntroStanFGME2017.html)
+  fix a model with $P(Y \mid \theta)$ & $P(\theta)$; $y$ is the data set for conditioning; $y^{(\text{rep})}$ is new data or $y^{(\text{rep})} = y$
 </div>
+
+## leave-one-out cross-validation
+
+<span style = "color:firebrick">log point-wise density</span>
+
+how (log-)likely is each (new) datum $y^{(\text{rep})}_i$ under the posterior predictive distribution given $y$?
+
+$$ 
+\begin{align*}
+\text{LPD} & = \sum_{i=1}^n \log P(y^{(\text{rep})}_i \mid y) \ \ \ \ = \sum_{i=1}^n \log \int P(y^{(\text{rep})}_i \mid \theta) \ P(\theta \mid y) \ \text{d}\theta \\
+& \approx \sum_{i=1}^n \log \left ( \frac{1}{S} \sum_{s = 1}^S P(y^{(\text{rep})}_i \mid \theta^s) \right ) \ \ \ \ \ \ \theta^s \sim P(\theta \mid y) \ \ \ \text{(from MCMC sampling)}
+\end{align*}
+$$
+
+<span style = "color:white"> &nbsp; </span>
+
+<span style = "color:firebrick">leave-one-out cross-validation</span>
+
+how (log-)likely is each old datum $y_i$ under the posterior predictive distribution given $y_{-i}$?
+
+$$ 
+\text{LOO} = \sum_{i=1}^n \log P(y_i \mid y_{-i}) \ \ \ \ = \sum_{i=1}^n \log \int P(y_i \mid \theta) \ P(\theta \mid y_{-i}) \ \text{d}\theta
+$$
+
+## package `loo`
+
+efficiently estimates LOO score (with estimate of standard error) from raw MCMC output 
+
+
+```{r, results = 'markup'}
+loo_scores = loo(FE, VarInt, VarIntSlo, MaxME)
+loo_scores
+```
+
+
+
+# wrap-up
 
 ## generalized linear model
 
@@ -616,13 +631,20 @@ $$
 </div>  
 </div>  
 
-
-## outlook
+## Stan course
 
 <span style = "color:white"> &nbsp; </span>
 
-<span style = "color:firebrick">Friday</span>
+<span style = "color:firebrick">Introduction to Bayesian Modeling using Stan</span>
 
-- rounding off
-- projects
+taught by Shravan Vasishth and Bruno Nicenboim 
+
+on September 17 2017 in Tübingen (part of [Methoden & Evaluation](http://fgme2017.de/en/))
+
+
+<div style = "position:absolute; top: 620px; right:60px;">
+  more information [here](http://www.ling.uni-potsdam.de/~vasishth/courses/IntroStanFGME2017.html)
+</div>
+
+
 

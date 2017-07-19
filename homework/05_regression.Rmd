@@ -1,0 +1,108 @@
+---
+title: "BDA+CM_2017: Homework 5"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, dev.args = list(bg = 'transparent'), fig.align='center')
+require('tidyverse')
+require('forcats')
+require('rjags')
+require('ggmcmc')
+theme_set(theme_bw() + theme(plot.background=element_blank()) )
+```
+
+This homework assignment is due July 28th 2017 before class. Submit your results in a zipped archive with name `BDA+CM_HW5_YOURLASTNAME.zip` which includes both Rmarkdown and a compiled version (preferably HTML). Use the same naming scheme for the `*.Rmd` and `*.html` files. All other files, if needed, should start with `BDA+CM_HW5_YOURLASTNAME_` as well. Upload the archive to the Dropbox folder.
+
+Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. All of the exercises below are required and count equally to the final score.
+
+# Exercise 1: Robust regression
+
+We will look once more at the IQ data from class (plucked from Kruschke's textbook).
+
+```{r}
+iq_data = readr::read_csv('../data/07_Kruschke_TwoGroupIQ.csv')
+head(iq_data)
+```
+
+Here's a plot of the data to compare the distribution of measured IQ scores in both groups:
+
+```{r, fig.align='center', fig.width=5, fig.height=4}
+iq_data %>% group_by(Group) %>% mutate(mean_score = mean(Score)) %>% 
+  ggplot(aes(x = Score)) + geom_density() +
+  geom_point(aes(x = Score, 
+                 y = 0 - runif(nrow(iq_data), 0, 0.005)), 
+             color = "skyblue", size = 0.5) + 
+  facet_grid(Group ~ .) + 
+  geom_vline(aes(xintercept = mean_score), color = "firebrick")
+```
+
+The graphs show the estimated densities, the jittered distribution (blue) and the means (firebrick) of both control and treatment group. We see that there are quite some outliers, which a Gaussian noise model might not be ideally suited to deal with. For this reason, we will look at two linear regression models, both of which predict metric variable `Score` in terms of categorical variable `Group`. One model has a Gaussian noise model, the other uses a $t$-distribution instead. 
+
+The Gaussian noise model is this:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{N}(\mu = y_{\text{pred}}, \sigma_{err}) \\
+\beta_0 & \sim \mathcal{N}(100, 15)  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1) \\
+\beta_1 & \sim \mathcal{N}(0, 30)
+\end{align*}
+$$
+
+Here's the JAGS code for the Gaussian model, which we used in class:
+
+```{r}
+# specify model
+modelString = "
+model{
+ sigma_e = 1/sqrt(tau_e)
+ tau_e ~ dgamma(0.1,0.1)
+ b0 ~ dnorm(100, 1/15^2)
+ b1 ~ dnorm(0, 1/30^2)
+ for (i in 1:k){
+   yPred[i] = b0 + b1 * x[i] 
+   y[i] ~ dnorm(yPred[i], tau_e)
+ }
+}
+"
+# prepare data for JAGS
+dataList = list(y = iq_data$Score, 
+                x = ifelse(iq_data$Group == "Placebo", 0, 1),
+                k = nrow(iq_data))
+
+# set up and run model
+params <- c('b0', "b1", "sigma_e")
+jagsModel = jags.model(file = textConnection(modelString), 
+                       data = dataList, 
+                       n.chains = 3, quiet = TRUE)
+update(jagsModel, 5000) # 5000 burn-in samples
+codaSamples = coda.samples(jagsModel, 
+                           variable.names = params, 
+                           n.iter = 20000)
+
+ggmcmc::ggs(codaSamples) %>% 
+  group_by(Parameter) %>% 
+  summarize(HDI_lo = coda::HPDinterval(as.mcmc(value))[1],
+            mean = mean(value),
+            HDI_hi = coda::HPDinterval(as.mcmc(value))[2])
+```
+
+
+a. Based on these results from parameter inference, would you conclude that it is credible that there is a difference between control and treatment group? (Hint: is some relevant parameter's 95% HDI credibly different from some relevant value?)
+
+b. Implement the following robust regression model:
+
+$$ 
+\begin{align*}
+y_{\text{pred}} & = \beta_0 + \beta_1 x  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y & \sim \mathcal{t}(\mu = y_{\text{pred}}, \sigma_{err}, \nu) \\
+\beta_0 & \sim \mathcal{N}(100, 15)  & \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\frac{1}{\sigma_{err}^2} & \sim \text{Gamma}(0.1,0.1) \\
+\beta_1 & \sim \mathcal{N}(0, 30) &
+\nu - 1 & \sim \text{Exponential}(1/30)
+\end{align*}
+$$
+
+c. What do you infer now based on parameter estimation about whether it is credible that there is a difference between control and treatment group?

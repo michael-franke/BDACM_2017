@@ -675,10 +675,6 @@ model{
     yPred[i] = b0 + b1 * x[i] 
     y[i] ~ dnorm(yPred[i], tau_e)
   }
-  yPred1 = yPred[1]
-  yPred120 = yPred[120]
-  x1 = x[1]
-  x120 = x[120]
 }
 "
 # prepare data for JAGS

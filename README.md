@@ -40,5 +40,5 @@ n | date | topic | reading (main) | extra info
 21 | 14/7 | [more on the GLM](slides/17_GLM_2.html) | Kruschke ch 16-22 |
 22 | 18/7 | [mixed models & LOO](slides/18_GLM_3.html) | Sorensen et al. [(2016)](http://www.ling.uni-potsdam.de/~vasishth/pdfs/SorensenHohensteinVasishth2016.pdf) |  |
 23 | 21/7 | rounding off, project topics |  |  
-   | 28/7 |  | HW5 due | 
+   | 28/7 |  |  | [HW5](homework/05_regression.html) due
 

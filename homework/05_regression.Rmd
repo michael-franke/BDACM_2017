@@ -106,3 +106,22 @@ y & \sim \mathcal{t}(\mu = y_{\text{pred}}, \sigma_{err}, \nu) \\
 $$
 
 c. What do you infer now based on parameter estimation about whether it is credible that there is a difference between control and treatment group?
+
+# Exercise 2: Mixed effects regression
+
+The goal of this exercise is to demonstrate how the inclusion of mixed effects can lead to more conservative conclusions. We consider the self-paced reading data from the study on Chinese relative clauses again. But we will rig the data slightly:
+
+```{r}
+rt_data = readr::read_delim('../data/08_gibsonwu2012data.txt', delim = " ") %>% 
+  filter(region == "headnoun") %>% 
+  mutate(so = ifelse(type == "subj-ext", "-1", "1")) %>% 
+  select(subj, item, so, rt) %>% 
+  mutate(rt_rigged = ifelse(subj <= 10 & so == 1, rt*0.75, rt * 0.85)) # rigging the data!
+```
+
+Make sure that you understand what the last line did. We made some subjects respond faster after all, with a stronger increase in RTs for the object relative clause condition.
+
+a. Calculate a simple linear regression model with only fixed effects, using the `brms` package. Regress log-reading time against condition factor `so`, just as we did in class. (Use the default (flat/improper) priors of the `brms` package.) Inspect the 95% HDI for parameter `so` and check whether there is a credible (however slightly) effect of relative clause type.
+b. Let's do the same parameter inference and 95% HDI check for the regression model with the maximal mixed effects structure (the last one from class). What do you conclude now about whether it's credible that there is an effect of relative clause type?
+c. If everything went well (there can be stochastic fluctuations!) the parameter estimate for a hierarchical model is more conservative. Try to explain in simple and rough terms why the addition of mixed effects (whatever they are) can have such an effect.
+d. Compare the fitted models using leave-one-out cross-validation. Using the `loo` function from the `loo` package by calling `loo(model_1, model_2)`. This function returns the loo-values as discussed in class multiplied by $-2$ (thus making the loo score play in the same ball park as information criteria). Interpret the outcome of this model comparison. Which model is better?

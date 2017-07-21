@@ -12,9 +12,9 @@ require('ggmcmc')
 theme_set(theme_bw() + theme(plot.background=element_blank()) )
 ```
 
-This homework assignment is due July 28th 2017 before class. Submit your results in a zipped archive with name `BDA+CM_HW5_YOURLASTNAME.zip` which includes both Rmarkdown and a compiled version (preferably HTML). Use the same naming scheme for the `*.Rmd` and `*.html` files. All other files, if needed, should start with `BDA+CM_HW5_YOURLASTNAME_` as well. Upload the archive to the Dropbox folder.
+This homework assignment is due July 28th 2017 before noon. Submit your results in a zipped archive with name `BDA+CM_HW5_YOURLASTNAME.zip` which includes both Rmarkdown and a compiled version (preferably HTML). Use the same naming scheme for the `*.Rmd` and `*.html` files. All other files, if needed, should start with `BDA+CM_HW5_YOURLASTNAME_` as well. Upload the archive to the Dropbox folder.
 
-Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. All of the exercises below are required and count equally to the final score.
+Keep your descriptions and answers as short and concise as possible, without reverting to bullet points. **All of the exercises below are required and count equally to the final score if you are taking this course for 6 credit points. If you want 3 credit points for this course, you only need to do the first exercise.**
 
 # Exercise 1: Robust regression
 
@@ -37,7 +37,7 @@ iq_data %>% group_by(Group) %>% mutate(mean_score = mean(Score)) %>%
   geom_vline(aes(xintercept = mean_score), color = "firebrick")
 ```
 
-The graphs show the estimated densities, the jittered distribution (blue) and the means (firebrick) of both control and treatment group. We see that there are quite some outliers, which a Gaussian noise model might not be ideally suited to deal with. For this reason, we will look at two linear regression models, both of which predict metric variable `Score` in terms of categorical variable `Group`. One model has a Gaussian noise model, the other uses a $t$-distribution instead. 
+The graphs show the estimated densities (black lines), a jittered scatter plot of each data point (blue dots) and the means (red vertical lines) of both control and treatment group. We see that there are quite some outliers, which a Gaussian noise model might not be ideally suited to deal with. For this reason, we will look at two linear regression models, both of which predict metric variable `Score` in terms of categorical variable `Group`. One model has a Gaussian noise model, the other uses a $t$-distribution instead. 
 
 The Gaussian noise model is this:
 
@@ -92,7 +92,7 @@ ggmcmc::ggs(codaSamples) %>%
 
 a. Based on these results from parameter inference, would you conclude that it is credible that there is a difference between control and treatment group? (Hint: is some relevant parameter's 95% HDI credibly different from some relevant value?)
 
-b. Implement the following robust regression model:
+b. Implement the following robust regression model (Hints: you only need to change a few lines of code in the script above; the exponential distribution with shape parameter $\frac{1}{30}$ in JAGS is `dexp(1/30)`; it is not entirely improbable that Kruschke's textbook contains all and exactly the information you need):
 
 $$ 
 \begin{align*}
@@ -119,9 +119,9 @@ rt_data = readr::read_delim('../data/08_gibsonwu2012data.txt', delim = " ") %>%
   mutate(rt_rigged = ifelse(subj <= 10 & so == 1, rt*0.75, rt * 0.85)) # rigging the data!
 ```
 
-Make sure that you understand what the last line did. We made some subjects respond faster tout court, with a stronger increase in RTs for the object relative clause condition.
+Make sure that you understand what the last line did. We made some subjects respond faster tout court, with a stronger increase in RTs for the object relative clause condition. (Just to be absolutely clear: such sata tweaking is a total no-go if serious inference from the data is desired! We do it just for illustration of the effect that the inclusion of mixed effects *can* have on *some* (artificial!) data set.)
 
-a. Calculate a simple linear regression model with only fixed effects, using the `brms` package. Regress log-reading time against condition factor `so`, just as we did in class. (Use the default (flat/improper) priors of the `brms` package.) Inspect the 95% HDI for parameter `so` and check whether there is a credible (however slightly) effect of relative clause type.
+a. Calculate a simple linear regression model with only fixed effects, using the `brms` package. Regress rigged log-reading time against condition factor `so`, just as we did in class for the orginal, non-rigged data. As we did in class, use the default (flat/improper) priors of the `brms` package. Inspect the 95% HDI for parameter `so` and check whether there is a credible effect of relative clause type. (Let us not worry about ROPEs for the sake of clarity; just look at whether the relevant value is in the 95% HDI.)
 b. Let's do the same parameter inference and 95% HDI check for the regression model with the maximal mixed effects structure (the last one from class). What do you conclude now about whether it's credible that there is an effect of relative clause type?
-c. If everything went well (there can be stochastic fluctuations!) the parameter estimate for a hierarchical model is more conservative. Try to explain in simple and rough terms why the addition of mixed effects (whatever they are) can have such an effect.
-d. Compare the fitted models using leave-one-out cross-validation. Use `loo` package by calling `loo::loo(model_1, model_2)`. This function returns the loo-values as discussed in class multiplied by $-2$ (thus making the loo score play in the same ball park as standard information criteria). Interpret the outcome of this model comparison. Which model is better? Check the estimated standard error of the loo-IC scores and validate whether the result of the model comparison is trustworthy.
+c. If everything went well (there can be stochastic fluctuations!) the parameter estimate for the hierarchical model is more conservative. Try to explain in simple and rough terms why the addition of mixed effects (whatever they are) can have such an effect.
+d. Compare the fitted models using leave-one-out cross-validation. Use function `loo::loo(model_1, model_2)` from the `loo` package. This function returns the loo-values as discussed in class multiplied by $-2$ (thus making the loo score play in the same ballpark as standard information criteria). Interpret the outcome of this model comparison. Which model is better? (Be mindful about whether bigger numbers are better or smaller ones are.) Check the estimated standard error of the loo-IC scores, as returned by the `loo` function, and validate whether the result of the model comparison is trustworthy given the `loo` function's estimation method. (There may be warning messages about slightly high diagnostic values, which you would normally take very serious (read the [paper](https://arxiv.org/abs/1507.04544) that goes with the `loo` package if you can!), but for this exercise you may pass them over.)
